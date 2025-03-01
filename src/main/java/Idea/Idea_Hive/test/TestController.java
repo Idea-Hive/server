@@ -8,6 +8,6 @@ public class TestController {
 
     @GetMapping("/test")
     public String testEndpoint() {
-        return "CI/CD develop merge test";
+        return "윤제혁 바보 먼추니";
     }
 }
