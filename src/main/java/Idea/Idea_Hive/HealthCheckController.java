@@ -17,7 +17,6 @@ public class HealthCheckController {
         Map<String, Object> response = new HashMap<>();
         response.put("status", "OK");
         response.put("timestamp", LocalDateTime.now());
-
         return ResponseEntity.ok(response);
     }
 }
