@@ -1,4 +1,4 @@
-package Idea.Idea_Hive.config;
+package Idea.Idea_Hive.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
