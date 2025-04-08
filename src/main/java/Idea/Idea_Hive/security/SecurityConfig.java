@@ -1,5 +1,7 @@
 package Idea.Idea_Hive.security;
 
+import Idea.Idea_Hive.auth.handler.CustomOAuth2SuccessHandler;
+import Idea.Idea_Hive.auth.service.CustomOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+
 
     /* 비밀번호 해싱(암호화)를 위한 객체 빈 등록 */
     @Bean
@@ -38,7 +43,13 @@ public class SecurityConfig {
                     authorize
                             .anyRequest().permitAll();
                             /* todo: URLs */
-                });
+                })
+                /* todo: OAuth2 */
+                .oauth2Login(ouath -> ouath
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(new CustomOauth2UserService()))
+                        .successHandler(customOAuth2SuccessHandler)); // todo: 로그인 성공 시 Redirect 페이지
+
         return http.build();
     }
 }
