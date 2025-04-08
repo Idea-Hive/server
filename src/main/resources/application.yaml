@@ -20,7 +20,35 @@ spring:
       hibernate:
         show_sql: true # System.out ? ?????? ?? SQL? ?? => ?? ????? ???? ??? ??
         format_sql: true
-#
+
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${github-client-id}
+            client-secret: ${github-client-secret}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+            scope:
+              - read:user
+              - user:email # 모든 이메일 정보를 가져오기 위한 설정
+          google:
+            client-id: ${google-client-id}
+            client-secret: ${google-client-secret}
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          github:
+            authorization-url: https://github.com/login/oauth/authorize
+            token-uri: https://github.com/login/oauth/access_token
+            user-info-uri: https://api.github.com/user
+
+  jwt:
+    key: dfsdfjklsf3j34324lk32l1j2312@#!@#!@#asdlksadjsalkdksajdlj2jk1j31k2j3l12kjdsaldkas@dkljaslkdjsakdjsadlksajlkdasjdlj2l13jl1k3@
+    validity:
+      atk: 30000000
+      rtk: 30000000
+
+# http://localhost:8080/login/oauth2/code/google
 #  security:
 #    oauth2:
 #      client:
