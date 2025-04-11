@@ -1,7 +1,5 @@
 package Idea.Idea_Hive.auth.service;
 
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
@@ -11,7 +9,6 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
@@ -67,7 +64,8 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         HttpEntity<Void> request = new HttpEntity<>(headers);
 
         ResponseEntity<List<Map<String, Object>>> response = restTemplate.exchange(
-                uri, HttpMethod.GET, request, new ParameterizedTypeReference<>() {}
+                uri, HttpMethod.GET, request, new ParameterizedTypeReference<>() {
+                }
         );
 
         return response.getBody().stream()
