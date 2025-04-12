@@ -47,7 +47,8 @@ spring:
     validity:
       atk: 30000000
       rtk: 30000000
-
+frontend:
+  url: $(frontend-url}
 # http://localhost:8080/login/oauth2/code/google
 #  security:
 #    oauth2:

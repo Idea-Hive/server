@@ -34,7 +34,7 @@ public class AuthController {
     public String Home() {
         return "<div>" +
                 "<a href='/oauth2/authorization/github'>GitHub 로그인</a>" +
-                "</div>"+
+                "</div>" +
                 "<a href='/oauth2/authorization/google'>Google 로그인</a>";
     }
 
