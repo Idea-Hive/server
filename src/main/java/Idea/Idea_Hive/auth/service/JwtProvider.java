@@ -40,7 +40,7 @@ public class JwtProvider {
     public void validateAccessToken(final String jwt) {
         try {
             parseToken(jwt);
-        } catch (final ExpiredJwtException e ) {
+        } catch (final ExpiredJwtException e) {
             System.out.println(new BadCredentialsException("만료된 토큰입니다.").getMessage());
         } catch (final JwtException | IllegalArgumentException e) {
             System.out.println(new BadCredentialsException("잘못된 토큰입니다.").getMessage());
