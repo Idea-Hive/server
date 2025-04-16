@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +44,12 @@ public class Project {
     private Boolean isNew;
 
     private Boolean tempSave;
+
+    private LocalDateTime dueDate;
+
+    private String contact;
+
+    private LocalDateTime expirationDate;
 
     @OneToOne
     @JoinColumn(name = "projectDetailId")
