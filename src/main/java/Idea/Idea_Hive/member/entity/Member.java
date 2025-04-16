@@ -1,13 +1,18 @@
 package Idea.Idea_Hive.member.entity;
 
+import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Member Entity
@@ -19,6 +24,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SQLDelete(sql = "UPDATE member SET is_deleted = true WHERE id = ?") // Soft Delete
 @SQLRestriction("is_deleted = false")
+@Getter
 public class Member {
 
     @Id
@@ -39,6 +45,35 @@ public class Member {
     /* todo: 회원 정보 변경 시 수정 시간 필드 필요 시 추가 */
 
     private Boolean isDeleted;
+
+    private String job;
+
+    private Integer career;
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<MemberHashtag> memberHashtags = new ArrayList<>();
+
+    private LocalDateTime modifiedDate;
+
+    private String joinType;
+
+    private boolean isVerified;
+
+    private String profileUrl;
+
+
+    // 해시태그 추가 메서드
+    public void addHashtag(Hashtag hashtag) {
+        MemberHashtag memberHashtag = MemberHashtag.builder()
+                .member(this)
+                .hashtag(hashtag)
+                .build();
+        this.memberHashtags.add(memberHashtag);
+    }
+
+
+
+
 
 
     @Builder
