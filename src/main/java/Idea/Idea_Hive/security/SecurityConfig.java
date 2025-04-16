@@ -47,13 +47,15 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // default formlogin unactive
                 .httpBasic(AbstractHttpConfigurer::disable) // httpBasic unactive
                 .csrf(AbstractHttpConfigurer::disable) /* todo: CSRF 임시 비활성, 프론트 협의 */
-                .sessionManagement((session) ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .headers(headers -> headers
+                        .frameOptions(frameOptions -> frameOptions.disable()) //h2 콘솔 연결시에만 필요
+                )
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // IF_REQUIRED : 다른 API 요청에 대해서는 JWT 인증 사용
                 ) // 세션 Stateless 설정 (JWT 사용 예정)
                 .authorizeHttpRequests(authorize -> {
                     authorize
                             .anyRequest().permitAll();
-                            /* todo: URLs */
                 })
                 /* todo: OAuth2 */
                 .oauth2Login(ouath -> ouath

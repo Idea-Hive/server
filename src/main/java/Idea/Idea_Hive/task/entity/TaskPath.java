@@ -16,4 +16,6 @@ public class TaskPath {
     private String taskUrl;
 
     private LocalDateTime uploadDate;
+
+    private String fileType;
 }
