@@ -1,5 +1,7 @@
 package Idea.Idea_Hive.project.entity;
 
+import Idea.Idea_Hive.hashtag.entity.Hashtag;
+import Idea.Idea_Hive.member.entity.MemberHashtag;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -47,17 +49,7 @@ public class Project {
     private ProjectDetail projectDetail;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private List<ProjectFile> projectFiles = new ArrayList<>();
-
-    // 연관관계 편의 메서드
-    public void addProjectFile(String fileUrl, String fileType) {
-        ProjectFile file = ProjectFile.builder()
-                .fileUrl(fileUrl)
-                .fileType(fileType)
-                .project(this)  // 생성 시점에 project 설정
-                .build();
-        this.projectFiles.add(file);
-    }
+    private List<ProjectHashtag> projectHashtags = new ArrayList<>();
 
     @Builder
     public Project(String title, String description, Integer maxMembers, Boolean tempSave) {
@@ -68,6 +60,15 @@ public class Project {
         this.status = ProjectStatus.RECRUITING;
         this.isNew = true;
         this.tempSave = tempSave;
+    }
+
+    // 해시태그 추가 메서드
+    public void addHashtag(Hashtag hashtag) {
+        ProjectHashtag projectHashtag = ProjectHashtag.builder()
+                .project(this)
+                .hashtag(hashtag)
+                .build();
+        this.projectHashtags.add(projectHashtag);
     }
 
 }
