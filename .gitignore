@@ -38,3 +38,7 @@ out/
 
 ### 설정 파일 ###
 .env
+
+### docker redis ###
+# Redis data
+docker/redis/data/

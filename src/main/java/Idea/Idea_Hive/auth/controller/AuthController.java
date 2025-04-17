@@ -1,4 +1,4 @@
-package Idea.Idea_Hive.member.controller;
+package Idea.Idea_Hive.auth.controller;
 
 import Idea.Idea_Hive.member.entity.dto.request.EmailLoginRequest;
 import Idea.Idea_Hive.member.entity.dto.request.SignUpRequest;
@@ -19,18 +19,9 @@ public class AuthController {
 
     private final SignUpService signUpService;
 
-    @PostMapping("/signup")
-    public ResponseEntity<String> signUpController(@RequestBody SignUpRequest request) throws Exception {
-        // todo: 입력 값 유효성 체크
-
-
-        // todo: Service 호출
-        signUpService.signUp(request);
-        return ResponseEntity.ok("회원가입되었어요");
-    }
 
     // todo: 임시 컨트롤러입니다.
-    @GetMapping("/github")
+    @GetMapping("/logintest")
     public String Home() {
         return "<div>" +
                 "<a href='/oauth2/authorization/github'>GitHub 로그인</a>" +
