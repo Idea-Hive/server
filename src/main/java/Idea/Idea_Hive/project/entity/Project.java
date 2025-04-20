@@ -3,10 +3,7 @@ package Idea.Idea_Hive.project.entity;
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.member.entity.MemberHashtag;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import org.springframework.cglib.core.Local;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,6 +12,7 @@ import java.util.List;
 @Entity
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Project {
 
     @Id
@@ -59,7 +57,7 @@ public class Project {
     private List<ProjectHashtag> projectHashtags = new ArrayList<>();
 
     @Builder
-    public Project(String title, String description, Integer maxMembers, Boolean tempSave) {
+    public Project(String title, String description, Integer maxMembers,Boolean tempSave) {
         this.title = title;
         this.description = description;
         this.maxMembers = maxMembers;
