@@ -1,13 +1,15 @@
 package Idea.Idea_Hive.member.entity.dto.request;
 
+import java.util.List;
+
 public record SignUpRequest(
         String email,
         String password,
-        String passwordCheck, // 이거 필요한가?
+        String passwordCheck,
         String name,
         String job,
-        String history,
-        String interest,
-        String type
+        Integer career,
+        String type, // sns 연동 종류
+        List<Long> hashtagIds
 ) {
 }

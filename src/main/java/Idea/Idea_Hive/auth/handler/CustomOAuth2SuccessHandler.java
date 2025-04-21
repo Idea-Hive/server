@@ -1,6 +1,7 @@
 package Idea.Idea_Hive.auth.handler;
 
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.service.MemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-    private final MemberJpaRepo memberJpaRepo;
+//    private final MemberJpaRepo memberJpaRepo;
+    private final MemberService memberService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -31,8 +33,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
 
-        // todo: 이메일 없는 경우 회원가입 페이지로 리다이렉트, 임시
-        if (email == null || !memberJpaRepo.existsByEmail(email)) {
+        // todo: 이메일 없는 경우 회원가입
+        if (email == null || !memberService.existsByEmail(email)) {
             response.sendRedirect("http://localhost:8080/api/signup/temp");
             return;
         }

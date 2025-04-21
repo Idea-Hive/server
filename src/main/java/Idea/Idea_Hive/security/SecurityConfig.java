@@ -34,11 +34,11 @@ public class SecurityConfig {
     private String frontendUrl;
 
 
-    /* 비밀번호 해싱(암호화)를 위한 객체 빈 등록 */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    /* 비밀번호 해싱(암호화)를 위한 객체 빈 등록, 순환 참조 때문에 따로 뺐습니다! */
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception {
