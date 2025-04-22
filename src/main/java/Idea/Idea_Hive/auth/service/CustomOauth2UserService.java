@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -16,6 +17,7 @@ import java.util.*;
 /**
  * OAuth2 로그인 시 사용자 정보를 가져오는 역할 수행
  */
+@Service
 @Slf4j
 public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
@@ -30,10 +32,11 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         String email = "";
 
         String userNameAttributeName;
-
+        attributes.put("authorizedClientRegistrationId", registrationId);
         switch(registrationId) {
             case "github" -> {
                 email = fetchGithubEmail(userRequest);
+                attributes.put("email", email);
                 userNameAttributeName = "login";
             }
             case "google" -> {
@@ -43,7 +46,8 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             case "kakao" -> {
                 LinkedHashMap kakao_account = (LinkedHashMap) attributes.get("kakao_account");
                 email = (String) kakao_account.get("email");
-                userNameAttributeName = "kakao_account";
+                attributes.put("email", email);
+                userNameAttributeName = "email";
             }
             default -> throw new OAuth2AuthenticationException("Unsupported OAuth provider: " + registrationId);
         }

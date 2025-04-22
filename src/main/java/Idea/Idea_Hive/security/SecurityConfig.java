@@ -29,6 +29,7 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+    private final CustomOauth2UserService customOauth2UserService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -60,7 +61,7 @@ public class SecurityConfig {
                 /* todo: OAuth2 */
                 .oauth2Login(ouath -> ouath
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(new CustomOauth2UserService()))
+                                .userService(customOauth2UserService))
                         .successHandler(customOAuth2SuccessHandler)); // todo: 로그인 성공 시 Redirect 페이지
 
         return http.build();

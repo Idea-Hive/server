@@ -10,9 +10,13 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -43,7 +47,6 @@ public class MemberService {
         String hashedPassword = passwordEncoder.encode(request.password());
 
         // todo: DB 저장, Member Entity 변수 생성 시 추가
-        log.warn("Member Entity 수정 반영해야함.");
         Member member = Member.builder()
                 .email(request.email())
                 .password(hashedPassword)
@@ -63,9 +66,44 @@ public class MemberService {
         return new SignUpResponse(saved.getId(), saved.getEmail(), saved.getName());
     }
 
-//    @Transactional
-//    public SignUpResponse signUpWithSocialLogin(String email) {
-//
-//    }
+    @Transactional
+    public SignUpResponse handleOAuth2User(Map<String, Object> attributes) {
+        String email = (String) attributes.get("email");
+        String provider = (String) attributes.get("authorizedClientRegistrationId"); // google, github, kakao
+
+        // 1. 기존 유저 존재 여부 확인
+        Optional<Member> existing = memberJpaRepo.findByEmail(email);
+        if (existing.isPresent()) {
+            Member member = existing.get();
+            // 이미 존재하는 유저 → 바로 response 생성
+            return SignUpResponse.from(member);
+        }
+
+        // 2. 신규 회원가입 처리
+        Member member = createMemberFromOAuthAttributes(attributes, provider);
+//        memberJpaRepo.save(member);
+
+        return SignUpResponse.from(member);
+    }
+
+    private Member createMemberFromOAuthAttributes(Map<String, Object> attributes, String provider) {
+        String email = (String) attributes.get("email");
+        String name = switch (provider) {
+            case "kakao" -> {
+                Map<String, Object> profile = (Map<String, Object>) ((Map<String, Object>) attributes.get("kakao_account")).get("profile");
+                yield (String) profile.get("nickname");
+            }
+            case "google", "github" -> (String) attributes.get("name");
+            default -> "UnknownUser";
+        };
+
+        Member member = Member.builder()
+                .email(email)
+                .name(name)
+                .type(provider)
+                .build();
+
+        return member;
+    }
 
 }
