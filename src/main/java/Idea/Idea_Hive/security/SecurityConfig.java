@@ -29,16 +29,17 @@ import java.util.Arrays;
 public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
+    private final CustomOauth2UserService customOauth2UserService;
 
     @Value("${frontend.url}")
     private String frontendUrl;
 
 
-    /* 비밀번호 해싱(암호화)를 위한 객체 빈 등록 */
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+    /* 비밀번호 해싱(암호화)를 위한 객체 빈 등록, 순환 참조 때문에 따로 뺐습니다! */
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception {
@@ -60,7 +61,7 @@ public class SecurityConfig {
                 /* todo: OAuth2 */
                 .oauth2Login(ouath -> ouath
                         .userInfoEndpoint(userInfo -> userInfo
-                                .userService(new CustomOauth2UserService()))
+                                .userService(customOauth2UserService))
                         .successHandler(customOAuth2SuccessHandler)); // todo: 로그인 성공 시 Redirect 페이지
 
         return http.build();

@@ -9,16 +9,15 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * OAuth2 로그인 시 사용자 정보를 가져오는 역할 수행
  */
+@Service
 @Slf4j
 public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
@@ -29,25 +28,34 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google or github
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
-        String email = (String) attributes.get("email"); // Email 추출
+//        String email = (String) attributes.get("email"); // Email 추출
+        String email = "";
 
         String userNameAttributeName;
-
-        if ("github".equals(registrationId) && email == null) {
-            email = fetchGithubEmail(userRequest);
-            userNameAttributeName = "login";
-        } else if ("google".equals(registrationId) && email == null) {
-            // google의 경우 email은 기본으로 제공됨
-            // attributes에서 "email", "name" 등 접근 가능
-            userNameAttributeName = "sub";
-        } else { // default
-            userNameAttributeName = "sub";
+        attributes.put("authorizedClientRegistrationId", registrationId);
+        switch(registrationId) {
+            case "github" -> {
+                email = fetchGithubEmail(userRequest);
+                attributes.put("email", email);
+                userNameAttributeName = "login";
+            }
+            case "google" -> {
+                email = (String) attributes.get("email");
+                userNameAttributeName = "sub";
+            }
+            case "kakao" -> {
+                LinkedHashMap kakao_account = (LinkedHashMap) attributes.get("kakao_account");
+                email = (String) kakao_account.get("email");
+                attributes.put("email", email);
+                userNameAttributeName = "email";
+            }
+            default -> throw new OAuth2AuthenticationException("Unsupported OAuth provider: " + registrationId);
         }
 
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
                 attributes,
-                userNameAttributeName // google은 sub, github은 login 사용 (주의!)
+                userNameAttributeName // google은 sub, github은 login 사용 kakao: email (주의!)
         );
     }
 

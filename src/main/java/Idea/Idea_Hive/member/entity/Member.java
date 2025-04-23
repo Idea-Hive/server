@@ -50,12 +50,13 @@ public class Member {
 
     private Integer career;
 
+    // 관심사
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberHashtag> memberHashtags = new ArrayList<>();
 
     private LocalDateTime modifiedDate;
 
-    private String joinType;
+    private String type; // sns 연동 유형
 
     private boolean isVerified;
 
@@ -71,16 +72,16 @@ public class Member {
         this.memberHashtags.add(memberHashtag);
     }
 
-
-
-
-
-
     @Builder
-    public Member(final String name, final String email, final String password) {
+    public Member(final String name, final String email,
+                  final String password, final String job,
+                  final String type, final Integer career) {
         this.name = name;
         this.email = email;
         this.password = password;
+        this.job = job;
+        this.type = type;
+        this.career = career;
         this.createdDate = LocalDateTime.now();
         this.isDeleted = false;
     }

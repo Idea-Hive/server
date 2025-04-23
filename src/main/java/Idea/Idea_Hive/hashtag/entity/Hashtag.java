@@ -3,8 +3,7 @@ package Idea.Idea_Hive.hashtag.entity;
 import Idea.Idea_Hive.member.entity.MemberHashtag;
 import Idea.Idea_Hive.project.entity.ProjectHashtag;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,12 +11,15 @@ import java.util.List;
 @Entity
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Hashtag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false)
     private Long id;
+
+    private String category;
 
     private String name;
 
@@ -27,5 +29,9 @@ public class Hashtag {
     @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL)
     private List<ProjectHashtag> projectHashtags = new ArrayList<>();
 
-
+    @Builder
+    public Hashtag(String category, String name) {
+        this.category = category;
+        this.name = name;
+    }
 }

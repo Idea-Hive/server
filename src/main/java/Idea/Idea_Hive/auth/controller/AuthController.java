@@ -1,8 +1,7 @@
 package Idea.Idea_Hive.auth.controller;
 
 import Idea.Idea_Hive.member.entity.dto.request.EmailLoginRequest;
-import Idea.Idea_Hive.member.entity.dto.request.SignUpRequest;
-import Idea.Idea_Hive.member.service.SignUpService;
+import Idea.Idea_Hive.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class AuthController {
 
-    private final SignUpService signUpService;
+    private final MemberService memberService;
 
 
     // todo: 임시 컨트롤러입니다.
