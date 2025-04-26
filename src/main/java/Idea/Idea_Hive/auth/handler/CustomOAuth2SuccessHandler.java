@@ -27,15 +27,19 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 //    private final MemberJpaRepo memberJpaRepo;
     private final MemberService memberService;
 
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> attributes = oAuth2User.getAttributes();
+
         SignUpResponse signUpResponse = memberService.handleOAuth2User(attributes);
 
         // todo: jwt 발급
+
+
 
         // todo : 토큰 담아서 리다이렉팅
         response.sendRedirect("http://localhost:8080/api/login/success");

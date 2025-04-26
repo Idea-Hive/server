@@ -75,5 +75,4 @@ public class Project {
                 .build();
         this.projectHashtags.add(projectHashtag);
     }
-
 }
