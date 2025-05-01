@@ -19,9 +19,9 @@ public class SkillStack {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    private String category;
+    private String category; // 1depth
 
-    private String name;
+    private String name; // 2depth
 
     @OneToMany(mappedBy = "skillStack", cascade = CascadeType.ALL)
     private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();

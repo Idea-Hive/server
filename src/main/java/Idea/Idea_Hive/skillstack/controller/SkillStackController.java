@@ -17,15 +17,15 @@ public class SkillStackController {
     private final SkillStackService skillstackService;
 
     @GetMapping("")
-    public ResponseEntity<List<SkillStackResponse>> getAllHashtags() {
-        List<SkillStackResponse> skillstacks = skillstackService.getAllSkillStack();
-        return ResponseEntity.ok(skillstacks);
+    public ResponseEntity<List<SkillStackResponse>> getAllStacks() {
+        List<SkillStackResponse> stacks = skillstackService.getAllSkillStack();
+        return ResponseEntity.ok(stacks);
     }
 
     /* Admin에서 직접 스킬스택 추가 할 수 있도록 하기위한 API */
     @PostMapping("")
     public ResponseEntity<String> addSkillStack(@RequestBody CreateSkillStackRequest createSkillStackRequest) {
         skillstackService.createHashtag(createSkillStackRequest);
-        return ResponseEntity.ok(createSkillStackRequest.name() + ": 스킬스택 생성 성공");
+        return ResponseEntity.ok(createSkillStackRequest.name() + ": 기술 스택 생성 성공");
     }
 }
