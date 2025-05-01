@@ -1,6 +1,6 @@
 package Idea.Idea_Hive.exception.handler;
 
-import Idea.Idea_Hive.exception.handler.custom.HashtagAlreadyExistsException;
+import Idea.Idea_Hive.exception.handler.custom.SkillStackAlreadyExistsException;
 import io.swagger.v3.oas.annotations.Hidden;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +17,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 
-    @ExceptionHandler(HashtagAlreadyExistsException.class)
-    public ResponseEntity<String> handlerHashtagAlreadyExistsException(HashtagAlreadyExistsException exception) {
+    @ExceptionHandler(SkillStackAlreadyExistsException.class)
+    public ResponseEntity<String> handlerHashtagAlreadyExistsException(SkillStackAlreadyExistsException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exception.getMessage());
     }
 

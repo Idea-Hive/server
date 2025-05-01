@@ -1,6 +1,6 @@
 package Idea.Idea_Hive.skillstack.service;
 
-import Idea.Idea_Hive.exception.handler.custom.HashtagAlreadyExistsException;
+import Idea.Idea_Hive.exception.handler.custom.SkillStackAlreadyExistsException;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.skillstack.entity.dto.request.CreateSkillStackRequest;
 import Idea.Idea_Hive.skillstack.entity.dto.response.SkillStackResponse;
@@ -23,18 +23,14 @@ public class SkillStackService {
 
     @Transactional
     public void createHashtag(CreateSkillStackRequest createSkillStackRequest) {
-
-        // 이미 존재하는 해쉬태그일 경우 에러 던짐
-
+        // 이미 존재하는 기술스택일 경우 에러 던짐
         if (skillStackJpaRepo.existsByName(createSkillStackRequest.name())) {
-            throw new HashtagAlreadyExistsException(createSkillStackRequest.name());
+            throw new SkillStackAlreadyExistsException(createSkillStackRequest.name());
         }
-
         SkillStack newSkillStack = SkillStack.builder()
                 .category(createSkillStackRequest.category())
                 .name(createSkillStackRequest.name())
                 .build();
-
         skillStackJpaRepo.save(newSkillStack);
     }
 }
