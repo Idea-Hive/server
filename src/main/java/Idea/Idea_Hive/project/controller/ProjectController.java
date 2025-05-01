@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/projects")
+@RequestMapping("/api/project")
 @Slf4j
 public class ProjectController {
 
@@ -23,10 +23,10 @@ public class ProjectController {
 
     @GetMapping("/search")
     public ResponseEntity<ProjectSearchResponse> searchProjects(@RequestParam(required = false, defaultValue = "") String keyword,
-                                                                @RequestParam(required = false, defaultValue = "ALL") String recruitType,
-                                                                @RequestParam(required = false) Long hashtagId) {
+                                                                @RequestParam(required = false, defaultValue = "ALL") String recruitType
+                                                                ) {
 
-        ProjectSearchResponse reponse = projectService.searchProjects(keyword,recruitType, hashtagId);
+        ProjectSearchResponse reponse = projectService.searchProjects(keyword,recruitType);
         return ResponseEntity.ok(reponse);
 
     }

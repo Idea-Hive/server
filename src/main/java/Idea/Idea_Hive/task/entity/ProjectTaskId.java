@@ -1,6 +1,5 @@
 package Idea.Idea_Hive.task.entity;
 
-import Idea.Idea_Hive.member.entity.MemberHashtagId;
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

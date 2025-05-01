@@ -1,12 +1,8 @@
 package Idea.Idea_Hive.hashtag.entity;
 
-import Idea.Idea_Hive.member.entity.MemberHashtag;
-import Idea.Idea_Hive.project.entity.ProjectHashtag;
+import Idea.Idea_Hive.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -19,19 +15,14 @@ public class Hashtag {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    private String category;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="project_id")
+    private Project project;
     private String name;
 
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL)
-    private List<MemberHashtag> memberHashtags = new ArrayList<>();
-
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL)
-    private List<ProjectHashtag> projectHashtags = new ArrayList<>();
-
     @Builder
-    public Hashtag(String category, String name) {
-        this.category = category;
+    public Hashtag(Project project, String name) {
+        this.project = project;
         this.name = name;
     }
 }

@@ -1,6 +1,6 @@
 package Idea.Idea_Hive.member.entity;
 
-import Idea.Idea_Hive.hashtag.entity.Hashtag;
+import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -8,7 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,7 +51,7 @@ public class Member {
 
     // 관심사
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
-    private List<MemberHashtag> memberHashtags = new ArrayList<>();
+    private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();
 
     private LocalDateTime modifiedDate;
 
@@ -64,12 +63,12 @@ public class Member {
 
 
     // 해시태그 추가 메서드
-    public void addHashtag(Hashtag hashtag) {
-        MemberHashtag memberHashtag = MemberHashtag.builder()
+    public void addSkillStack(SkillStack skillStack) {
+        MemberSkillStack memberSkillStack = MemberSkillStack.builder()
                 .member(this)
-                .hashtag(hashtag)
+                .skillStack(skillStack)
                 .build();
-        this.memberHashtags.add(memberHashtag);
+        this.memberSkillStacks.add(memberSkillStack);
     }
 
     @Builder
