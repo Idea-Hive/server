@@ -19,4 +19,9 @@ public class HealthCheckController {
         response.put("timestamp", LocalDateTime.now());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/api/signup/temp")
+    public ResponseEntity<String> signUpTemp() {
+        return ResponseEntity.ok("회원가입 임시 페이지");
+    }
 }
