@@ -18,7 +18,6 @@ public class AuthController {
 
     private final MemberService memberService;
 
-
     // todo: 임시 컨트롤러입니다.
     @GetMapping("/logintest")
     public String Home() {
@@ -37,9 +36,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> emailLoginController(@RequestBody EmailLoginRequest reqeust) {
         // todo: 입력 값 유효성 체크
-
+        
         // todo: login 진행
-
         return ResponseEntity.ok("로그인 완료");
     }
 }
