@@ -1,7 +1,7 @@
 package Idea.Idea_Hive.member.service;
 
-import Idea.Idea_Hive.hashtag.entity.Hashtag;
-import Idea.Idea_Hive.hashtag.entity.repository.HashtagJpaRepo;
+import Idea.Idea_Hive.skillstack.entity.SkillStack;
+import Idea.Idea_Hive.skillstack.entity.repository.SkillStackJpaRepo;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.request.SignUpRequest;
 import Idea.Idea_Hive.member.entity.dto.response.SignUpResponse;
@@ -10,10 +10,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,7 +22,7 @@ import java.util.Optional;
 public class MemberService {
 
     private final MemberJpaRepo memberJpaRepo;
-    private final HashtagJpaRepo hashtagJpaRepo;
+    private final SkillStackJpaRepo skillStackJpaRepo;
     private final PasswordEncoder passwordEncoder;
 
     public boolean existsByEmail(String email) {
@@ -56,9 +54,9 @@ public class MemberService {
                 .type(request.type())
                 .build();
 
-        List<Hashtag> hashtags = hashtagJpaRepo.findAllById(request.hashtagIds());
-        for (Hashtag hashtag : hashtags) {
-            member.addHashtag(hashtag);
+        List<SkillStack> skillStacks = skillStackJpaRepo.findAllById(request.skillstackIds());
+        for (SkillStack skillStack : skillStacks) {
+            member.addSkillStack(skillStack);
         }
 
         Member saved = memberJpaRepo.save(member);

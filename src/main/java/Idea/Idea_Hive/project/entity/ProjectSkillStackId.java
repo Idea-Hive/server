@@ -1,4 +1,4 @@
-package Idea.Idea_Hive.member.entity;
+package Idea.Idea_Hive.project.entity;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
@@ -10,21 +10,21 @@ import java.util.Objects;
 @Embeddable
 @NoArgsConstructor
 @AllArgsConstructor
-public class MemberHashtagId implements Serializable {
-    private Long memberId;
-    private Long hashtagId;
+public class ProjectSkillStackId implements Serializable {
+    private Long projectId;
+    private Long skillStackId;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass())return false;
-        MemberHashtagId that = (MemberHashtagId) o;
-        return Objects.equals(memberId, that.memberId) &&
-                Objects.equals(hashtagId, that.hashtagId);
+        ProjectSkillStackId that = (ProjectSkillStackId) o;
+        return Objects.equals(projectId, that.projectId) &&
+                Objects.equals(skillStackId, that.skillStackId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(memberId, hashtagId);
+        return Objects.hash(projectId, skillStackId);
     }
 }

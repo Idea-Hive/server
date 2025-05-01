@@ -20,8 +20,8 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
 
-    public ProjectSearchResponse searchProjects(String keyword, String recruitType, Long hashtagId) {
-        List<Project> projects = projectRepository.searchByTitleAndHashtag(keyword, recruitType, hashtagId);
+    public ProjectSearchResponse searchProjects(String keyword, String recruitType) {
+        List<Project> projects = projectRepository.searchByKeyword(keyword, recruitType);
         return ProjectSearchResponse.of(projects);
     }
 }

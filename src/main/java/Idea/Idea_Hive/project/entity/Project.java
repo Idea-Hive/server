@@ -1,7 +1,7 @@
 package Idea.Idea_Hive.project.entity;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
-import Idea.Idea_Hive.member.entity.MemberHashtag;
+import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -54,7 +54,10 @@ public class Project {
     private ProjectDetail projectDetail;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-    private List<ProjectHashtag> projectHashtags = new ArrayList<>();
+    private List<ProjectSkillStack> projectSkillStacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<Hashtag> hashtags = new ArrayList<>();
 
     @Builder
     public Project(String title, String description, Integer maxMembers,Boolean tempSave) {
@@ -67,13 +70,22 @@ public class Project {
         this.tempSave = tempSave;
     }
 
-    // 해시태그 추가 메서드
-    public void addHashtag(Hashtag hashtag) {
-        ProjectHashtag projectHashtag = ProjectHashtag.builder()
+    // 스킬스택 추가 메서드
+    public void addSkillStack(SkillStack skillStack) {
+        ProjectSkillStack projectSkillStack = ProjectSkillStack.builder()
                 .project(this)
-                .hashtag(hashtag)
+                .skillStack(skillStack)
                 .build();
-        this.projectHashtags.add(projectHashtag);
+        this.projectSkillStacks.add(projectSkillStack);
+    }
+
+    //해시태그 연관관계 편의 메서드
+    public void addHashtag(String name) {
+        Hashtag hashtag = Hashtag.builder()
+                .project(this)
+                .name(name)
+                .build();
+        this.hashtags.add(hashtag);
     }
 
 }

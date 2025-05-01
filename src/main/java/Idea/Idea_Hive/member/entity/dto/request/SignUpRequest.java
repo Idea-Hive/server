@@ -10,6 +10,6 @@ public record SignUpRequest(
         String job,
         Integer career,
         String type, // sns 연동 종류
-        List<Long> hashtagIds
+        List<Long> skillstackIds
 ) {
 }
