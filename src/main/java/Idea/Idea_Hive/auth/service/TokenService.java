@@ -23,6 +23,10 @@ public class TokenService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+    public String createRefreshToken(String email) {
+        return jwtProvider.createRefreshToken(email);
+    }
+
     public long getRefreshTokenValidityInMilliseconds() {
         return jwtProvider.getRefreshTokenValidityInMilliseconds();
     }

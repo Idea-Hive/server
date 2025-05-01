@@ -1,8 +1,10 @@
 package Idea.Idea_Hive.auth.handler;
 
+import Idea.Idea_Hive.auth.service.TokenService;
 import Idea.Idea_Hive.member.entity.dto.response.SignUpResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.member.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +26,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-//    private final MemberJpaRepo memberJpaRepo;
     private final MemberService memberService;
+    private final TokenService tokenService;
 
 
     @Override
@@ -37,11 +39,24 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         SignUpResponse signUpResponse = memberService.handleOAuth2User(attributes);
 
-        // todo: jwt 발급
+        // todo: 임시 RefreshToken 발급
+        String refreshToken = tokenService.createRefreshToken(signUpResponse.email());
 
+        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+        refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
+        refreshTokenCookie.setSecure(false);   // HTTPS에서만 전송
+        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
+        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
 
+        response.addCookie(refreshTokenCookie);
 
-        // todo : 토큰 담아서 리다이렉팅
-        response.sendRedirect("http://localhost:8080/api/login/success");
+        // todo : 토큰 담아서 리다이렉팅, 소셜 로그인마다 다른 곳으로
+
+        String authorizedClientRegistrationId = (String) attributes.get("authorizedClientRegistrationId");
+        String url = "http://localhost:3000/auth/" +
+                authorizedClientRegistrationId +
+                "?email=" +
+                signUpResponse.email();
+        response.sendRedirect(url);
     }
 }

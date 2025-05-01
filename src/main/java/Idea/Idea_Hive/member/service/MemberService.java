@@ -79,7 +79,7 @@ public class MemberService {
 
         // 2. 신규 회원가입 처리
         Member member = createMemberFromOAuthAttributes(attributes, provider);
-//        memberJpaRepo.save(member);
+        memberJpaRepo.save(member);
 
         return SignUpResponse.from(member);
     }
