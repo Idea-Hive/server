@@ -1,11 +1,16 @@
 package Idea.Idea_Hive.security;
 
 import Idea.Idea_Hive.auth.handler.CustomOAuth2SuccessHandler;
+import Idea.Idea_Hive.auth.infra.BearerAuthorizationExtractor;
+import Idea.Idea_Hive.auth.infra.JwtAuthenticationFilter;
+import Idea.Idea_Hive.auth.infra.JwtAuthenticationProvider;
 import Idea.Idea_Hive.auth.service.CustomOauth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,6 +18,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,6 +36,21 @@ public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final CustomOauth2UserService customOauth2UserService;
+    private final AuthenticationConfiguration authenticationConfiguration;
+
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final BearerAuthorizationExtractor extractor;
+
+    // 1번
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
+        return new JwtAuthenticationFilter("/**", extractor, authenticationManager);
+    }
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -43,6 +64,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception {
+
+        AuthenticationManager authenticationManager = authenticationManager();
+        JwtAuthenticationFilter jwtAuthenticationFilter = jwtAuthenticationFilter(authenticationManager);
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .formLogin(AbstractHttpConfigurer::disable) // default formlogin unactive
@@ -54,9 +79,13 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // IF_REQUIRED : 다른 API 요청에 대해서는 JWT 인증 사용
                 ) // 세션 Stateless 설정 (JWT 사용 예정)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(jwtAuthenticationProvider)
                 .authorizeHttpRequests(authorize -> {
                     authorize
-                            .anyRequest().permitAll();
+                            .requestMatchers("/api/member/signup").permitAll()
+                            .requestMatchers("/api/auth/login").permitAll()
+                            .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */
                 .oauth2Login(ouath -> ouath
