@@ -1,15 +1,13 @@
 package Idea.Idea_Hive.project.controller;
 
+import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectResponseDto;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,6 +26,11 @@ public class ProjectController {
 
         ProjectSearchResponse reponse = projectService.searchProjects(keyword,recruitType);
         return ResponseEntity.ok(reponse);
+    }
 
+    @PostMapping("/create")
+    public ResponseEntity<Long> createProject(@RequestBody ProjectCreateRequest projectCreateRequest) {
+        Long projectId = projectService.createProject(projectCreateRequest);
+        return ResponseEntity.ok(projectId);
     }
 }

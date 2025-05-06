@@ -85,6 +85,9 @@ public class SecurityConfig {
                     authorize
                             .requestMatchers("/api/member/signup").permitAll()
                             .requestMatchers("/api/auth/login").permitAll()
+                            .requestMatchers("/h2-console/**").permitAll()
+                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                            .requestMatchers("/swagger-ui/**","/v3/api-docs/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */
