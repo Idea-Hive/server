@@ -41,16 +41,17 @@ public class Project {
 
     private Boolean isNew;
 
-    private Boolean tempSave;
+    private Boolean isSave; //true:저장, false:임시저장
 
-    private LocalDateTime dueDate;
+    private LocalDateTime dueDateFrom;
+
+    private LocalDateTime dueDateTo;
 
     private String contact;
 
     private LocalDateTime expirationDate;
 
-    @OneToOne
-    @JoinColumn(name = "projectDetailId")
+    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
     private ProjectDetail projectDetail;
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
@@ -60,14 +61,18 @@ public class Project {
     private List<Hashtag> hashtags = new ArrayList<>();
 
     @Builder
-    public Project(String title, String description, Integer maxMembers,Boolean tempSave) {
+    public Project(String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
         this.title = title;
         this.description = description;
+        this.contact = contact;
         this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
         this.createdDate = LocalDateTime.now();
         this.status = ProjectStatus.RECRUITING;
         this.isNew = true;
-        this.tempSave = tempSave;
+        this.isSave = isSave;
+        this.expirationDate = this.createdDate.plusMonths(1);
     }
 
     // 스킬스택 추가 메서드
@@ -86,5 +91,26 @@ public class Project {
                 .name(name)
                 .build();
         this.hashtags.add(hashtag);
+    }
+
+    // 임시저장된 프로젝트 업데이트
+    public void updateTemporaryProject(String title, String description,String contact, Integer maxMembers,
+                                       LocalDateTime dueDateFrom, LocalDateTime dueDateTo, Boolean isSave) {
+        this.title = title;
+        this.description = description;
+        this.contact = contact;
+        this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
+        this.createdDate = LocalDateTime.now();
+        this.status = ProjectStatus.RECRUITING;
+        this.isNew = true;
+        this.isSave = isSave;
+        this.expirationDate = this.createdDate.plusMonths(1);
+    }
+    // Project 엔티티
+    public void setProjectDetail(ProjectDetail projectDetail) {
+        this.projectDetail = projectDetail;
+        projectDetail.setProject(this);  // 양방향 연관관계 설정
     }
 }
