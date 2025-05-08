@@ -1,6 +1,7 @@
 package Idea.Idea_Hive.project.entity;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
+import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Getter
@@ -54,11 +56,14 @@ public class Project {
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
     private ProjectDetail projectDetail;
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectSkillStack> projectSkillStacks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hashtag> hashtags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<ProjectMember> projectMembers = new ArrayList<>();
 
     @Builder
     public Project(String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
@@ -76,10 +81,10 @@ public class Project {
     }
 
     // 스킬스택 추가 메서드
-    public void addSkillStack(SkillStack skillStack) {
+    public void addSkillStack(SkillStack skillstack) {
         ProjectSkillStack projectSkillStack = ProjectSkillStack.builder()
                 .project(this)
-                .skillStack(skillStack)
+                .skillstack(skillstack)
                 .build();
         this.projectSkillStacks.add(projectSkillStack);
     }
@@ -112,5 +117,26 @@ public class Project {
     public void setProjectDetail(ProjectDetail projectDetail) {
         this.projectDetail = projectDetail;
         projectDetail.setProject(this);  // 양방향 연관관계 설정
+    }
+
+    // ProjectMember 추가 메서드
+    public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isFavorited) {
+        ProjectMemberId projectMemberId = ProjectMemberId.builder()
+                .projectId(this.id)
+                .memberId(member.getId())
+                .build();
+
+        ProjectMember projectMember = ProjectMember.builder()
+                .id(projectMemberId)
+                .project(this)
+                .member(member)
+                .role(role)
+                .isProfileShared(isProfileShared)
+                .profileSharedDate(profilesharedDate)
+                .isFavorited(isFavorited)
+                .build();
+
+        this.projectMembers.add(projectMember);
+        return projectMember;
     }
 }

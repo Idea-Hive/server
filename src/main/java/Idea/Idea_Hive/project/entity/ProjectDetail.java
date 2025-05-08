@@ -2,8 +2,12 @@ package Idea.Idea_Hive.project.entity;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
+@NoArgsConstructor
 public class ProjectDetail {
 
     @Id

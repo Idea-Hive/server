@@ -63,10 +63,10 @@ public class Member {
 
 
     // 해시태그 추가 메서드
-    public void addSkillStack(SkillStack skillStack) {
+    public void addSkillStack(SkillStack skillstack) {
         MemberSkillStack memberSkillStack = MemberSkillStack.builder()
                 .member(this)
-                .skillStack(skillStack)
+                .skillstack(skillstack)
                 .build();
         this.memberSkillStacks.add(memberSkillStack);
     }
