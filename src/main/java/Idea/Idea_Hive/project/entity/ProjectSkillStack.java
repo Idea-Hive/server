@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "project_skillStack")
+@Table(name = "project_skillstack")
 public class ProjectSkillStack {
 
     @EmbeddedId
@@ -21,14 +21,14 @@ public class ProjectSkillStack {
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("skillStackId")
-    @JoinColumn(name = "skillStack_id")
-    private SkillStack skillStack;
+    @MapsId("skillstackId")
+    @JoinColumn(name = "skillstack_id")
+    private SkillStack skillstack;
 
     @Builder
-    public ProjectSkillStack(Project project, SkillStack skillStack) {
+    public ProjectSkillStack(Project project, SkillStack skillstack) {
         this.project = project;
-        this.skillStack = skillStack;
-        this.id = new ProjectSkillStackId(project.getId(), skillStack.getId());
+        this.skillstack = skillstack;
+        this.id = new ProjectSkillStackId(project.getId(), skillstack.getId());
     }
 }

@@ -4,10 +4,7 @@ import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
-import Idea.Idea_Hive.project.entity.Project;
-import Idea.Idea_Hive.project.entity.ProjectDetail;
-import Idea.Idea_Hive.project.entity.ProjectMember;
-import Idea.Idea_Hive.project.entity.ProjectMemberId;
+import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
 import Idea.Idea_Hive.project.entity.repository.SkillStackRepository;
@@ -26,7 +23,6 @@ import static Idea.Idea_Hive.project.entity.Role.LEADER;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
 @Slf4j
 public class ProjectService {
 
@@ -35,11 +31,13 @@ public class ProjectService {
     private final MemberJpaRepo memberJpaRepo;
     private final ProjectMemberRepository projectMemberRepository;
 
+    @Transactional(readOnly = true)
     public ProjectSearchResponse searchProjects(String keyword, String recruitType) {
         List<Project> projects = projectRepository.searchByKeyword(keyword, recruitType);
         return ProjectSearchResponse.of(projects);
     }
 
+    @Transactional
     public Long createProject(ProjectCreateRequest request) {
         // 임시저장이 아닌 경우 validation 체크
         if (request.getIsSave()) {
@@ -89,51 +87,90 @@ public class ProjectService {
         // 연관관계 설정
         project.setProjectDetail(projectDetail);
 
+
+        // 입력된 기술스택 유효성 검사
+
+
         // 기술스택 추가
-        if (request.getSkillStackIds() != null && !request.getSkillStackIds().isEmpty()) {
-            //기존 기술스택 삭제(수정 시)
-            if (request.getProjectId() != null) {
+        if (request.getProjectId() != null) { //기존에 저장되어있는 프로젝트가 있을 경우
+            if (request.getSkillStackIds() == null || request.getSkillStackIds().isEmpty()) { //기술스택이 없을 경우 모두 삭제
                 project.getProjectSkillStacks().clear();
+            } else {
+                List<SkillStack> skillStacks = skillStackRepository.findAllById(request.getSkillStackIds());
+                if (skillStacks.size() != request.getSkillStackIds().size()) {
+                    throw new IllegalArgumentException("존재하지 않는 기술스택이 포함되어 있습니다.");
+                }
+
+                //기존 기술스택 중 요청에 없는 것들 삭제
+                project.getProjectSkillStacks().removeIf(projectSkillStack ->
+                        !request.getSkillStackIds().contains(projectSkillStack.getSkillstack().getId()));
+
+                //새로운 기술스택 추가
+                for (SkillStack skillStack : skillStacks) {
+                    boolean exists = project.getProjectSkillStacks().stream()
+                            .anyMatch(ps -> ps.getSkillstack().getId().equals(skillStack.getId()));
+                    if (!exists) {
+                        project.addSkillStack(skillStack);
+                    }
+                }
             }
+        } else if (request.getSkillStackIds() != null && !request.getSkillStackIds().isEmpty()) { //새 프로젝트 생성 시 기술스택 추가
 
             List<SkillStack> skillStacks = skillStackRepository.findAllById(request.getSkillStackIds());
+            if (skillStacks.size() != request.getSkillStackIds().size()) {
+                throw new IllegalArgumentException("존재하지 않는 기술스택이 포함되어 있습니다.");
+            }
+
             for (SkillStack skillStack : skillStacks) {
                 project.addSkillStack(skillStack);
             }
         }
 
         //해시태그 추가
-        if (request.getHashtags() != null && !request.getHashtags().isEmpty()) {
-            // 기존 해시태그 삭제 (수정 시)
-            if (request.getProjectId() != null) {
+        // 기존에 저장되어있는 프로젝트가 있을 경우
+        if (request.getProjectId() != null) {
+            if (request.getHashtags() == null || request.getHashtags().isEmpty()) {
                 project.getHashtags().clear();
-            }
+            } else {
+                //기존 해시태그 중 새로운 해시태그 목록에 없는 것만 삭제
+                project.getHashtags().removeIf(hashtag ->
+                        !request.getHashtags().contains(hashtag.getName()));
 
-            for (String hashtag : request.getHashtags()) {
-                project.addHashtag(hashtag);
+                // 새로운 해시태그 중 기존에 없는 것만 추가
+                for (String hashtagName : request.getHashtags()) {
+                    boolean exists = project.getHashtags().stream()
+                            .anyMatch(hashtag -> hashtag.getName().equals(hashtagName));
+                    if (!exists) {
+                        project.addHashtag(hashtagName);
+                    }
+                }
+            }
+        } else if (request.getHashtags() != null && !request.getHashtags().isEmpty()) {
+            for (String hashtagName : request.getHashtags()) {
+                project.addHashtag(hashtagName);
             }
         }
 
         Project savedProject = projectRepository.save(project);
 
+        // ProjectMember 생성
         ProjectMemberId projectMemberId = ProjectMemberId.builder()
                 .projectId(savedProject.getId())
                 .memberId(member.getId())
                 .build();
 
         Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
-
         if (optionalProjectMember.isEmpty()) {
-            log.info("ProjectMember if 문에 진입");
-            ProjectMember projectMember = ProjectMember.builder()
-                    .id(projectMemberId)
-                    .role(LEADER)
-                    .isProfileShared(true)
-                    .profileSharedDate(LocalDateTime.now())
-                    .isFavorited(false)
-                    .build();
+            savedProject.addProjectMember(
+                    member,
+                    LEADER,
+                    false,
+                    null,
+                    false
+            );
 
-            projectMemberRepository.save(projectMember);
+            // Project를 다시 저장하여 ProjectMember도 함께 저장
+            projectRepository.save(savedProject);
         }
 
         return savedProject.getId();

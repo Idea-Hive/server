@@ -1,5 +1,6 @@
 package Idea.Idea_Hive.project.entity;
 
+import Idea.Idea_Hive.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,6 +18,16 @@ public class ProjectMember {
 
     @EmbeddedId
     private ProjectMemberId id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("projectId")
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("memberId")
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)

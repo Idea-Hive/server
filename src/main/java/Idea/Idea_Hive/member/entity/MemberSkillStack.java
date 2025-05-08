@@ -21,14 +21,14 @@ public class MemberSkillStack {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("skillStackId")
-    @JoinColumn(name = "skillStack_id")
-    private SkillStack skillStack;
+    @MapsId("skillstackId")
+    @JoinColumn(name = "skillstack_id")
+    private SkillStack skillstack;
 
     @Builder
-    public MemberSkillStack(Member member, SkillStack skillStack) {
+    public MemberSkillStack(Member member, SkillStack skillstack) {
         this.member = member;
-        this.skillStack = skillStack;
-        this.id = new MemberSkillStackId(member.getId(), skillStack.getId());
+        this.skillstack = skillstack;
+        this.id = new MemberSkillStackId(member.getId(), skillstack.getId());
     }
 }

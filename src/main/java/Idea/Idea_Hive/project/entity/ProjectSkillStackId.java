@@ -12,7 +12,7 @@ import java.util.Objects;
 @AllArgsConstructor
 public class ProjectSkillStackId implements Serializable {
     private Long projectId;
-    private Long skillStackId;
+    private Long skillstackId;
 
     @Override
     public boolean equals(Object o) {
@@ -20,11 +20,11 @@ public class ProjectSkillStackId implements Serializable {
         if (o == null || getClass() != o.getClass())return false;
         ProjectSkillStackId that = (ProjectSkillStackId) o;
         return Objects.equals(projectId, that.projectId) &&
-                Objects.equals(skillStackId, that.skillStackId);
+                Objects.equals(skillstackId, that.skillstackId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(projectId, skillStackId);
+        return Objects.hash(projectId, skillstackId);
     }
 }
