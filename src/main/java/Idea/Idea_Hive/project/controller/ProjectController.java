@@ -21,10 +21,11 @@ public class ProjectController {
 
     @GetMapping("/search")
     public ResponseEntity<ProjectSearchResponse> searchProjects(@RequestParam(required = false, defaultValue = "") String keyword,
-                                                                @RequestParam(required = false, defaultValue = "ALL") String recruitType
+                                                                @RequestParam(required = false, defaultValue = "ALL") String recruitType,
+                                                                @RequestParam(required = false, defaultValue = "RECENT") String sortType
                                                                 ) {
 
-        ProjectSearchResponse reponse = projectService.searchProjects(keyword,recruitType);
+        ProjectSearchResponse reponse = projectService.searchProjects(keyword, recruitType, sortType);
         return ResponseEntity.ok(reponse);
     }
 
