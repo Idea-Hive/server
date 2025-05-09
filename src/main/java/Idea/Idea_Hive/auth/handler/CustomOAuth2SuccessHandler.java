@@ -1,14 +1,15 @@
 package Idea.Idea_Hive.auth.handler;
 
 import Idea.Idea_Hive.auth.service.TokenService;
+import Idea.Idea_Hive.common.constant.Constants;
 import Idea.Idea_Hive.member.entity.dto.response.SignUpResponse;
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.member.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -29,6 +30,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final MemberService memberService;
     private final TokenService tokenService;
 
+    @Value("${frontend.url:http://localhost:3000}")
+    private String FRONTEND_URL;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -40,7 +43,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         SignUpResponse signUpResponse = memberService.handleOAuth2User(attributes);
 
         // todo: 임시 RefreshToken 발급
-        String refreshToken = tokenService.createRefreshToken(signUpResponse.email());
+        String refreshToken = tokenService.createTempRefreshToken(signUpResponse.email());
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
@@ -50,11 +53,8 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         response.addCookie(refreshTokenCookie);
 
-        // todo : 토큰 담아서 리다이렉팅, 소셜 로그인마다 다른 곳으로
-
-        String authorizedClientRegistrationId = (String) attributes.get("authorizedClientRegistrationId");
-        String url = "http://localhost:3000/auth/" +
-                authorizedClientRegistrationId +
+        // todo: 운영 시 url 수정 필요 ..
+        String url = FRONTEND_URL + "/auth/social" +
                 "?email=" +
                 signUpResponse.email();
         response.sendRedirect(url);

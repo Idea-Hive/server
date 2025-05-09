@@ -23,6 +23,13 @@ public class TokenService {
         return new TokenResponse(accessToken, refreshToken);
     }
 
+    public String createTempRefreshToken(String email) {
+        String refreshToken = createRefreshToken(email);
+        long refreshTokenExpire = jwtProvider.getRefreshTokenValidityInMilliseconds();
+        redisDao.setValues(email, refreshToken, Duration.ofMillis(refreshTokenExpire));
+        return refreshToken;
+    }
+
     public String createRefreshToken(String email) {
         return jwtProvider.createRefreshToken(email);
     }

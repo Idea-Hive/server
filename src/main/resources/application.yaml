@@ -84,7 +84,7 @@ spring:
           starttls:
             enable: true # 7
 frontend:
-  url: $(frontend-url}
+  url: ${frontend-url}
 # http://localhost:8080/login/oauth2/code/google
 #  security:
 #    oauth2:
