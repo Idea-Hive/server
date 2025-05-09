@@ -43,7 +43,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         SignUpResponse signUpResponse = memberService.handleOAuth2User(attributes);
 
         // todo: 임시 RefreshToken 발급
-        String refreshToken = tokenService.createRefreshToken(signUpResponse.email());
+        String refreshToken = tokenService.createTempRefreshToken(signUpResponse.email());
 
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
