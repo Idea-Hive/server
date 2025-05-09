@@ -1,12 +1,12 @@
 package Idea.Idea_Hive.project.entity.repository;
 
 import Idea.Idea_Hive.hashtag.entity.QHashtag;
-import Idea.Idea_Hive.project.entity.QProjectSkillStack;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.entity.QProject;
-import Idea.Idea_Hive.skillstack.entity.QSkillStack;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,7 +25,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Project> searchByKeyword(String keyword, String recruitType) {
+    public List<Project> searchByKeyword(String keyword, String recruitType, String sortType) {
         QProject project = QProject.project;
         QHashtag hashtag = QHashtag.hashtag;
 
@@ -46,7 +47,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                                         .or(project.hashtags.any().name.contains(keyword))
                                 : null
                 )
-                .orderBy(project.searchDate.desc())
+                .orderBy(createOrderSpecifier(sortType, project))
                 .fetch();
     }
 
@@ -65,6 +66,21 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 return project.status.eq(ProjectStatus.RECRUITING);
             default:
                 return null;
+        }
+    }
+
+    // 최신순, 마감임박순 정렬
+    private OrderSpecifier<?>[] createOrderSpecifier(String sortType, QProject project) {
+        if ("RECENT".equals(sortType)) {
+            return new OrderSpecifier<?>[]{
+                    new OrderSpecifier<>(Order.DESC, project.searchDate),
+                    new OrderSpecifier<>(Order.DESC, project.createdDate)
+            };
+        } else {
+            return new OrderSpecifier<?>[]{
+                    new OrderSpecifier<>(Order.DESC, project.searchDate),
+                    new OrderSpecifier<>(Order.DESC, project.expirationDate)
+            };
         }
     }
 }

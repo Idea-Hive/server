@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +30,8 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
 
     @Transactional(readOnly = true)
-    public ProjectSearchResponse searchProjects(String keyword, String recruitType) {
-        List<Project> projects = projectRepository.searchByKeyword(keyword, recruitType);
+    public ProjectSearchResponse searchProjects(String keyword, String recruitType, String sortType) {
+        List<Project> projects = projectRepository.searchByKeyword(keyword, recruitType, sortType);
         return ProjectSearchResponse.of(projects);
     }
 
