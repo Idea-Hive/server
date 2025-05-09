@@ -73,9 +73,6 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable) // default formlogin unactive
                 .httpBasic(AbstractHttpConfigurer::disable) // httpBasic unactive
                 .csrf(AbstractHttpConfigurer::disable) /* todo: CSRF 임시 비활성, 프론트 협의 */
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.disable()) //h2 콘솔 연결시에만 필요
-                )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // IF_REQUIRED : 다른 API 요청에 대해서는 JWT 인증 사용
                 ) // 세션 Stateless 설정 (JWT 사용 예정)
@@ -85,9 +82,9 @@ public class SecurityConfig {
                     authorize
                             .requestMatchers("/api/member/signup").permitAll()
                             .requestMatchers("/api/auth/login").permitAll()
-                            .requestMatchers("/h2-console/**").permitAll()
                             .requestMatchers("/api/auth/refresh").permitAll()
                             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                            .requestMatchers("/api/project/search/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */
