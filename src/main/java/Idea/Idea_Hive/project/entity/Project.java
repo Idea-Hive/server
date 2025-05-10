@@ -65,6 +65,8 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
     private List<ProjectMember> projectMembers = new ArrayList<>();
 
+    private Integer likedCnt;
+
     @Builder
     public Project(String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
         this.title = title;
@@ -120,7 +122,7 @@ public class Project {
     }
 
     // ProjectMember 추가 메서드
-    public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isFavorited) {
+    public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isLike) {
         ProjectMemberId projectMemberId = ProjectMemberId.builder()
                 .projectId(this.id)
                 .memberId(member.getId())
@@ -133,7 +135,7 @@ public class Project {
                 .role(role)
                 .isProfileShared(isProfileShared)
                 .profileSharedDate(profilesharedDate)
-                .isFavorited(isFavorited)
+                .isLike(isLike)
                 .build();
 
         this.projectMembers.add(projectMember);

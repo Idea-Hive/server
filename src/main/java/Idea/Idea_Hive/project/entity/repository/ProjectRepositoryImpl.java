@@ -11,10 +11,12 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Project> searchByKeyword(String keyword, String recruitType, String sortType) {
+    public Page<Project> searchByKeyword(String keyword, String recruitType, String sortType, Pageable pageable) {
         QProject project = QProject.project;
         QHashtag hashtag = QHashtag.hashtag;
 
@@ -36,7 +38,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
             builder.and(createRecruiteCondition(recruitType, project));
         }
 
-        return queryFactory
+        List<Project> projects = queryFactory
                 .selectFrom(project)
                 .distinct()
                 .leftJoin(project.hashtags, hashtag)
@@ -48,7 +50,25 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                                 : null
                 )
                 .orderBy(createOrderSpecifier(sortType, project))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
+
+        Long total = queryFactory
+                .select(project.countDistinct())
+                .from(project)
+                .leftJoin(project.hashtags, hashtag)
+                .where(
+                        builder,
+                        keyword != null ?
+                                project.title.contains(keyword)
+                                        .or(project.hashtags.any().name.contains(keyword))
+                                : null
+                )
+                .fetchOne();
+
+        return new PageImpl<>(projects, pageable, total);
+
     }
 
     // 모집 상태에 따른 조건 생성
