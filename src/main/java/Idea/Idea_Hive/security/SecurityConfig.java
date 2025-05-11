@@ -83,6 +83,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/member/signup").permitAll()
                             .requestMatchers("/api/auth/login").permitAll()
                             .requestMatchers("/api/auth/refresh").permitAll()
+                            .requestMatchers("/api/email/send").permitAll()
+                            .requestMatchers("/api/email/verify").permitAll()
                             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                             .requestMatchers("/api/project/search/**").permitAll()
                             .anyRequest().authenticated();
