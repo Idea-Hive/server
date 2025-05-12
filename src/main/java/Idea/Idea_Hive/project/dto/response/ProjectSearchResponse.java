@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 @Getter
 @AllArgsConstructor
 public class ProjectSearchResponse {
-    private List<ProjectResponseDto> projects;
+    private List<ProjectSearchResponseDto> projects;
     private long totalElements;
     private int totalPages;
     private int currentPage;
@@ -19,8 +19,8 @@ public class ProjectSearchResponse {
 
 
     public static ProjectSearchResponse of(Page<Project> projectPage) {
-        List<ProjectResponseDto> projectDto = projectPage.getContent().stream()
-                .map(ProjectResponseDto::from)
+        List<ProjectSearchResponseDto> projectDto = projectPage.getContent().stream()
+                .map(ProjectSearchResponseDto::from)
                 .collect(Collectors.toList());
         return new ProjectSearchResponse(
                 projectDto,

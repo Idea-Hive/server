@@ -4,6 +4,7 @@ import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectTempSavedResponse;
 import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
@@ -192,5 +193,11 @@ public class ProjectService {
         if (request.getMaxMembers() == null || request.getMaxMembers() <= 0) {
             throw new IllegalArgumentException("최대 인원은 1명 이상이어야 합니다.");
         }
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProjectTempSavedResponse> getTempSavedProjects(Long userId) {
+        List<Project> projects = projectRepository.findByProjectMembers_MemberIdAndIsSaveFalseOrderByCreatedDateDesc(userId);
+        return ProjectTempSavedResponse.from(projects);
     }
 }

@@ -18,7 +18,7 @@ public class ProjectDetail {
     @JoinColumn(name = "project_id")
     private Project project;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String idea;
 
     public void updateIdea(String idea) {

@@ -24,7 +24,7 @@ public class Project {
 
     private String title;
 
-    @Column(length = 100) // 간단 설명 글자 수 정해지면 수정 필요
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private Integer maxMembers;
@@ -80,6 +80,9 @@ public class Project {
         this.isNew = true;
         this.isSave = isSave;
         this.expirationDate = this.createdDate.plusMonths(1);
+        this.searchDate = LocalDateTime.now();
+        this.viewCnt = 0;
+        this.likedCnt = 0;
     }
 
     // 스킬스택 추가 메서드
@@ -114,6 +117,7 @@ public class Project {
         this.isNew = true;
         this.isSave = isSave;
         this.expirationDate = this.createdDate.plusMonths(1);
+        this.searchDate = LocalDateTime.now();
     }
     // Project 엔티티
     public void setProjectDetail(ProjectDetail projectDetail) {

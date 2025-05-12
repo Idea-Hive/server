@@ -2,8 +2,8 @@ spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/taskmate
-    username: taskmate
-    password: taskmate
+    username: ${db-username}
+    password: ${db-password}
           
   jpa:
     hibernate:
