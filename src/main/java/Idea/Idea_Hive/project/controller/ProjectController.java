@@ -2,6 +2,8 @@ package Idea.Idea_Hive.project.controller;
 
 import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectTempSavedResponse;
+import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.service.ProjectService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -11,6 +13,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,5 +43,11 @@ public class ProjectController {
     public ResponseEntity<Long> createProject(@RequestBody ProjectCreateRequest projectCreateRequest) {
         Long projectId = projectService.createProject(projectCreateRequest);
         return ResponseEntity.ok(projectId);
+    }
+
+    @GetMapping("/tempSaved")
+    public ResponseEntity<List<ProjectTempSavedResponse>> tempSavedProjects(@RequestParam(required = true) Long userId) {
+        List<ProjectTempSavedResponse> projects = projectService.getTempSavedProjects(userId);
+        return ResponseEntity.ok(projects);
     }
 }
