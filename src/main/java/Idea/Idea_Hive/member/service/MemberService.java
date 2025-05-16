@@ -1,5 +1,7 @@
 package Idea.Idea_Hive.member.service;
 
+import Idea.Idea_Hive.member.entity.dto.request.PasswordResetRequest;
+import Idea.Idea_Hive.redis.RedisDao;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.skillstack.entity.repository.SkillStackJpaRepo;
 import Idea.Idea_Hive.member.entity.Member;
@@ -9,6 +11,7 @@ import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,10 +27,7 @@ public class MemberService {
     private final MemberJpaRepo memberJpaRepo;
     private final SkillStackJpaRepo skillStackJpaRepo;
     private final PasswordEncoder passwordEncoder;
-
-    public boolean existsByEmail(String email) {
-        return memberJpaRepo.existsByEmail(email);
-    }
+    private final RedisDao redisDao;
 
     @Transactional
     public SignUpResponse signUp(SignUpRequest request) throws IllegalArgumentException {
@@ -102,6 +102,37 @@ public class MemberService {
                 .build();
 
         return member;
+    }
+
+    @Transactional
+    public void resetPassword(PasswordResetRequest request) {
+
+        Member member = memberJpaRepo.findByEmail(request.email())
+                .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
+
+        if (passwordEncoder.matches(request.newPassword(), member.getPassword())) {
+            throw new IllegalArgumentException("기존 비밀번호와 일치합니다. 다른 비밀번호로 설정해주세요.");
+        }
+
+        // todo: 비밀번호 유효성 검사 추가
+        validatePassword(request.newPassword());
+
+        // todo: 비밀번호 새로 저장
+        member.updatePassword(passwordEncoder.encode(request.newPassword()));
+        memberJpaRepo.save(member);
+
+        // todo: 수정 완료 시 RefreshToken Redis에서 제거, 프론트에서도 AccessToken 제거해줘야함.
+        redisDao.deleteValues(request.email()); // Refresh Token 제거
+    }
+
+
+    private void validatePassword(String password) {
+        if (password.length() < 8 || password.length() > 20) {
+            throw new IllegalArgumentException("비밀번호는 8자 이상 20자 이하이어야 합니다.");
+        }
+        if (!password.matches(".*[A-Za-z].*") || !password.matches(".*\\d.*")) {
+            throw new IllegalArgumentException("비밀번호는 영문자와 숫자를 포함해야 합니다.");
+        }
     }
 
 }
