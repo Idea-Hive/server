@@ -1,6 +1,7 @@
 package Idea.Idea_Hive.project.entity.repository;
 
 import Idea.Idea_Hive.hashtag.entity.QHashtag;
+import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.entity.QProject;
@@ -25,6 +26,22 @@ import java.util.List;
 public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public ProjectInfoResponse findProjectInfoById(Long projectId) {
+        QProject project = QProject.project;
+
+        Project foundProject = queryFactory
+                .selectFrom(project)
+                .where(project.id.eq(projectId))
+                .fetchOne();
+
+        if (foundProject == null) {
+            throw new IllegalArgumentException("존재하지 않는 프로젝트입니다.");
+        }
+
+        return ProjectInfoResponse.from(foundProject);
+    }
 
     @Override
     public Page<Project> searchByKeyword(String keyword, String recruitType, String sortType, Pageable pageable) {
@@ -103,4 +120,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
             };
         }
     }
+
+
 }

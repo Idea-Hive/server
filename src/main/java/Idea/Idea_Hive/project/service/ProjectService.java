@@ -3,6 +3,7 @@ package Idea.Idea_Hive.project.service;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
+import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectTempSavedResponse;
 import Idea.Idea_Hive.project.entity.*;
@@ -199,5 +200,11 @@ public class ProjectService {
     public List<ProjectTempSavedResponse> getTempSavedProjects(Long userId) {
         List<Project> projects = projectRepository.findByProjectMembers_MemberIdAndIsSaveFalseOrderByCreatedDateDesc(userId);
         return ProjectTempSavedResponse.from(projects);
+    }
+
+    @Transactional(readOnly = true)
+    public ProjectInfoResponse getProjectInfo(Long projectId) {
+        ProjectInfoResponse projectInfoResponse = projectRepository.findProjectInfoById(projectId);
+        return projectInfoResponse;
     }
 }
