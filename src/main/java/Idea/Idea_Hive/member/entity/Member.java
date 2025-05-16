@@ -71,6 +71,12 @@ public class Member {
         this.memberSkillStacks.add(memberSkillStack);
     }
 
+    // 비밀번호 수정 메서드
+    // 반드시 해싱된 패스워드여야 함 !!
+    public void updatePassword(String hashedPassword) {
+        this.password = hashedPassword;
+    }
+
     @Builder
     public Member(final String name, final String email,
                   final String password, final String job,
