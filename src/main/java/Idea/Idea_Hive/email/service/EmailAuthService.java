@@ -20,7 +20,7 @@ public class EmailAuthService {
 
 
     public void sendSignUpAuthCode(String email) {
-        String code = generateCode();
+        String code = generateCode(6);
 
         // Redis에 저장 (key = email:abc@naver.com, TTL = 5분)
         String key = "signup:" + email;
@@ -45,7 +45,31 @@ public class EmailAuthService {
         return false;
     }
 
-    private String generateCode() {
-        return UUID.randomUUID().toString().substring(0, 5);
+    public void sendPasswordResetAuthCode(String email) {
+        String key = "password-reset:"+email;
+        String code = generateCode(5);
+        redisDao.setValues(key, code, Duration.ofMinutes(EXPIRE_MINUTES));
+
+        // 이메일 발송
+        // todo: 메일 내용 수정
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("비밀번호 찾기 인증 코드 발송 안내");
+        message.setText("인증 코드 : " + code);
+        mailSender.send(message);
+    }
+
+    public boolean verifyPasswordResetAuthCode(String email, String code) {
+        String key = "password-reset:" + email;
+        String storedCode = redisDao.getValues(key);
+        if (storedCode != null && storedCode.equals(code)) {
+            redisDao.deleteValues(key); // 한 번 인증되면 삭제
+            return true;
+        }
+        return false;
+    }
+
+    private String generateCode(int size) {
+        return UUID.randomUUID().toString().substring(0, size);
     }
 }
