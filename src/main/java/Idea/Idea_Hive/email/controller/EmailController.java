@@ -15,13 +15,13 @@ public class EmailController {
 
     private final EmailAuthService authService;
 
-    @PostMapping("/send")
+    @PostMapping("/signup/send")
     public ResponseEntity<String> sendCode(@RequestParam String email) {
         authService.sendCode(email);
         return ResponseEntity.ok("인증 코드가 이메일로 전송되었습니다.");
     }
 
-    @PostMapping("/verify")
+    @PostMapping("/signup/verify")
     public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) {
         if (authService.verifyCode(email, code)) {
             return ResponseEntity.ok("이메일 인증 성공");
