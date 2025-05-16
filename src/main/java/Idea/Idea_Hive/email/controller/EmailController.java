@@ -17,13 +17,13 @@ public class EmailController {
 
     @PostMapping("/signup/send")
     public ResponseEntity<String> sendCode(@RequestParam String email) {
-        authService.sendCode(email);
+        authService.sendSignUpAuthCode(email);
         return ResponseEntity.ok("인증 코드가 이메일로 전송되었습니다.");
     }
 
     @PostMapping("/signup/verify")
     public ResponseEntity<String> verifyCode(@RequestParam String email, @RequestParam String code) {
-        if (authService.verifyCode(email, code)) {
+        if (authService.verifySignUpAuthCode(email, code)) {
             return ResponseEntity.ok("이메일 인증 성공");
         } else {
             return ResponseEntity.badRequest().body("인증 코드가 올바르지 않거나 만료되었습니다.");
