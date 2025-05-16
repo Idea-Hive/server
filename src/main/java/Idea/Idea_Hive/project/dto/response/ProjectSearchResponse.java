@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class ProjectSearchResponse {
     private List<ProjectSearchResponseDto> projects;
-    private long totalElements;
+    private long totalCnt;
     private int totalPages;
     private int currentPage;
     private int pageSize;

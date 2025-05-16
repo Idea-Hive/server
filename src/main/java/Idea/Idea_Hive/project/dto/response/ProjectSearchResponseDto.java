@@ -18,7 +18,7 @@ public class ProjectSearchResponseDto {
     private String description;
     private List<String> hashtagNames;
     private String creator;
-    private int viewCount;
+    private int viewCnt;
     private int likedCnt;
 
     public static ProjectSearchResponseDto from(Project project) {
@@ -36,7 +36,7 @@ public class ProjectSearchResponseDto {
                 .map(pm -> pm.getMember().getName())
                 .orElse("Unknown");
 
-        dto.viewCount = project.getViewCnt();
+        dto.viewCnt = project.getViewCnt();
         dto.likedCnt = project.getLikedCnt();
         return dto;
     }
