@@ -3,13 +3,11 @@ package Idea.Idea_Hive.member.controller;
 import Idea.Idea_Hive.member.entity.dto.request.PasswordResetRequest;
 import Idea.Idea_Hive.member.entity.dto.request.SignUpRequest;
 import Idea.Idea_Hive.member.entity.dto.response.SignUpResponse;
+import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,4 +30,9 @@ public class MemberController {
     }
 
 
+    @GetMapping("/info")
+    public ResponseEntity<MemberInfoResponse> getUserInfo() {
+        MemberInfoResponse memberInfoResponse = memberService.getUserInfo();
+        return ResponseEntity.ok(memberInfoResponse);
+    }
 }
