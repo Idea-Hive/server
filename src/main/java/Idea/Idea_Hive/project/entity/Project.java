@@ -67,6 +67,9 @@ public class Project {
 
     private Integer likedCnt;
 
+    @OneToMany(mappedBy = "project")
+    private List<ProjectApplications> projectApplications = new ArrayList<>();
+
     @Builder
     public Project(String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
         this.title = title;
