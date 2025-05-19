@@ -1,6 +1,7 @@
 package Idea.Idea_Hive.member.service;
 
 import Idea.Idea_Hive.member.entity.dto.request.PasswordResetRequest;
+import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.redis.RedisDao;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.skillstack.entity.repository.SkillStackJpaRepo;
@@ -12,6 +13,8 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -133,6 +136,22 @@ public class MemberService {
         if (!password.matches(".*[A-Za-z].*") || !password.matches(".*\\d.*")) {
             throw new IllegalArgumentException("비밀번호는 영문자와 숫자를 포함해야 합니다.");
         }
+    }
+
+    public MemberInfoResponse getUserInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 로그인 정보가 없는 경우
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BadCredentialsException("잘못된 접근입니다.");
+        }
+
+        String userEmail = authentication.getName();
+        Member member = memberJpaRepo.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+
+        return MemberInfoResponse.from(member);
     }
 
 }
