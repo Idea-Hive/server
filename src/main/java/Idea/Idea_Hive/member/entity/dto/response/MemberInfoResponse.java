@@ -2,9 +2,13 @@ package Idea.Idea_Hive.member.entity.dto.response;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.MemberSkillStack;
+import Idea.Idea_Hive.skillstack.entity.SkillStack;
+import Idea.Idea_Hive.skillstack.entity.dto.SkillStackVO;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public record MemberInfoResponse(
         Long id,
@@ -16,12 +20,17 @@ public record MemberInfoResponse(
         String type,
         LocalDateTime modifiedDate,
         String profileUrl,
-        List<MemberSkillStack> memberSkillStacks,
+        List<SkillStackVO> SkillStacks,
         Boolean isDeleted,
         Boolean isVerified
 ) {
 
     public static MemberInfoResponse from(Member member) {
+
+        List<SkillStackVO> skillStacks = member.getMemberSkillStacks().stream()
+                .map(ms -> SkillStackVO.from(ms.getSkillstack()))
+                .toList();
+
         return new MemberInfoResponse(
                 member.getId(),
                 member.getName(),
@@ -32,7 +41,7 @@ public record MemberInfoResponse(
                 member.getType(),
                 member.getModifiedDate(),
                 member.getProfileUrl(),
-                member.getMemberSkillStacks(),
+                skillStacks,
                 member.getIsDeleted(),
                 member.isVerified()
         );
