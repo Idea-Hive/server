@@ -1,10 +1,13 @@
 package Idea.Idea_Hive.project.controller;
 
-import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
+import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponseDto;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,5 +23,14 @@ public class ProjectController {
     public ResponseEntity<ProjectInfoResponse> projectInfo(@RequestParam(required = true) Long projectId) {
         ProjectInfoResponse projectInfoResponse = projectService.getProjectInfo(projectId);
         return ResponseEntity.ok(projectInfoResponse);
+    }
+
+    @GetMapping("/applicants")
+    public ResponseEntity<ProjectApplicantResponse> applicantInfo(@RequestParam(required = true) Long projectId,
+                                                                  @RequestParam(defaultValue = "1") int page,
+                                                                  @RequestParam(defaultValue = "4") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        ProjectApplicantResponse projectApplicant = projectService.getApplicantInfo(projectId, pageable);
+        return ResponseEntity.ok(projectApplicant);
     }
 }

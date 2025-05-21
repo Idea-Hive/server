@@ -3,7 +3,6 @@ package Idea.Idea_Hive.project.dto.response;
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.Role;
-import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,7 +29,6 @@ public class ProjectInfoResponse {
     private LocalDateTime dueDateFrom;
     private LocalDateTime dueDateTo;
     private String contact;
-    private List<ApplicantDto> applicants;
     private Integer likedCnt;
     private Integer viewCnt;
     private LocalDateTime expirationDate;
@@ -64,9 +62,6 @@ public class ProjectInfoResponse {
         info.dueDateFrom = project.getDueDateFrom();
         info.dueDateTo = project.getDueDateTo();
         info.contact = project.getContact();
-        info.applicants = project.getProjectApplications().stream()
-                .map(ApplicantDto::from)
-                .collect(Collectors.toList());
         info.likedCnt = project.getLikedCnt();
         info.viewCnt = project.getViewCnt();
         info.expirationDate = project.getExpirationDate();
