@@ -22,6 +22,7 @@ public class ProjectInfoResponse {
     private String creatorName;
     private String creatorJob;
     private Integer creatorCareer;
+    private Long creatorCompletedProjectCnt;
     private List<String> projectSkillStacks;
     private String description;
     private String idea;
@@ -30,8 +31,11 @@ public class ProjectInfoResponse {
     private LocalDateTime dueDateTo;
     private String contact;
     private List<ApplicantDto> applicants;
+    private Integer likedCnt;
+    private Integer viewCnt;
+    private LocalDateTime expirationDate;
 
-    public static ProjectInfoResponse from(Project project) {
+    public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt) {
         ProjectInfoResponse info = new ProjectInfoResponse();
         info.projectId = project.getId();
         info.title = project.getTitle();
@@ -48,6 +52,8 @@ public class ProjectInfoResponse {
                     info.creatorCareer = leader.getMember().getCareer();
                 });
 
+        info.creatorCompletedProjectCnt = creatorCompletedProjectCnt;
+
         info.projectSkillStacks = project.getProjectSkillStacks().stream()
                 .map(projectSkillStack -> projectSkillStack.getSkillstack().getName())
                 .collect(Collectors.toList());
@@ -61,6 +67,9 @@ public class ProjectInfoResponse {
         info.applicants = project.getProjectApplications().stream()
                 .map(ApplicantDto::from)
                 .collect(Collectors.toList());
+        info.likedCnt = project.getLikedCnt();
+        info.viewCnt = project.getViewCnt();
+        info.expirationDate = project.getExpirationDate();
         return info;
     }
 }

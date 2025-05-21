@@ -148,4 +148,9 @@ public class Project {
         this.projectMembers.add(projectMember);
         return projectMember;
     }
+
+    //조회수 증가
+    public void increaseViewCnt() {
+        this.viewCnt++;
+    }
 }

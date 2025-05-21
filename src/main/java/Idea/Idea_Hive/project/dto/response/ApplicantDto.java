@@ -1,5 +1,6 @@
 package Idea.Idea_Hive.project.dto.response;
 
+import Idea.Idea_Hive.project.entity.IsAccepted;
 import Idea.Idea_Hive.project.entity.ProjectApplications;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import lombok.*;
@@ -18,6 +19,7 @@ public class ApplicantDto {
     private Integer career;
     private String applicationMessage;
     private List<String> skillStacks;
+    private IsAccepted isAccepted;
 
     public static ApplicantDto from(ProjectApplications applications) {
         return ApplicantDto.builder()
@@ -29,6 +31,7 @@ public class ApplicantDto {
                 .skillStacks(applications.getMember().getMemberSkillStacks().stream()
                         .map(memberSkillStack -> memberSkillStack.getSkillstack().getName())
                         .collect(Collectors.toList()))
+                .isAccepted(applications.getIsAccepted())
                 .build();
     }
 
