@@ -4,10 +4,7 @@ import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectTempSavedInfoResponse;
-import Idea.Idea_Hive.project.entity.Project;
-import Idea.Idea_Hive.project.entity.ProjectDetail;
-import Idea.Idea_Hive.project.entity.ProjectMember;
-import Idea.Idea_Hive.project.entity.ProjectMemberId;
+import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
 import Idea.Idea_Hive.project.entity.repository.SkillStackRepository;
@@ -20,8 +17,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
-
-import static Idea.Idea_Hive.project.entity.Role.LEADER;
 
 @Service
 @RequiredArgsConstructor
@@ -155,7 +150,7 @@ public class ProjectCreateService {
         if (optionalProjectMember.isEmpty()) {
             savedProject.addProjectMember(
                     member,
-                    LEADER,
+                    Role.LEADER,
                     false,
                     null,
                     false

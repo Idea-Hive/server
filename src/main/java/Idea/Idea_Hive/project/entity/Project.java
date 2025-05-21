@@ -153,4 +153,13 @@ public class Project {
     public void increaseViewCnt() {
         this.viewCnt++;
     }
+
+    //좋아요 수 변경
+    public void increaseLikedCnt() {
+        this.likedCnt++;
+    }
+
+    public void decreaseLikedCnt() {
+        this.likedCnt--;
+    }
 }

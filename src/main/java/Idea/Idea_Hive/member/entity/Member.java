@@ -1,5 +1,6 @@
 package Idea.Idea_Hive.member.entity;
 
+import Idea.Idea_Hive.project.entity.ProjectMember;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -52,6 +53,9 @@ public class Member {
     // 관심사
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    private List<ProjectMember> projectMembers = new ArrayList<>();
 
     private LocalDateTime modifiedDate;
 

@@ -1,7 +1,7 @@
 package Idea.Idea_Hive.project.controller;
 
+import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
-import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponseDto;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.service.ProjectService;
 import lombok.RequiredArgsConstructor;
@@ -32,5 +32,11 @@ public class ProjectController {
         Pageable pageable = PageRequest.of(page - 1, size);
         ProjectApplicantResponse projectApplicant = projectService.getApplicantInfo(projectId, pageable);
         return ResponseEntity.ok(projectApplicant);
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity<Void> projectLike(@RequestBody ProjectLikeRequest projectLikeRequest) {
+        projectService.likeProject(projectLikeRequest);
+        return ResponseEntity.ok().build();
     }
 }
