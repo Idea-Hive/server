@@ -140,6 +140,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 .leftJoin(project.hashtags, hashtag)
                 .where(
                         builder,
+                        project.isSave.eq(true),
                         keyword != null ?
                                 project.title.contains(keyword)
                                         .or(project.hashtags.any().name.contains(keyword))
@@ -156,6 +157,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 .leftJoin(project.hashtags, hashtag)
                 .where(
                         builder,
+                        project.isSave.eq(true),
                         keyword != null ?
                                 project.title.contains(keyword)
                                         .or(project.hashtags.any().name.contains(keyword))
