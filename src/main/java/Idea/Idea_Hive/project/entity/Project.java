@@ -162,4 +162,12 @@ public class Project {
     public void decreaseLikedCnt() {
         this.likedCnt--;
     }
+
+    public void updateStatus(ProjectStatus status) {
+        this.status = status;
+    }
+
+    public void updateIsNew(boolean isNew) {
+        this.isNew = isNew;
+    }
 }

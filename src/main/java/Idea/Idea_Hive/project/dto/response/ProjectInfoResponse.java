@@ -2,6 +2,7 @@ package Idea.Idea_Hive.project.dto.response;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.project.entity.Project;
+import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.entity.Role;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -32,6 +33,7 @@ public class ProjectInfoResponse {
     private Integer likedCnt;
     private Integer viewCnt;
     private LocalDateTime expirationDate;
+    private ProjectStatus projectStatus;
 
     public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt) {
         ProjectInfoResponse info = new ProjectInfoResponse();
@@ -65,6 +67,7 @@ public class ProjectInfoResponse {
         info.likedCnt = project.getLikedCnt();
         info.viewCnt = project.getViewCnt();
         info.expirationDate = project.getExpirationDate();
+        info.projectStatus = project.getStatus();
         return info;
     }
 }

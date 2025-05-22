@@ -11,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/project")
@@ -19,12 +21,14 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    @GetMapping("/info") //프로젝트 상세 조회
+    //프로젝트 상세 조회
+    @GetMapping("/info")
     public ResponseEntity<ProjectInfoResponse> projectInfo(@RequestParam(required = true) Long projectId) {
         ProjectInfoResponse projectInfoResponse = projectService.getProjectInfo(projectId);
         return ResponseEntity.ok(projectInfoResponse);
     }
 
+    // 지원자 정보 조회
     @GetMapping("/applicants")
     public ResponseEntity<ProjectApplicantResponse> applicantInfo(@RequestParam(required = true) Long projectId,
                                                                   @RequestParam(defaultValue = "1") int page,
@@ -34,9 +38,37 @@ public class ProjectController {
         return ResponseEntity.ok(projectApplicant);
     }
 
+    // 찜하기, 찜 해제
     @PostMapping("/like")
     public ResponseEntity<Void> projectLike(@RequestBody ProjectLikeRequest projectLikeRequest) {
         projectService.likeProject(projectLikeRequest);
         return ResponseEntity.ok().build();
     }
+
+    //프로젝트 시작
+    @PostMapping("/start")
+    public ResponseEntity<Void> projectStart(@RequestBody Map<String, Long> projectId) {
+        projectService.startProject(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
+
+    //팀원 추가모집
+    @PostMapping("/recruit")
+    public ResponseEntity<Void> memberRecruit(@RequestBody Map<String, Long> projectId) {
+        projectService.recruitMember(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+

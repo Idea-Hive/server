@@ -18,7 +18,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
@@ -29,6 +28,22 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final MemberJpaRepo memberJpaRepo;
+
+    @Transactional
+    public void recruitMember(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+
+        project.updateIsNew(false);
+        project.updateStatus(ProjectStatus.RECRUITING);
+    }
+
+    @Transactional
+    public void startProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+        project.updateStatus(ProjectStatus.IN_PROGRESS);
+    }
 
     @Transactional
     public ProjectInfoResponse getProjectInfo(Long projectId) {
