@@ -89,7 +89,8 @@ public class SecurityConfig {
                             .requestMatchers("/api/email/password-reset/verify").permitAll()
                             .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                             .requestMatchers("/api/project/search").permitAll()
-                            .requestMatchers("/api/project/info").permitAll()
+                            .requestMatchers("/api/project/info/**").permitAll()
+                            .requestMatchers("/api/project/applicants/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */

@@ -4,6 +4,7 @@ import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -47,14 +48,14 @@ public class ProjectController {
 
     //프로젝트 시작
     @PostMapping("/start")
-    public ResponseEntity<Void> projectStart(@RequestBody Map<String, Long> projectId) {
+    public ResponseEntity<Void> projectStart(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
         projectService.startProject(projectId.get("projectId"));
         return ResponseEntity.ok().build();
     }
 
     //팀원 추가모집
     @PostMapping("/recruit")
-    public ResponseEntity<Void> memberRecruit(@RequestBody Map<String, Long> projectId) {
+    public ResponseEntity<Void> memberRecruit(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
         projectService.recruitMember(projectId.get("projectId"));
         return ResponseEntity.ok().build();
     }

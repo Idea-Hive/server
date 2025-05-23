@@ -2,6 +2,7 @@ package Idea.Idea_Hive.project.dto.response;
 
 import Idea.Idea_Hive.project.entity.IsAccepted;
 import Idea.Idea_Hive.project.entity.ProjectApplications;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.util.List;
