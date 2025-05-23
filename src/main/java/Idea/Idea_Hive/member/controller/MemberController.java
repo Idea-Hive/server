@@ -16,6 +16,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
+    // Email을 사용한 회원가입
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUpController(@RequestBody SignUpRequest request) throws Exception {
         // todo: 입력 값 유효성 체크

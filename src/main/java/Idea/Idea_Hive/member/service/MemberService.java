@@ -34,11 +34,6 @@ public class MemberService {
 
     @Transactional
     public SignUpResponse signUp(SignUpRequest request) throws IllegalArgumentException {
-        // todo: 비밀번호 확인
-        if (!request.password().equals(request.passwordCheck())) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
-        }
-
         // todo: 가입 여부 체크
         if (memberJpaRepo.existsByEmail(request.email())) {
             throw new IllegalArgumentException("이미 존재하는 이메일입니다.");
@@ -51,16 +46,8 @@ public class MemberService {
         Member member = Member.builder()
                 .email(request.email())
                 .password(hashedPassword)
-                .name(request.name())
-                .job(request.job())
-                .career(request.career())
-                .type(request.type())
+                .type("email")
                 .build();
-
-        List<SkillStack> skillStacks = skillStackJpaRepo.findAllById(request.skillstackIds());
-        for (SkillStack skillStack : skillStacks) {
-            member.addSkillStack(skillStack);
-        }
 
         Member saved = memberJpaRepo.save(member);
 
