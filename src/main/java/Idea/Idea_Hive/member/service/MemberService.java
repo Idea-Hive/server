@@ -63,8 +63,13 @@ public class MemberService {
         Optional<Member> existing = memberJpaRepo.findByEmail(email);
         if (existing.isPresent()) {
             Member member = existing.get();
-            // 이미 존재하는 유저 → 바로 response 생성
-            return SignUpResponse.from(member);
+
+            // 이미 해당 소셜 로그인 계정이 존재하는 경우
+            if (member.getType().equals(provider)) {
+                return SignUpResponse.from(member);
+            } else {
+                throw new IllegalArgumentException("이미 해당 이메일로 가입된 계정이 있습니다.");
+            }
         }
 
         // 2. 신규 회원가입 처리

@@ -40,7 +40,18 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        SignUpResponse signUpResponse = memberService.handleOAuth2User(attributes);
+        SignUpResponse signUpResponse;
+        try {
+            signUpResponse = memberService.handleOAuth2User(attributes);
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
+
+            String jsonError = String.format("{\"error\": \"%s\"}", e.getMessage());
+            response.getWriter().write(jsonError);
+            return;
+        }
+
 
         // todo: 임시 RefreshToken 발급
         String refreshToken = tokenService.createTempRefreshToken(signUpResponse.email());
