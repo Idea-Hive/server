@@ -2,8 +2,8 @@ package Idea.Idea_Hive.project.dto.response;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.project.entity.Project;
+import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.entity.Role;
-import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,6 +22,7 @@ public class ProjectInfoResponse {
     private String creatorName;
     private String creatorJob;
     private Integer creatorCareer;
+    private Long creatorCompletedProjectCnt;
     private List<String> projectSkillStacks;
     private String description;
     private String idea;
@@ -29,9 +30,12 @@ public class ProjectInfoResponse {
     private LocalDateTime dueDateFrom;
     private LocalDateTime dueDateTo;
     private String contact;
-    private List<ApplicantDto> applicants;
+    private Integer likedCnt;
+    private Integer viewCnt;
+    private LocalDateTime expirationDate;
+    private ProjectStatus projectStatus;
 
-    public static ProjectInfoResponse from(Project project) {
+    public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt) {
         ProjectInfoResponse info = new ProjectInfoResponse();
         info.projectId = project.getId();
         info.title = project.getTitle();
@@ -48,6 +52,8 @@ public class ProjectInfoResponse {
                     info.creatorCareer = leader.getMember().getCareer();
                 });
 
+        info.creatorCompletedProjectCnt = creatorCompletedProjectCnt;
+
         info.projectSkillStacks = project.getProjectSkillStacks().stream()
                 .map(projectSkillStack -> projectSkillStack.getSkillstack().getName())
                 .collect(Collectors.toList());
@@ -58,9 +64,10 @@ public class ProjectInfoResponse {
         info.dueDateFrom = project.getDueDateFrom();
         info.dueDateTo = project.getDueDateTo();
         info.contact = project.getContact();
-        info.applicants = project.getProjectApplications().stream()
-                .map(ApplicantDto::from)
-                .collect(Collectors.toList());
+        info.likedCnt = project.getLikedCnt();
+        info.viewCnt = project.getViewCnt();
+        info.expirationDate = project.getExpirationDate();
+        info.projectStatus = project.getStatus();
         return info;
     }
 }

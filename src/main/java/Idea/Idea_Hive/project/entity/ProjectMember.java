@@ -39,4 +39,8 @@ public class ProjectMember {
 
     private boolean isLike;
 
+    public void updateLike(boolean isLike) {
+        this.isLike = isLike;
+    }
+
 }

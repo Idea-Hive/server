@@ -29,7 +29,7 @@ public class ProjectApplications {
 
     private String applicationMessage;
 
-    private boolean isAccepted;
+    private IsAccepted isAccepted;
 
     private LocalDateTime applicationDate;
 
