@@ -3,6 +3,7 @@ package Idea.Idea_Hive.project.service;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
 import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponseDto;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -29,6 +31,39 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final MemberJpaRepo memberJpaRepo;
 
+
+    @Transactional
+    public void viewIdea(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
+        Project project = projectRepository.findById(projectIdAndMemberIdDto.getProjectId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+
+        Member member = memberJpaRepo.findById(projectIdAndMemberIdDto.getMemberId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        ProjectMemberId projectMemberId = ProjectMemberId.builder()
+                .projectId(projectIdAndMemberIdDto.getProjectId())
+                .memberId(projectIdAndMemberIdDto.getMemberId())
+                .build();
+
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+
+        if (optionalProjectMember.isEmpty()) {
+
+            ProjectMember projectMember = ProjectMember.builder()
+                    .id(projectMemberId)
+                    .project(project)
+                    .member(member)
+                    .role(Role.GUEST)
+                    .isProfileShared(true)
+                    .profileSharedDate(LocalDateTime.now())
+                    .isLike(false)
+                    .build();
+
+            projectMemberRepository.save(projectMember);
+        } else {
+            optionalProjectMember.get().updateProfileShared(true);
+        }
+    }
     @Transactional
     public void recruitMember(Long projectId) {
         Project project = projectRepository.findById(projectId)

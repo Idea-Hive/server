@@ -149,11 +149,6 @@ public class Project {
         return projectMember;
     }
 
-    //조회수 증가
-    public void increaseViewCnt() {
-        this.viewCnt++;
-    }
-
     //좋아요 수 변경
     public void increaseLikedCnt() {
         this.likedCnt++;
@@ -170,4 +165,5 @@ public class Project {
     public void updateIsNew(boolean isNew) {
         this.isNew = isNew;
     }
+
 }

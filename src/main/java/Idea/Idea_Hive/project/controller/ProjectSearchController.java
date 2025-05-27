@@ -4,6 +4,7 @@ import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectTempSavedResponse;
 import Idea.Idea_Hive.project.service.ProjectSearchService;
 import Idea.Idea_Hive.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ public class ProjectSearchController {
 
     private final ProjectSearchService projectSearchService;
 
+    @Operation(summary = "프로젝트 검색")
     @GetMapping("/search")
     public ResponseEntity<ProjectSearchResponse> searchProjects(@RequestParam(required = false, defaultValue = "") String keyword,
                                                                 @Parameter(schema = @Schema(allowableValues = {"NEW", "ADDITIONAL", "ALL"}))
@@ -41,6 +43,7 @@ public class ProjectSearchController {
         return ResponseEntity.ok(reponse);
     }
 
+    @Operation(summary = "임시저장된 프로젝트 목록 조회")
     @GetMapping("/tempsaved")
     public ResponseEntity<List<ProjectTempSavedResponse>> tempSavedProjects(@RequestParam(required = true) Long userId) {
         List<ProjectTempSavedResponse> projects = projectSearchService.getTempSavedProjects(userId);
