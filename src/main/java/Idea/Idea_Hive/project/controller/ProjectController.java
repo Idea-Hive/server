@@ -1,5 +1,6 @@
 package Idea.Idea_Hive.project.controller;
 
+import Idea.Idea_Hive.project.dto.request.ProjectApplyRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
 import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
@@ -66,6 +67,13 @@ public class ProjectController {
     @PostMapping("/view")
     public ResponseEntity<Void> viewIdea(@RequestBody ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
         projectService.viewIdea(projectIdAndMemberIdDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원하기")
+    @PostMapping("/apply")
+    public ResponseEntity<Void> projectApply(@RequestBody ProjectApplyRequest projectApplyRequest) {
+        projectService.applyProject(projectApplyRequest);
         return ResponseEntity.ok().build();
     }
 }

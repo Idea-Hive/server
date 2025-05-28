@@ -3,14 +3,17 @@ package Idea.Idea_Hive.project.service;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.project.dto.request.ProjectApplyRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
 import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponseDto;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.entity.*;
+import Idea.Idea_Hive.project.entity.repository.ProjectApplicationsRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -30,29 +34,73 @@ public class ProjectService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final MemberJpaRepo memberJpaRepo;
+    private final ProjectApplicationsRepository projectApplicationsRepository;
 
-
-    @Transactional
-    public void viewIdea(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
-        Project project = projectRepository.findById(projectIdAndMemberIdDto.getProjectId())
+    /**
+     * 프로젝트와 멤버 정보를 조회하는 유틸리티 메서드
+     *
+     * @param projectId 프로젝트 ID
+     * @param memberId  멤버 ID
+     * @return ProjectAndMemberInfo 객체 (project, member, projectMemberId 포함)
+     */
+    private ProjectAndMemberInfo getProjectAndMemberInfo(Long projectId, Long memberId) {
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
 
-        Member member = memberJpaRepo.findById(projectIdAndMemberIdDto.getMemberId())
+        Member member = memberJpaRepo.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(projectIdAndMemberIdDto.getProjectId())
-                .memberId(projectIdAndMemberIdDto.getMemberId())
+                .projectId(projectId)
+                .memberId(memberId)
                 .build();
 
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+        return new ProjectAndMemberInfo(project, member, projectMemberId);
+
+    }
+
+    @Getter
+    private static class ProjectAndMemberInfo{
+        private final Project project;
+        private final Member member;
+        private final ProjectMemberId projectMemberId;
+
+        public ProjectAndMemberInfo(Project project, Member member, ProjectMemberId projectMemberId) {
+            this.project = project;
+            this.member = member;
+            this.projectMemberId = projectMemberId;
+        }
+    }
+
+    @Transactional
+    public void applyProject(ProjectApplyRequest projectApplyRequest) {
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.getProjectId(), projectApplyRequest.getMemberId());
+
+        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+
+        if (optionalProjectApplications.isPresent()) {
+            throw new IllegalArgumentException("이미 지원한 프로젝트입니다.");
+        } else {
+            info.getProject().addProjectApplications(
+                    info.getProjectMemberId(),
+                    info.getMember(),
+                    projectApplyRequest.getMessage(),
+                    IsAccepted.UNDECIDED);
+        }
+    }
+
+    @Transactional
+    public void viewIdea(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
+        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectIdAndMemberIdDto.getProjectId(), projectIdAndMemberIdDto.getMemberId());
+
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberInfo.getProjectMemberId());
 
         if (optionalProjectMember.isEmpty()) {
 
             ProjectMember projectMember = ProjectMember.builder()
-                    .id(projectMemberId)
-                    .project(project)
-                    .member(member)
+                    .id(projectMemberInfo.getProjectMemberId())
+                    .project(projectMemberInfo.getProject())
+                    .member(projectMemberInfo.getMember())
                     .role(Role.GUEST)
                     .isProfileShared(true)
                     .profileSharedDate(LocalDateTime.now())
@@ -95,26 +143,17 @@ public class ProjectService {
 
     @Transactional
     public void likeProject(ProjectLikeRequest projectLikeRequest) {
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(projectLikeRequest.getProjectId())
-                .memberId(projectLikeRequest.getMemberId())
-                .build();
+        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectLikeRequest.getProjectId(), projectLikeRequest.getMemberId());
 
-        Project project = projectRepository.findById(projectLikeRequest.getProjectId())
-                .orElseThrow(()-> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
-
-        Member member = memberJpaRepo.findById(projectLikeRequest.getMemberId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
-
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberInfo.getProjectMemberId());
 
         // 기존에 ProjectMember에 값이 없을 경우 새로운 값 추가
         if (optionalProjectMember.isEmpty()) {
 
             ProjectMember projectMember = ProjectMember.builder()
-                    .id(projectMemberId)
-                    .project(project)
-                    .member(member)
+                    .id(projectMemberInfo.getProjectMemberId())
+                    .project(projectMemberInfo.getProject())
+                    .member(projectMemberInfo.getMember())
                     .role(Role.GUEST)
                     .isProfileShared(false)
                     .profileSharedDate(null)
@@ -127,9 +166,9 @@ public class ProjectService {
         }
 
         if (projectLikeRequest.isLike()) {
-            project.increaseLikedCnt();
+            projectMemberInfo.getProject().increaseLikedCnt();
         } else {
-            project.decreaseLikedCnt();
+            projectMemberInfo.getProject().decreaseLikedCnt();
         }
     }
 }

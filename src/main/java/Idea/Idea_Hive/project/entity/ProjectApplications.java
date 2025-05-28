@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @AllArgsConstructor
+@Builder
+@NoArgsConstructor
 public class ProjectApplications {
 
     @EmbeddedId
@@ -29,6 +31,7 @@ public class ProjectApplications {
 
     private String applicationMessage;
 
+    @Enumerated(EnumType.STRING)
     private IsAccepted isAccepted;
 
     private LocalDateTime applicationDate;

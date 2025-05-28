@@ -67,7 +67,7 @@ public class Project {
 
     private Integer likedCnt;
 
-    @OneToMany(mappedBy = "project")
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<ProjectApplications> projectApplications = new ArrayList<>();
 
     @Builder
@@ -147,6 +147,21 @@ public class Project {
 
         this.projectMembers.add(projectMember);
         return projectMember;
+    }
+
+    // ProjectApplications 추가 메서드
+    public ProjectApplications addProjectApplications(ProjectMemberId id, Member member, String message, IsAccepted isAccepted) {
+        ProjectApplications projectApplications = ProjectApplications.builder()
+                .id(id)
+                .member(member)
+                .project(this)
+                .applicationMessage(message)
+                .isAccepted(isAccepted)
+                .applicationDate(LocalDateTime.now())
+                .build();
+
+        this.projectApplications.add(projectApplications);
+        return projectApplications;
     }
 
     //좋아요 수 변경
