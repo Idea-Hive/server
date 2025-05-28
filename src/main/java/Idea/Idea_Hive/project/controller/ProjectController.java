@@ -1,5 +1,6 @@
 package Idea.Idea_Hive.project.controller;
 
+import Idea.Idea_Hive.project.dto.request.ProjectApplyDecisionRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectApplyRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
 import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
@@ -74,6 +75,13 @@ public class ProjectController {
     @PostMapping("/apply")
     public ResponseEntity<Void> projectApply(@RequestBody ProjectApplyRequest projectApplyRequest) {
         projectService.applyProject(projectApplyRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원자 거절/확정", description = "decision 값은 CONFIRMED(확정) 또는 REJECTED(거절)만 가능")
+    @PostMapping("/apply/decision")
+    public ResponseEntity<Void> projectApplyDecision(@RequestBody ProjectApplyDecisionRequest projectApplyDecisionRequest) {
+        projectService.projectApplyDecision(projectApplyDecisionRequest);
         return ResponseEntity.ok().build();
     }
 }

@@ -3,11 +3,11 @@ package Idea.Idea_Hive.project.service;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.project.dto.request.ProjectApplyDecisionRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectApplyRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
 import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
-import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponseDto;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectApplicationsRepository;
@@ -38,7 +38,6 @@ public class ProjectService {
 
     /**
      * 프로젝트와 멤버 정보를 조회하는 유틸리티 메서드
-     *
      * @param projectId 프로젝트 ID
      * @param memberId  멤버 ID
      * @return ProjectAndMemberInfo 객체 (project, member, projectMemberId 포함)
@@ -69,6 +68,21 @@ public class ProjectService {
             this.project = project;
             this.member = member;
             this.projectMemberId = projectMemberId;
+        }
+    }
+
+    @Transactional
+    public void projectApplyDecision(ProjectApplyDecisionRequest projectApplyDecisionRequest) {
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.getProjectId(), projectApplyDecisionRequest.getMemberId());
+
+        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+
+        if (optionalProjectApplications.isEmpty()) {
+            throw new IllegalArgumentException("지원한 내용이 없습니다.");
+        } else {
+            optionalProjectApplications.get().updateIsAcceptedAndRejectMessage(
+                    projectApplyDecisionRequest.getDecision(),
+                    projectApplyDecisionRequest.getRejectionMessage());
         }
     }
 

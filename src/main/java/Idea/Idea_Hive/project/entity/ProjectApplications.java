@@ -37,4 +37,9 @@ public class ProjectApplications {
     private LocalDateTime applicationDate;
 
     private String rejectionMessage;
+
+    public void updateIsAcceptedAndRejectMessage(IsAccepted isAccepted, String rejectionMessage) {
+        this.isAccepted = isAccepted;
+        this.rejectionMessage = rejectionMessage;
+    }
 }
