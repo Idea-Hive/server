@@ -43,4 +43,9 @@ public class ProjectMember {
         this.isLike = isLike;
     }
 
+    public void updateProfileShared(boolean isProfileShared) {
+        this.isProfileShared = isProfileShared;
+        this.profileSharedDate = LocalDateTime.now();
+    }
+
 }
