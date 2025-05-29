@@ -11,4 +11,6 @@ import java.util.Optional;
 @Repository
 public interface ProjectApplicationsRepository extends JpaRepository<ProjectApplications, Long> {
     Optional<ProjectApplications> findById(ProjectMemberId projectMemberId);
+
+    void delete(ProjectApplications projectApplications);
 }

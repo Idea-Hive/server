@@ -72,6 +72,35 @@ public class ProjectService {
     }
 
     @Transactional
+    public void projectApplyDelete(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectIdAndMemberIdDto.getProjectId(), projectIdAndMemberIdDto.getMemberId());
+
+        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+
+        if (optionalProjectApplications.isEmpty()) {
+            throw new IllegalArgumentException("지원한 내용이 없습니다.");
+        } else {
+            ProjectApplications projectApplications = optionalProjectApplications.get();
+            info.getProject().getProjectApplications().remove(projectApplications);
+            projectApplicationsRepository.delete(projectApplications);
+        }
+    }
+
+    @Transactional
+    public void projectApplyUpdate(ProjectApplyRequest projectApplyRequest) {
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.getProjectId(), projectApplyRequest.getMemberId());
+
+        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+
+        if (optionalProjectApplications.isEmpty()) {
+            throw new IllegalArgumentException("지원한 내용이 없습니다.");
+        } else {
+            optionalProjectApplications.get().updateApplicationMessage(projectApplyRequest.getMessage());
+        }
+    }
+
+
+    @Transactional
     public void projectApplyDecision(ProjectApplyDecisionRequest projectApplyDecisionRequest) {
         ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.getProjectId(), projectApplyDecisionRequest.getMemberId());
 

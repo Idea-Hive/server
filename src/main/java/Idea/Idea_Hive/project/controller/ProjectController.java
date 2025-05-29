@@ -78,10 +78,24 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "지원자 거절/확정", description = "decision 값은 CONFIRMED(확정) 또는 REJECTED(거절)만 가능")
+    @Operation(summary = "지원자 거절/확정/확정취소", description = "decision 값은 CONFIRMED(확정), REJECTED(거절), UNDECIDED(확정취소) 가능")
     @PostMapping("/apply/decision")
     public ResponseEntity<Void> projectApplyDecision(@RequestBody ProjectApplyDecisionRequest projectApplyDecisionRequest) {
         projectService.projectApplyDecision(projectApplyDecisionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원하기 수정")
+    @PostMapping("/apply/update")
+    public ResponseEntity<Void> projectApplyUpdate(@RequestBody ProjectApplyRequest projectApplyRequest) {
+        projectService.projectApplyUpdate(projectApplyRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원취소")
+    @DeleteMapping("/apply")
+    public ResponseEntity<Void> projectApplyDelete(@RequestBody ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
+        projectService.projectApplyDelete(projectIdAndMemberIdDto);
         return ResponseEntity.ok().build();
     }
 }

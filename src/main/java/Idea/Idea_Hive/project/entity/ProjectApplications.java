@@ -42,4 +42,9 @@ public class ProjectApplications {
         this.isAccepted = isAccepted;
         this.rejectionMessage = rejectionMessage;
     }
+
+    public void updateApplicationMessage(String applicationMessage) {
+        this.applicationMessage = applicationMessage;
+    }
+
 }
