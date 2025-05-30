@@ -73,7 +73,7 @@ public class ProjectService {
 
     @Transactional
     public void projectApplyDelete(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectIdAndMemberIdDto.getProjectId(), projectIdAndMemberIdDto.getMemberId());
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectIdAndMemberIdDto.projectId(), projectIdAndMemberIdDto.memberId());
 
         Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
 
@@ -88,21 +88,21 @@ public class ProjectService {
 
     @Transactional
     public void projectApplyUpdate(ProjectApplyRequest projectApplyRequest) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.getProjectId(), projectApplyRequest.getMemberId());
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.projectId(), projectApplyRequest.memberId());
 
         Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
 
         if (optionalProjectApplications.isEmpty()) {
             throw new IllegalArgumentException("지원한 내용이 없습니다.");
         } else {
-            optionalProjectApplications.get().updateApplicationMessage(projectApplyRequest.getMessage());
+            optionalProjectApplications.get().updateApplicationMessage(projectApplyRequest.message());
         }
     }
 
 
     @Transactional
     public void projectApplyDecision(ProjectApplyDecisionRequest projectApplyDecisionRequest) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.getProjectId(), projectApplyDecisionRequest.getMemberId());
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.projectId(), projectApplyDecisionRequest.memberId());
 
         Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
 
@@ -110,14 +110,14 @@ public class ProjectService {
             throw new IllegalArgumentException("지원한 내용이 없습니다.");
         } else {
             optionalProjectApplications.get().updateIsAcceptedAndRejectMessage(
-                    projectApplyDecisionRequest.getDecision(),
-                    projectApplyDecisionRequest.getRejectionMessage());
+                    projectApplyDecisionRequest.decision(),
+                    projectApplyDecisionRequest.rejectionMessage());
         }
     }
 
     @Transactional
     public void applyProject(ProjectApplyRequest projectApplyRequest) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.getProjectId(), projectApplyRequest.getMemberId());
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.projectId(), projectApplyRequest.memberId());
 
         Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
 
@@ -127,14 +127,14 @@ public class ProjectService {
             info.getProject().addProjectApplications(
                     info.getProjectMemberId(),
                     info.getMember(),
-                    projectApplyRequest.getMessage(),
+                    projectApplyRequest.message(),
                     IsAccepted.UNDECIDED);
         }
     }
 
     @Transactional
     public void viewIdea(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
-        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectIdAndMemberIdDto.getProjectId(), projectIdAndMemberIdDto.getMemberId());
+        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectIdAndMemberIdDto.projectId(), projectIdAndMemberIdDto.memberId());
 
         Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberInfo.getProjectMemberId());
 
@@ -172,9 +172,9 @@ public class ProjectService {
     }
 
     @Transactional
-    public ProjectInfoResponse getProjectInfo(Long projectId) {
+    public ProjectInfoResponse getProjectInfo(Long projectId, Long userId) {
         projectRepository.increaseViewCnt(projectId);
-        ProjectInfoResponse projectInfoResponse = projectRepository.findProjectInfoById(projectId);
+        ProjectInfoResponse projectInfoResponse = projectRepository.findProjectInfoById(projectId, userId);
         return projectInfoResponse;
     }
 
@@ -186,7 +186,7 @@ public class ProjectService {
 
     @Transactional
     public void likeProject(ProjectLikeRequest projectLikeRequest) {
-        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectLikeRequest.getProjectId(), projectLikeRequest.getMemberId());
+        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectLikeRequest.projectId(), projectLikeRequest.memberId());
 
         Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberInfo.getProjectMemberId());
 
@@ -200,15 +200,15 @@ public class ProjectService {
                     .role(Role.GUEST)
                     .isProfileShared(false)
                     .profileSharedDate(null)
-                    .isLike(projectLikeRequest.isLike())
+                    .isLike(projectLikeRequest.like())
                     .build();
 
             projectMemberRepository.save(projectMember);
         }else{ // 기존에 ProjectMember에 값이 있을 경우
-            optionalProjectMember.get().updateLike(projectLikeRequest.isLike());
+            optionalProjectMember.get().updateLike(projectLikeRequest.like());
         }
 
-        if (projectLikeRequest.isLike()) {
+        if (projectLikeRequest.like()) {
             projectMemberInfo.getProject().increaseLikedCnt();
         } else {
             projectMemberInfo.getProject().decreaseLikedCnt();

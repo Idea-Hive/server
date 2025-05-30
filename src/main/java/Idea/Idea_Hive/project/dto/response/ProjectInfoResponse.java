@@ -4,70 +4,66 @@ import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.entity.Role;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ProjectInfoResponse {
-    private Long projectId;
-    private String title;
-    private List<String> hashtagNames;
-    private Long creatorId;
-    private String creatorName;
-    private String creatorJob;
-    private Integer creatorCareer;
-    private Long creatorCompletedProjectCnt;
-    private List<String> projectSkillStacks;
-    private String description;
-    private String idea;
-    private Integer maxMembers;
-    private LocalDateTime dueDateFrom;
-    private LocalDateTime dueDateTo;
-    private String contact;
-    private Integer likedCnt;
-    private Integer viewCnt;
-    private LocalDateTime expirationDate;
-    private ProjectStatus projectStatus;
+public record ProjectInfoResponse (
+        Long projectId,
+        String title,
+        List<String> hashtagNames,
+        Long creatorId,
+        String creatorName,
+        String creatorJob,
+        Integer creatorCareer,
+        Long creatorCompletedProjectCnt,
+        List<String> projectSkillStacks,
+        String description,
+        String idea,
+        Integer maxMembers,
+        LocalDateTime dueDateFrom,
+        LocalDateTime dueDateTo,
+        String contact,
+        Integer likedCnt,
+        Integer viewCnt,
+        LocalDateTime expirationDate,
+        ProjectStatus projectStatus,
+        Boolean isLike,
+        Boolean isApply
 
-    public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt) {
-        ProjectInfoResponse info = new ProjectInfoResponse();
-        info.projectId = project.getId();
-        info.title = project.getTitle();
-        info.hashtagNames = project.getHashtags().stream()
-                .map(Hashtag::getName)
-                .collect(Collectors.toList());
-        project.getProjectMembers().stream()
+) {
+    public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt, Boolean isLike, Boolean isApply) {
+        // 리더 정보 찾기
+        var leader = project.getProjectMembers().stream()
                 .filter(pm -> pm.getRole() == Role.LEADER)
-                .findFirst()
-                .ifPresent(leader -> {
-                    info.creatorId = leader.getMember().getId();
-                    info.creatorName = leader.getMember().getName();
-                    info.creatorJob = leader.getMember().getJob();
-                    info.creatorCareer = leader.getMember().getCareer();
-                });
+                .findFirst();
 
-        info.creatorCompletedProjectCnt = creatorCompletedProjectCnt;
-
-        info.projectSkillStacks = project.getProjectSkillStacks().stream()
-                .map(projectSkillStack -> projectSkillStack.getSkillstack().getName())
-                .collect(Collectors.toList());
-
-        info.description = project.getDescription();
-        info.idea = project.getProjectDetail().getIdea();
-        info.maxMembers = project.getMaxMembers();
-        info.dueDateFrom = project.getDueDateFrom();
-        info.dueDateTo = project.getDueDateTo();
-        info.contact = project.getContact();
-        info.likedCnt = project.getLikedCnt();
-        info.viewCnt = project.getViewCnt();
-        info.expirationDate = project.getExpirationDate();
-        info.projectStatus = project.getStatus();
-        return info;
+        return new ProjectInfoResponse(
+                project.getId(),
+                project.getTitle(),
+                project.getHashtags().stream()
+                        .map(Hashtag::getName)
+                        .collect(Collectors.toList()),
+                leader.map(l -> l.getMember().getId()).orElse(null),
+                leader.map(l -> l.getMember().getName()).orElse(null),
+                leader.map(l -> l.getMember().getJob()).orElse(null),
+                leader.map(l -> l.getMember().getCareer()).orElse(null),
+                creatorCompletedProjectCnt,
+                project.getProjectSkillStacks().stream()
+                        .map(projectSkillStack -> projectSkillStack.getSkillstack().getName())
+                        .collect(Collectors.toList()),
+                project.getDescription(),
+                project.getProjectDetail().getIdea(),
+                project.getMaxMembers(),
+                project.getDueDateFrom(),
+                project.getDueDateTo(),
+                project.getContact(),
+                project.getLikedCnt(),
+                project.getViewCnt(),
+                project.getExpirationDate(),
+                project.getStatus(),
+                isLike,
+                isApply
+        );
     }
 }
