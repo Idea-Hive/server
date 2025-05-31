@@ -101,28 +101,47 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
         QProject project = QProject.project;
         QMember member = QMember.member;
 
+        Boolean isLike = false;
+        Boolean isApply = false;
+
         Project foundProject = queryFactory
                 .selectFrom(project)
                 .where(project.id.eq(projectId))
-                .fetchOne();
-
-        Member foundMember = queryFactory
-                .selectFrom(member)
-                .where(member.id.eq(userId))
                 .fetchOne();
 
         if (foundProject == null) {
             throw new IllegalArgumentException("존재하지 않는 프로젝트입니다.");
         }
 
-        if (foundMember == null) {
-            throw new IllegalArgumentException("존재하지 않는 회원입니다.");
-        }
+        if (userId != null) {
+            Member foundMember = queryFactory
+                    .selectFrom(member)
+                    .where(member.id.eq(userId))
+                    .fetchOne();
 
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(projectId)
-                .memberId(userId)
-                .build();
+            if (foundMember == null) {
+                throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+            }
+
+            ProjectMemberId projectMemberId = ProjectMemberId.builder()
+                    .projectId(projectId)
+                    .memberId(userId)
+                    .build();
+
+            // 들어온 프로젝트에 대해 유저의 찜 여부
+            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+
+            if (optionalProjectMember.isPresent() && optionalProjectMember.get().isLike()) {
+                isLike = true;
+            }
+
+            // 들어온 프로젝트에 대해 듀저의 지원 상태
+            Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(projectMemberId);
+
+            if (optionalProjectApplications.isPresent()) {
+                isApply = true;
+            }
+        }
 
         // 프로젝트 리더의 완료된 프로젝트 개수
         Long completedProjectCnt = foundProject.getProjectMembers().stream()
@@ -138,22 +157,6 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                             .getSingleResult());
                 })
                 .orElse(0L);
-
-        // 들어온 프로젝트에 대해 유저의 찜 여부
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
-
-        Boolean isLike = false;
-        if (optionalProjectMember.isPresent() && optionalProjectMember.get().isLike()) {
-            isLike = true;
-        }
-
-        // 들어온 프로젝트에 대해 듀저의 지원 상태
-        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(projectMemberId);
-
-        Boolean isApply = false;
-        if (optionalProjectApplications.isPresent()) {
-            isApply = true;
-        }
 
         return ProjectInfoResponse.from(foundProject,completedProjectCnt, isLike, isApply);
     }
