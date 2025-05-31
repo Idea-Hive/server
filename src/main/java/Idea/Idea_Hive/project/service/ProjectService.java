@@ -155,13 +155,19 @@ public class ProjectService {
             optionalProjectMember.get().updateProfileShared(true);
         }
     }
+
     @Transactional
     public void recruitMember(Long projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
 
+        // 기존 지원 내역 삭제
+        project.getProjectApplications().clear();
+
         project.updateIsNew(false);
         project.updateStatus(ProjectStatus.RECRUITING);
+        project.updateModifiedDate(LocalDateTime.now());
+        project.updateExpirationDate(LocalDateTime.now().plusMonths(1));
     }
 
     @Transactional

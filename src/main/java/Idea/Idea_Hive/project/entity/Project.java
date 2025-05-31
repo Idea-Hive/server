@@ -177,8 +177,16 @@ public class Project {
         this.status = status;
     }
 
-    public void updateIsNew(boolean isNew) {
+    public void updateIsNew(Boolean isNew) {
         this.isNew = isNew;
+    }
+
+    public void updateModifiedDate(LocalDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public void updateExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
 }
