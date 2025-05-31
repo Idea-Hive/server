@@ -15,7 +15,8 @@ public record ProjectApplicantResponseDto (
         String applicationMessage,
         List<String> skillStacks,
         IsAccepted isAccepted,
-        Long completedProjectCnt
+        Long completedProjectCnt,
+        String rejectionMessage
 ){
 
 
@@ -30,7 +31,8 @@ public record ProjectApplicantResponseDto (
                         .map(memberSkillStack -> memberSkillStack.getSkillstack().getName())
                         .collect(Collectors.toList()),
                 applications.getIsAccepted(),
-                completedProjectCnt
+                completedProjectCnt,
+                applications.getRejectionMessage()
         );
     }
 }

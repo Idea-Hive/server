@@ -200,15 +200,15 @@ public class ProjectService {
                     .role(Role.GUEST)
                     .isProfileShared(false)
                     .profileSharedDate(null)
-                    .isLike(projectLikeRequest.like())
+                    .isLike(projectLikeRequest.isLike())
                     .build();
 
             projectMemberRepository.save(projectMember);
         }else{ // 기존에 ProjectMember에 값이 있을 경우
-            optionalProjectMember.get().updateLike(projectLikeRequest.like());
+            optionalProjectMember.get().updateLike(projectLikeRequest.isLike());
         }
 
-        if (projectLikeRequest.like()) {
+        if (projectLikeRequest.isLike()) {
             projectMemberInfo.getProject().increaseLikedCnt();
         } else {
             projectMemberInfo.getProject().decreaseLikedCnt();

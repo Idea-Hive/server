@@ -29,7 +29,8 @@ public record ProjectInfoResponse (
         LocalDateTime expirationDate,
         ProjectStatus projectStatus,
         Boolean isLike,
-        Boolean isApply
+        Boolean isApply,
+        Boolean isNew
 
 ) {
     public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt, Boolean isLike, Boolean isApply) {
@@ -63,7 +64,8 @@ public record ProjectInfoResponse (
                 project.getExpirationDate(),
                 project.getStatus(),
                 isLike,
-                isApply
+                isApply,
+                project.getIsNew()
         );
     }
 }

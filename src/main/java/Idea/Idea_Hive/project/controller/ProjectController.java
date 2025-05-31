@@ -29,7 +29,7 @@ public class ProjectController {
     @Operation(summary = "프로젝트 상세 조회")
     @GetMapping("/info")
     public ResponseEntity<ProjectInfoResponse> projectInfo(@RequestParam(required = true) Long projectId,
-                                                           @RequestParam(required = true) Long userId) {
+                                                           @RequestParam(required = false) Long userId) {
         ProjectInfoResponse projectInfoResponse = projectService.getProjectInfo(projectId, userId);
         return ResponseEntity.ok(projectInfoResponse);
     }
