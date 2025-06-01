@@ -170,9 +170,9 @@ public class ProjectCreateService {
         if (!StringUtils.hasText(request.description())) {
             throw new IllegalArgumentException("설명은 필수 입력값입니다.");
         }
-        if (!StringUtils.hasText(request.idea())) {
-            throw new IllegalArgumentException("아이디어는 필수 입력값입니다.");
-        }
+//        if (!StringUtils.hasText(request.idea())) {
+//            throw new IllegalArgumentException("아이디어는 필수 입력값입니다.");
+//        }
         if (!StringUtils.hasText(request.contact())) {
             throw new IllegalArgumentException("연락처는 필수 입력값입니다.");
         }
