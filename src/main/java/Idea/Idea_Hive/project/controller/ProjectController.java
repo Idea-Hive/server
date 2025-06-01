@@ -79,7 +79,7 @@ public class ProjectController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "지원자 거절/확정/확정취소", description = "decision 값은 CONFIRMED(확정), REJECTED(거절), UNDECIDED(확정취소) 가능")
+    @Operation(summary = "지원자 거절/확정/확정취소", description = "decision 값은 CONFIRMED(확정), REJECTED(거절), CANCEL_CONFIRM(확정취소) 가능")
     @PostMapping("/apply/decision")
     public ResponseEntity<Void> projectApplyDecision(@RequestBody ProjectApplyDecisionRequest projectApplyDecisionRequest) {
         projectService.projectApplyDecision(projectApplyDecisionRequest);

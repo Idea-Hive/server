@@ -102,16 +102,28 @@ public class ProjectService {
 
     @Transactional
     public void projectApplyDecision(ProjectApplyDecisionRequest projectApplyDecisionRequest) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.projectId(), projectApplyDecisionRequest.memberId());
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.projectId(), projectApplyDecisionRequest.userId());
 
         Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
 
         if (optionalProjectApplications.isEmpty()) {
             throw new IllegalArgumentException("지원한 내용이 없습니다.");
         } else {
-            optionalProjectApplications.get().updateIsAcceptedAndRejectMessage(
-                    projectApplyDecisionRequest.decision(),
-                    projectApplyDecisionRequest.rejectionMessage());
+            optionalProjectApplications.get().updateIsAccepted(
+                    projectApplyDecisionRequest.decision()
+            );
+
+            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
+
+            if (optionalProjectMember.isEmpty()) {
+                throw new IllegalArgumentException("ProjectMember 테이블에 데이터가 존재하지 않습니다.");
+            }
+
+            if (projectApplyDecisionRequest.decision() == IsAccepted.CONFIRMED) {
+                optionalProjectMember.get().updateRole(Role.TEAM_MEMBER);
+            } else if (projectApplyDecisionRequest.decision() == IsAccepted.CANCEL_CONFIRM) {
+                optionalProjectMember.get().updateRole(Role.GUEST);
+            }
         }
     }
 
@@ -129,6 +141,27 @@ public class ProjectService {
                     info.getMember(),
                     projectApplyRequest.message(),
                     IsAccepted.UNDECIDED);
+
+            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
+
+            // 기존에 ProjectMember에 값이 없을 경우 새로운 값 추가
+            if (optionalProjectMember.isEmpty()) {
+
+                ProjectMember projectMember = ProjectMember.builder()
+                        .id(info.getProjectMemberId())
+                        .project(info.getProject())
+                        .member(info.getMember())
+                        .role(Role.GUEST)
+                        .isProfileShared(true)
+                        .profileSharedDate(LocalDateTime.now())
+                        .isLike(false)
+                        .build();
+
+                projectMemberRepository.save(projectMember);
+
+            } else{ // 기존에 ProjectMember에 값이 있을 경우
+                optionalProjectMember.get().updateProfileShared(true);
+            }
         }
     }
 

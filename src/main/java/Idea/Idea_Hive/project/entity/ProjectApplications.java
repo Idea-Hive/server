@@ -38,8 +38,11 @@ public class ProjectApplications {
 
     private String rejectionMessage;
 
-    public void updateIsAcceptedAndRejectMessage(IsAccepted isAccepted, String rejectionMessage) {
+    public void updateIsAccepted(IsAccepted isAccepted) {
         this.isAccepted = isAccepted;
+    }
+
+    public void updateRejectionMessage(String rejectionMessage) {
         this.rejectionMessage = rejectionMessage;
     }
 
