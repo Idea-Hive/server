@@ -29,11 +29,12 @@ public class JwtProvider {
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
     }
 
-    public String createAccessToken(final String email) {
+    public String createAccessToken(final String email, final Long id) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.accessTokenValidityInMillisecnds);
         return Jwts.builder()
                 .setSubject(email)
+                .setId(id.toString())
                 .setIssuer("Taskmate")
                 .setIssuedAt(now)
                 .setExpiration(validity)
@@ -42,11 +43,12 @@ public class JwtProvider {
                 .compact();
     }
 
-    public String createRefreshToken(final String email) {
+    public String createRefreshToken(final String email, final Long id) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.refreshTokenValidityInMilliseconds);
         return Jwts.builder()
                 .setSubject(email)
+                .setId(id.toString())
                 .setIssuer("Taskmate")
                 .setIssuedAt(now)
                 .setExpiration(validity)
@@ -76,6 +78,12 @@ public class JwtProvider {
         return parseToken(jwt)
                 .getBody()
                 .getSubject();
+    }
+
+    public Long getId(String jwt) {
+        return Long.valueOf(parseToken(jwt)
+                .getBody()
+                .getId());
     }
 
     public Claims getClaims(String jwt) {
