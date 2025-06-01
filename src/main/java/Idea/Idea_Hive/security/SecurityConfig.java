@@ -92,6 +92,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/project/info").permitAll()
                             .requestMatchers("/api/project/applicants").permitAll()
                             .requestMatchers("/api/member/password-reset").permitAll()
+                            .requestMatchers("/api/project/viewCnt").permitAll()
                             .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */

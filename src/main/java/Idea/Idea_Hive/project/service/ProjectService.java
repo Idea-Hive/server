@@ -179,9 +179,13 @@ public class ProjectService {
 
     @Transactional
     public ProjectInfoResponse getProjectInfo(Long projectId, Long userId) {
-        projectRepository.increaseViewCnt(projectId);
         ProjectInfoResponse projectInfoResponse = projectRepository.findProjectInfoById(projectId, userId);
         return projectInfoResponse;
+    }
+
+    @Transactional
+    public void increaseViewCnt(Long projectId) {
+        projectRepository.increaseViewCnt(projectId);
     }
 
     @Transactional

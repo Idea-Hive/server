@@ -99,6 +99,13 @@ public class ProjectController {
         projectService.projectApplyDelete(projectIdAndMemberIdDto);
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "조회수 count")
+    @PostMapping("/viewCnt")
+    public ResponseEntity<Void> projectIncreaseViewCnt(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
+        projectService.increaseViewCnt(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
 }
 
 
