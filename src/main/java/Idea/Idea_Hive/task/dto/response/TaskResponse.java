@@ -17,7 +17,7 @@ public record TaskResponse(
         Date uploadDate
 ) {
 
-    private TaskResponse from(Task task) {
+    public static TaskResponse from(Task task) {
         return new TaskResponse(
                 task.getId(),
                 task.getIsRequired(),

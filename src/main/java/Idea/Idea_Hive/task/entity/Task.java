@@ -22,6 +22,7 @@ public class Task {
 
     private String title;
 
+    @Enumerated(EnumType.STRING)
     private TaskType taskType;
 
     // 업로드된 파일 경로

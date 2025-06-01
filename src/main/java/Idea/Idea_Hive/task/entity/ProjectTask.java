@@ -14,4 +14,6 @@ public class ProjectTask {
 
     @EmbeddedId
     private ProjectTaskId id;
+
+
 }
