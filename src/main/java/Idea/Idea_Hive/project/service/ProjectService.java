@@ -130,6 +130,16 @@ public class ProjectService {
                 projectApplyRequest.memberId()
         );
 
+        //이전 지원 기록이 있는 경우 이전 거절 메시지 저장
+        String preRejectionMessage = null;
+        if (isReApplication) {
+            preRejectionMessage = projectApplicationsRepository.findTopByProjectIdAndMemberIdOrderByApplicationDateDesc(
+                            projectApplyRequest.projectId(),
+                            projectApplyRequest.memberId()
+                    ).map(ProjectApplications::getRejectionMessage)
+                    .orElse(null);
+        }
+
         //ProjectApplications 추가
         ProjectApplications newApplicant = ProjectApplications.builder()
                 .project(info.getProject())
@@ -138,6 +148,7 @@ public class ProjectService {
                 .isAccepted(IsAccepted.UNDECIDED)
                 .applicationDate(LocalDateTime.now())
                 .isReApplication(isReApplication)
+                .preRejectionMessage(preRejectionMessage)
                 .build();
 
         //Project에 지원자 추가

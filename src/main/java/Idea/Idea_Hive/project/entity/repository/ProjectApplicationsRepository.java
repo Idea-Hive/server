@@ -14,5 +14,7 @@ public interface ProjectApplicationsRepository extends JpaRepository<ProjectAppl
 
     boolean existsByProjectIdAndMemberId(Long projectId, Long memberId);
 
+    Optional<ProjectApplications> findTopByProjectIdAndMemberIdOrderByApplicationDateDesc(Long projectId, Long memberId);
+
     void delete(ProjectApplications projectApplications);
 }

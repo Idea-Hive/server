@@ -30,7 +30,8 @@ public record ProjectInfoResponse (
         ProjectStatus projectStatus,
         Boolean isLike,
         Boolean isApply,
-        Boolean isNew
+        Boolean isNew,
+        LocalDateTime createDate
 
 ) {
     public static ProjectInfoResponse from(Project project, Long creatorCompletedProjectCnt, Boolean isLike, Boolean isApply) {
@@ -65,7 +66,8 @@ public record ProjectInfoResponse (
                 project.getStatus(),
                 isLike,
                 isApply,
-                project.getIsNew()
+                project.getIsNew(),
+                project.getCreatedDate()
         );
     }
 }

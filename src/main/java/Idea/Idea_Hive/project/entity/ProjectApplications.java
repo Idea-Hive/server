@@ -40,6 +40,8 @@ public class ProjectApplications {
 
     private Boolean isReApplication;
 
+    private String preRejectionMessage;
+
     public void updateIsAccepted(IsAccepted isAccepted) {
         this.isAccepted = isAccepted;
     }

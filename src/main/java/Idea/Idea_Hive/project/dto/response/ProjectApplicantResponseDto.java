@@ -18,7 +18,8 @@ public record ProjectApplicantResponseDto (
         IsAccepted isAccepted,
         Long completedProjectCnt,
         String rejectionMessage,
-        Boolean isReApplication
+        Boolean isReApplication,
+        String preRejectionMessage
 ){
 
 
@@ -36,7 +37,8 @@ public record ProjectApplicantResponseDto (
                 applications.getIsAccepted(),
                 completedProjectCnt,
                 applications.getRejectionMessage(),
-                applications.getIsReApplication()
+                applications.getIsReApplication(),
+                applications.getPreRejectionMessage()
         );
     }
 }
