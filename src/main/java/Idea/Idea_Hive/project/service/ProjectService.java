@@ -3,10 +3,7 @@ package Idea.Idea_Hive.project.service;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
-import Idea.Idea_Hive.project.dto.request.ProjectApplyDecisionRequest;
-import Idea.Idea_Hive.project.dto.request.ProjectApplyRequest;
-import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
-import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
+import Idea.Idea_Hive.project.dto.request.*;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.entity.*;
@@ -72,30 +69,25 @@ public class ProjectService {
     }
 
     @Transactional
-    public void projectApplyDelete(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectIdAndMemberIdDto.projectId(), projectIdAndMemberIdDto.memberId());
+    public void projectApplyDelete(Long applyId) {
+        ProjectApplications projectApplications = projectApplicationsRepository.findById(applyId)
+                .orElseThrow(() -> new IllegalArgumentException("지원한 내용이 없습니다."));
 
-        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
-
-        if (optionalProjectApplications.isEmpty()) {
-            throw new IllegalArgumentException("지원한 내용이 없습니다.");
-        } else {
-            ProjectApplications projectApplications = optionalProjectApplications.get();
-            info.getProject().getProjectApplications().remove(projectApplications);
-            projectApplicationsRepository.delete(projectApplications);
-        }
+        Project project = projectApplications.getProject();
+        project.getProjectApplications().remove(projectApplications);
+        projectApplicationsRepository.delete(projectApplications);
     }
 
     @Transactional
-    public void projectApplyUpdate(ProjectApplyRequest projectApplyRequest) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.projectId(), projectApplyRequest.memberId());
+    public void projectApplyUpdate(ProjectApplyUpdateRequest projectApplyUpdateRequest) {
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyUpdateRequest.projectId(), projectApplyUpdateRequest.memberId());
 
-        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(projectApplyUpdateRequest.applyId());
 
         if (optionalProjectApplications.isEmpty()) {
             throw new IllegalArgumentException("지원한 내용이 없습니다.");
         } else {
-            optionalProjectApplications.get().updateApplicationMessage(projectApplyRequest.message());
+            optionalProjectApplications.get().updateApplicationMessage(projectApplyUpdateRequest.message());
         }
     }
 
@@ -104,7 +96,7 @@ public class ProjectService {
     public void projectApplyDecision(ProjectApplyDecisionRequest projectApplyDecisionRequest) {
         ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.projectId(), projectApplyDecisionRequest.userId());
 
-        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(projectApplyDecisionRequest.applyId());
 
         if (optionalProjectApplications.isEmpty()) {
             throw new IllegalArgumentException("지원한 내용이 없습니다.");
@@ -121,8 +113,9 @@ public class ProjectService {
 
             if (projectApplyDecisionRequest.decision() == IsAccepted.CONFIRMED) {
                 optionalProjectMember.get().updateRole(Role.TEAM_MEMBER);
-            } else if (projectApplyDecisionRequest.decision() == IsAccepted.CANCEL_CONFIRM) {
+            } else if (projectApplyDecisionRequest.decision() == IsAccepted.CANCEL_CONFIRM) { // 확정 취소의 경우 ProjectApplications의 isAccepted를 미정으로 변경
                 optionalProjectMember.get().updateRole(Role.GUEST);
+                optionalProjectApplications.get().updateIsAccepted(IsAccepted.UNDECIDED);
             }
         }
     }
@@ -131,38 +124,47 @@ public class ProjectService {
     public void applyProject(ProjectApplyRequest projectApplyRequest) {
         ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyRequest.projectId(), projectApplyRequest.memberId());
 
-        Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(info.getProjectMemberId());
+        //이전 지원 기록 확인
+        boolean isReApplication = projectApplicationsRepository.existsByProjectIdAndMemberId(
+                projectApplyRequest.projectId(),
+                projectApplyRequest.memberId()
+        );
 
-        if (optionalProjectApplications.isPresent()) {
-            throw new IllegalArgumentException("이미 지원한 프로젝트입니다.");
-        } else {
-            info.getProject().addProjectApplications(
-                    info.getProjectMemberId(),
-                    info.getMember(),
-                    projectApplyRequest.message(),
-                    IsAccepted.UNDECIDED);
+        //ProjectApplications 추가
+        ProjectApplications newApplicant = ProjectApplications.builder()
+                .project(info.getProject())
+                .member(info.getMember())
+                .applicationMessage(projectApplyRequest.message())
+                .isAccepted(IsAccepted.UNDECIDED)
+                .applicationDate(LocalDateTime.now())
+                .isReApplication(isReApplication)
+                .build();
 
-            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
+        //Project에 지원자 추가
+        info.getProject().getProjectApplications().add(newApplicant);
+        projectApplicationsRepository.save(newApplicant);
 
-            // 기존에 ProjectMember에 값이 없을 경우 새로운 값 추가
-            if (optionalProjectMember.isEmpty()) {
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
 
-                ProjectMember projectMember = ProjectMember.builder()
-                        .id(info.getProjectMemberId())
-                        .project(info.getProject())
-                        .member(info.getMember())
-                        .role(Role.GUEST)
-                        .isProfileShared(true)
-                        .profileSharedDate(LocalDateTime.now())
-                        .isLike(false)
-                        .build();
+        // 기존에 ProjectMember에 값이 없을 경우 새로운 값 추가
+        if (optionalProjectMember.isEmpty()) {
 
-                projectMemberRepository.save(projectMember);
+            ProjectMember projectMember = ProjectMember.builder()
+                    .id(info.getProjectMemberId())
+                    .project(info.getProject())
+                    .member(info.getMember())
+                    .role(Role.GUEST)
+                    .isProfileShared(true)
+                    .profileSharedDate(LocalDateTime.now())
+                    .isLike(false)
+                    .build();
 
-            } else{ // 기존에 ProjectMember에 값이 있을 경우
-                optionalProjectMember.get().updateProfileShared(true);
-            }
+            projectMemberRepository.save(projectMember);
+
+        } else{ // 기존에 ProjectMember에 값이 있을 경우
+            optionalProjectMember.get().updateProfileShared(true);
         }
+
     }
 
     @Transactional

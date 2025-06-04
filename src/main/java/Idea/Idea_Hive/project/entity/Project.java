@@ -150,7 +150,7 @@ public class Project {
     }
 
     // ProjectApplications 추가 메서드
-    public ProjectApplications addProjectApplications(ProjectMemberId id, Member member, String message, IsAccepted isAccepted) {
+    public ProjectApplications addProjectApplications(Long id, Member member, String message, IsAccepted isAccepted) {
         ProjectApplications projectApplications = ProjectApplications.builder()
                 .id(id)
                 .member(member)

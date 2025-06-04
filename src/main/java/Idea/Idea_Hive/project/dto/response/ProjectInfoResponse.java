@@ -19,7 +19,7 @@ public record ProjectInfoResponse (
         Long creatorCompletedProjectCnt,
         List<String> projectSkillStacks,
         String description,
-        String idea,
+//        String idea,
         Integer maxMembers,
         LocalDateTime dueDateFrom,
         LocalDateTime dueDateTo,
@@ -54,7 +54,7 @@ public record ProjectInfoResponse (
                         .map(projectSkillStack -> projectSkillStack.getSkillstack().getName())
                         .collect(Collectors.toList()),
                 project.getDescription(),
-                project.getProjectDetail().getIdea(),
+//                project.getProjectDetail().getIdea(),
                 project.getMaxMembers(),
                 project.getDueDateFrom(),
                 project.getDueDateTo(),

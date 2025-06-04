@@ -135,10 +135,27 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 isLike = true;
             }
 
-            // 들어온 프로젝트에 대해 듀저의 지원 상태
-            Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(projectMemberId);
+            // 들어온 프로젝트에 대해 유저의 지원 상태
+            QProjectApplications projectApplications = QProjectApplications.projectApplications;
+            ProjectApplications latestApplications = queryFactory
+                    .selectFrom(projectApplications)
+                    .where(
+                            projectApplications.project.id.eq(projectId),
+                            projectApplications.member.id.eq(userId)
+                    )
+                    .orderBy(projectApplications.applicationDate.desc())
+                    .fetchFirst();
 
-            if (optionalProjectApplications.isPresent()) {
+            // 지원하기 가능한 상태:
+            // 1. ProjectApplications 값이 없을 경우
+            // 2. ProjectApplications 테이블에서 IsAccept 값이 REJECTED 인 경우
+            if (latestApplications == null) {
+                isApply = false;
+            } else if (latestApplications.getIsAccepted() == IsAccepted.REJECTED) {
+                isApply = false;
+            } else {
+                // 지원하기 불가능한 상태:
+                // ProjectApplications 테이블에서 IsAccept 값이 CONFIRMED, UNDECIDED 인 경우
                 isApply = true;
             }
         }

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record ProjectApplicantResponseDto (
+        Long applyId,
         Long memberId,
         String name,
         String job,
@@ -16,12 +17,14 @@ public record ProjectApplicantResponseDto (
         List<String> skillStacks,
         IsAccepted isAccepted,
         Long completedProjectCnt,
-        String rejectionMessage
+        String rejectionMessage,
+        Boolean isReApplication
 ){
 
 
     public static ProjectApplicantResponseDto from(ProjectApplications applications, Long completedProjectCnt) {
         return new ProjectApplicantResponseDto(
+                applications.getId(),
                 applications.getMember().getId(),
                 applications.getMember().getName(),
                 applications.getMember().getJob(),
@@ -32,7 +35,8 @@ public record ProjectApplicantResponseDto (
                         .collect(Collectors.toList()),
                 applications.getIsAccepted(),
                 completedProjectCnt,
-                applications.getRejectionMessage()
+                applications.getRejectionMessage(),
+                applications.getIsReApplication()
         );
     }
 }

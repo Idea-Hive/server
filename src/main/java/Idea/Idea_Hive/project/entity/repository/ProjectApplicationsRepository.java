@@ -10,7 +10,9 @@ import java.util.Optional;
 
 @Repository
 public interface ProjectApplicationsRepository extends JpaRepository<ProjectApplications, Long> {
-    Optional<ProjectApplications> findById(ProjectMemberId projectMemberId);
+    Optional<ProjectApplications> findById(Long id);
+
+    boolean existsByProjectIdAndMemberId(Long projectId, Long memberId);
 
     void delete(ProjectApplications projectApplications);
 }

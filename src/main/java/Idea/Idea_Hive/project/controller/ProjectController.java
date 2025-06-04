@@ -1,9 +1,6 @@
 package Idea.Idea_Hive.project.controller;
 
-import Idea.Idea_Hive.project.dto.request.ProjectApplyDecisionRequest;
-import Idea.Idea_Hive.project.dto.request.ProjectApplyRequest;
-import Idea.Idea_Hive.project.dto.request.ProjectIdAndMemberIdDto;
-import Idea.Idea_Hive.project.dto.request.ProjectLikeRequest;
+import Idea.Idea_Hive.project.dto.request.*;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.service.ProjectService;
@@ -88,15 +85,15 @@ public class ProjectController {
 
     @Operation(summary = "지원하기 수정")
     @PostMapping("/apply/update")
-    public ResponseEntity<Void> projectApplyUpdate(@RequestBody ProjectApplyRequest projectApplyRequest) {
-        projectService.projectApplyUpdate(projectApplyRequest);
+    public ResponseEntity<Void> projectApplyUpdate(@RequestBody ProjectApplyUpdateRequest projectApplyUpdateRequest) {
+        projectService.projectApplyUpdate(projectApplyUpdateRequest);
         return ResponseEntity.ok().build();
     }
 
     @Operation(summary = "지원취소")
     @DeleteMapping("/apply")
-    public ResponseEntity<Void> projectApplyDelete(@RequestBody ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
-        projectService.projectApplyDelete(projectIdAndMemberIdDto);
+    public ResponseEntity<Void> projectApplyDelete(@RequestBody @Schema(example = "{\"applyId\":1}") Map<String, Long> applyId) {
+        projectService.projectApplyDelete(applyId.get("applyId"));
         return ResponseEntity.ok().build();
     }
 

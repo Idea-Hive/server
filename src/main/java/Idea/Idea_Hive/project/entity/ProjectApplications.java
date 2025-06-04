@@ -16,16 +16,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class ProjectApplications {
 
-    @EmbeddedId
-    private ProjectMemberId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", updatable = false)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("projectId")
     @JoinColumn(name = "project_id")
     private Project project;
 
@@ -37,6 +37,8 @@ public class ProjectApplications {
     private LocalDateTime applicationDate;
 
     private String rejectionMessage;
+
+    private Boolean isReApplication;
 
     public void updateIsAccepted(IsAccepted isAccepted) {
         this.isAccepted = isAccepted;
