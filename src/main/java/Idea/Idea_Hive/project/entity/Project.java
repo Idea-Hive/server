@@ -189,4 +189,20 @@ public class Project {
         this.expirationDate = expirationDate;
     }
 
+    public void updateSearchDate(LocalDateTime searchDate) {
+        this.searchDate = searchDate;
+    }
+
+    // 프로젝트 정보 수정
+    public void updateProjectInfo(String title, String description,String contact, Integer maxMembers,
+                                       LocalDateTime dueDateFrom, LocalDateTime dueDateTo) {
+        this.title = title;
+        this.description = description;
+        this.contact = contact;
+        this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
+        this.modifiedDate = LocalDateTime.now();
+    }
+
 }

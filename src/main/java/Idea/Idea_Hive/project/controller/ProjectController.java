@@ -103,6 +103,20 @@ public class ProjectController {
         projectService.increaseViewCnt(projectId.get("projectId"));
         return ResponseEntity.ok().build();
     }
+
+    @Operation(summary = "끌어올리기")
+    @PostMapping("/pushToTop")
+    public ResponseEntity<Void> projectPushToTop(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
+        projectService.pushToTop(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로젝트 수정")
+    @PostMapping("/update")
+    public ResponseEntity<Long> projectUpdate(@RequestBody ProjectUpdateRequest projectUpdateRequest) {
+        Long projectId = projectService.projectUpdate(projectUpdateRequest);
+        return ResponseEntity.ok(projectId);
+    }
 }
 
 

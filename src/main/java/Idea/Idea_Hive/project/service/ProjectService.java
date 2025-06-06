@@ -10,6 +10,8 @@ import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectApplicationsRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
+import Idea.Idea_Hive.project.entity.repository.SkillStackRepository;
+import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +20,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -32,6 +36,7 @@ public class ProjectService {
     private final ProjectMemberRepository projectMemberRepository;
     private final MemberJpaRepo memberJpaRepo;
     private final ProjectApplicationsRepository projectApplicationsRepository;
+    private final SkillStackRepository skillStackRepository;
 
     /**
      * 프로젝트와 멤버 정보를 조회하는 유틸리티 메서드
@@ -268,6 +273,98 @@ public class ProjectService {
             projectMemberInfo.getProject().increaseLikedCnt();
         } else {
             projectMemberInfo.getProject().decreaseLikedCnt();
+        }
+    }
+
+    // 끌어올리기
+    @Transactional
+    public void pushToTop(Long projectId) {
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+
+        project.updateSearchDate(LocalDateTime.now());
+        project.updateExpirationDate(LocalDateTime.now().plusMonths(1));
+    }
+
+    // 프로젝트 수정
+    @Transactional
+    public Long projectUpdate(ProjectUpdateRequest request) {
+
+        //validation 체크
+        validationProjectRequest(request);
+
+        Project project = projectRepository.findById(request.projectId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+
+        //프로젝트 정보 수정
+        project.updateProjectInfo(
+                request.title(),
+                request.description(),
+                request.contact(),
+                request.maxMembers(),
+                request.dueDateFrom(),
+                request.dueDateTo()
+        );
+
+        //기술스택 수정
+        if (request.skillStackIds() == null || request.skillStackIds().isEmpty()) { //기술스택이 없을 경우 모두 삭제
+            project.getProjectSkillStacks().clear();
+        } else {
+            List<SkillStack> skillStacks = skillStackRepository.findAllById(request.skillStackIds());
+            if (skillStacks.size() != request.skillStackIds().size()) {
+                throw new IllegalArgumentException("존재하지 않는 기술스택이 포함되어 있습니다.");
+            }
+
+            //기존 기술스택 중 요청에 없는 것들 삭제
+            project.getProjectSkillStacks().removeIf(projectSkillStack ->
+                    !request.skillStackIds().contains(projectSkillStack.getSkillstack().getId()));
+
+            //새로운 기술스택 추가
+            for (SkillStack skillStack : skillStacks) {
+                boolean exists = project.getProjectSkillStacks().stream()
+                        .anyMatch(ps -> ps.getSkillstack().getId().equals(skillStack.getId()));
+                if (!exists) {
+                    project.addSkillStack(skillStack);
+                }
+            }
+        }
+
+        // 해시태그 수정
+        if (request.hashtags() == null || request.hashtags().isEmpty()) {
+            project.getHashtags().clear();
+        } else {
+            //기존 해시태그 중 새로운 해시태그 목록에 없는 것만 삭제
+            project.getHashtags().removeIf(hashtag ->
+                    !request.hashtags().contains(hashtag.getName()));
+
+            // 새로운 해시태그 중 기존에 없는 것만 추가
+            for (String hashtagName : request.hashtags()) {
+                boolean exists = project.getHashtags().stream()
+                        .anyMatch(hashtag -> hashtag.getName().equals(hashtagName));
+                if (!exists) {
+                    project.addHashtag(hashtagName);
+                }
+            }
+        }
+
+        return project.getId();
+    }
+
+    private void validationProjectRequest(ProjectUpdateRequest request) {
+        if (!StringUtils.hasText(request.title())) {
+            throw new IllegalArgumentException("제목은 필수 입력값입니다.");
+        }
+        if (!StringUtils.hasText(request.description())) {
+            throw new IllegalArgumentException("설명은 필수 입력값입니다.");
+        }
+//        if (!StringUtils.hasText(request.idea())) {
+//            throw new IllegalArgumentException("아이디어는 필수 입력값입니다.");
+//        }
+        if (!StringUtils.hasText(request.contact())) {
+            throw new IllegalArgumentException("연락처는 필수 입력값입니다.");
+        }
+        if (request.maxMembers() == null || request.maxMembers() <= 0) {
+            throw new IllegalArgumentException("최대 인원은 1명 이상이어야 합니다.");
         }
     }
 }
