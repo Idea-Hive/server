@@ -3,9 +3,8 @@ package Idea.Idea_Hive.project.dto.request;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record ProjectCreateRequest (
+public record ProjectUpdateRequest(
         Long projectId,
-        Long userId,
         String title,
         String description,
         String idea,
@@ -14,6 +13,6 @@ public record ProjectCreateRequest (
         LocalDateTime dueDateFrom,
         LocalDateTime dueDateTo,
         List<Long> skillStackIds,
-        List<String> hashtags,
-        Boolean isSave
-){}
+        List<String> hashtags
+) {
+}

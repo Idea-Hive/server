@@ -1,7 +1,8 @@
 package Idea.Idea_Hive.project.dto.request;
 
-public record ProjectLikeRequest(
+public record ProjectApplyUpdateRequest(
         Long projectId,
         Long memberId,
-        Boolean isLike
-) {}
+        Long applyId,
+        String message) {
+}

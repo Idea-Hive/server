@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProjectRepositoryCustom {
     Page<Project> searchByKeyword(String keyword, String recruitType, String sortType, Pageable pageable);
-    ProjectInfoResponse findProjectInfoById(Long projectId);
+    ProjectInfoResponse findProjectInfoById(Long projectId, Long userId);
     ProjectTempSavedInfoResponse findTempSavedProjectInfoById(Long projectId);
     void increaseViewCnt(Long projectId);
     Page<ProjectApplications> findApplicantInfoById(Long projectId, Pageable pageable);

@@ -150,7 +150,7 @@ public class Project {
     }
 
     // ProjectApplications 추가 메서드
-    public ProjectApplications addProjectApplications(ProjectMemberId id, Member member, String message, IsAccepted isAccepted) {
+    public ProjectApplications addProjectApplications(Long id, Member member, String message, IsAccepted isAccepted) {
         ProjectApplications projectApplications = ProjectApplications.builder()
                 .id(id)
                 .member(member)
@@ -177,8 +177,32 @@ public class Project {
         this.status = status;
     }
 
-    public void updateIsNew(boolean isNew) {
+    public void updateIsNew(Boolean isNew) {
         this.isNew = isNew;
+    }
+
+    public void updateModifiedDate(LocalDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public void updateExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public void updateSearchDate(LocalDateTime searchDate) {
+        this.searchDate = searchDate;
+    }
+
+    // 프로젝트 정보 수정
+    public void updateProjectInfo(String title, String description,String contact, Integer maxMembers,
+                                       LocalDateTime dueDateFrom, LocalDateTime dueDateTo) {
+        this.title = title;
+        this.description = description;
+        this.contact = contact;
+        this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
+        this.modifiedDate = LocalDateTime.now();
     }
 
 }

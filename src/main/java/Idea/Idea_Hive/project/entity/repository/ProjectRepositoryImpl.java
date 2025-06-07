@@ -1,6 +1,8 @@
 package Idea.Idea_Hive.project.entity.repository;
 
 import Idea.Idea_Hive.hashtag.entity.QHashtag;
+import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.member.entity.QMember;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectTempSavedInfoResponse;
 import Idea.Idea_Hive.project.entity.*;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -27,6 +30,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
     private final EntityManager entityManager;
+    private final ProjectMemberRepository projectMemberRepository;
+    private final ProjectApplicationsRepository projectApplicationsRepository;
 
     @Override
     public Page<ProjectApplications> findApplicantInfoById(Long projectId, Pageable pageable) {
@@ -92,8 +97,12 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
     }
 
     @Override
-    public ProjectInfoResponse findProjectInfoById(Long projectId) {
+    public ProjectInfoResponse findProjectInfoById(Long projectId, Long userId) {
         QProject project = QProject.project;
+        QMember member = QMember.member;
+
+        Boolean isLike = false;
+        Boolean isApply = false;
 
         Project foundProject = queryFactory
                 .selectFrom(project)
@@ -102,6 +111,53 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
 
         if (foundProject == null) {
             throw new IllegalArgumentException("존재하지 않는 프로젝트입니다.");
+        }
+
+        if (userId != null) {
+            Member foundMember = queryFactory
+                    .selectFrom(member)
+                    .where(member.id.eq(userId))
+                    .fetchOne();
+
+            if (foundMember == null) {
+                throw new IllegalArgumentException("존재하지 않는 회원입니다.");
+            }
+
+            ProjectMemberId projectMemberId = ProjectMemberId.builder()
+                    .projectId(projectId)
+                    .memberId(userId)
+                    .build();
+
+            // 들어온 프로젝트에 대해 유저의 찜 여부
+            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+
+            if (optionalProjectMember.isPresent() && optionalProjectMember.get().isLike()) {
+                isLike = true;
+            }
+
+            // 들어온 프로젝트에 대해 유저의 지원 상태
+            QProjectApplications projectApplications = QProjectApplications.projectApplications;
+            ProjectApplications latestApplications = queryFactory
+                    .selectFrom(projectApplications)
+                    .where(
+                            projectApplications.project.id.eq(projectId),
+                            projectApplications.member.id.eq(userId)
+                    )
+                    .orderBy(projectApplications.applicationDate.desc())
+                    .fetchFirst();
+
+            // 지원하기 가능한 상태:
+            // 1. ProjectApplications 값이 없을 경우
+            // 2. ProjectApplications 테이블에서 IsAccept 값이 REJECTED 인 경우
+            if (latestApplications == null) {
+                isApply = false;
+            } else if (latestApplications.getIsAccepted() == IsAccepted.REJECTED) {
+                isApply = false;
+            } else {
+                // 지원하기 불가능한 상태:
+                // ProjectApplications 테이블에서 IsAccept 값이 CONFIRMED, UNDECIDED 인 경우
+                isApply = true;
+            }
         }
 
         // 프로젝트 리더의 완료된 프로젝트 개수
@@ -119,7 +175,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 })
                 .orElse(0L);
 
-        return ProjectInfoResponse.from(foundProject,completedProjectCnt);
+        return ProjectInfoResponse.from(foundProject,completedProjectCnt, isLike, isApply);
     }
 
     @Override
