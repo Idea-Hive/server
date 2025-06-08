@@ -33,10 +33,11 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         if (atk != null) {
             jwtProvider.validateToken(atk);
             String email = jwtProvider.getEmail(atk);
+            Long id = jwtProvider.getId(atk);
 
             return new UsernamePasswordAuthenticationToken(
                     email,
-                    null,
+                    id,
                     null
             );
         } else {

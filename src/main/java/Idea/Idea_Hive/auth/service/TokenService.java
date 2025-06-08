@@ -1,6 +1,8 @@
 package Idea.Idea_Hive.auth.service;
 
 import Idea.Idea_Hive.auth.dto.response.TokenResponse;
+import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.redis.RedisDao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,10 +16,16 @@ public class TokenService {
 
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
+    private final MemberJpaRepo memberJpaRepo;
 
     public TokenResponse createTokens(String email) {
-        String accessToken = jwtProvider.createAccessToken(email);
-        String refreshToken = jwtProvider.createRefreshToken(email);
+        Member member = memberJpaRepo.findByEmail(email)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("존재하지 않는 이메일 입니다.")
+                );
+
+        String accessToken = jwtProvider.createAccessToken(email, member.getId());
+        String refreshToken = jwtProvider.createRefreshToken(email, member.getId());
         long refreshTokenExpire = jwtProvider.getRefreshTokenValidityInMilliseconds();
         redisDao.setValues(email, refreshToken, Duration.ofMillis(refreshTokenExpire));
         return new TokenResponse(accessToken, refreshToken);
@@ -31,7 +39,11 @@ public class TokenService {
     }
 
     public String createRefreshToken(String email) {
-        return jwtProvider.createRefreshToken(email);
+        Member member = memberJpaRepo.findByEmail(email)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("존재하지 않는 이메일 입니다.")
+                );
+        return jwtProvider.createRefreshToken(email, member.getId());
     }
 
     public long getRefreshTokenValidityInMilliseconds() {
