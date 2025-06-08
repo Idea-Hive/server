@@ -1,7 +1,9 @@
 package Idea.Idea_Hive.task.entity;
 
+import Idea.Idea_Hive.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 
@@ -29,11 +31,19 @@ public class Task {
     private String filePath;
 
     // 담당자 (person in charge)
-    private String pic;
+//    @Setter
+//    private String pic;
 
     // 마감 기한
+    @Setter
     private Date dueDate;
 
     // 제출 시간
     private Date uploadDate;
+
+    @Setter
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("memberId")
+    @JoinColumn(name = "member_id")
+    private Member member;
 }

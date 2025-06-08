@@ -1,5 +1,7 @@
 package Idea.Idea_Hive.task.entity.repository;
 
+import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.TaskType;
 
