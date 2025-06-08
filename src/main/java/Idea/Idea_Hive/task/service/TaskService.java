@@ -2,12 +2,16 @@ package Idea.Idea_Hive.task.service;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.task.dto.request.CreateOptionalTaskRequest;
 import Idea.Idea_Hive.task.dto.request.ProjectTaskListRequest;
 import Idea.Idea_Hive.task.dto.request.UpdateTaskDueDateRequest;
 import Idea.Idea_Hive.task.dto.request.UpdateTaskPicRequest;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
+import Idea.Idea_Hive.task.entity.ProjectTask;
+import Idea.Idea_Hive.task.entity.ProjectTaskId;
 import Idea.Idea_Hive.task.entity.Task;
+import Idea.Idea_Hive.task.entity.repository.ProjectTaskRepository;
 import Idea.Idea_Hive.task.entity.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -25,6 +29,7 @@ public class TaskService {
 
     private final TaskRepository taskRepository;
     private final MemberJpaRepo memberRepository;
+    private final ProjectTaskRepository projectTaskRepository;
 
     public ProjectTaskListResponse getTaskList(ProjectTaskListRequest request) {
 
@@ -36,6 +41,7 @@ public class TaskService {
 
         List<TaskResponse> requiredTasks = partitioned.getOrDefault(true, Collections.emptyList());
         List<TaskResponse> optionalTasks = partitioned.getOrDefault(false, Collections.emptyList());
+
 
         return new ProjectTaskListResponse(requiredTasks, optionalTasks);
     }
@@ -49,9 +55,9 @@ public class TaskService {
                         () -> new BadCredentialsException("존재하지 않는 Task Id입니다.")
                 );
         task.setDueDate(request.dueDate());
-        taskRepository.save(task);
+        Task savedTask = taskRepository.save(task);
 
-        return TaskResponse.from(task);
+        return TaskResponse.from(savedTask);
     }
 
     @Transactional
@@ -71,7 +77,23 @@ public class TaskService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 memberId는 프로젝트에 속해있지 않습니다."));
 
         task.setMember(targetMember);
-        taskRepository.save(task);
-        return TaskResponse.from(task);
+        Task savedTask = taskRepository.save(task);
+        return TaskResponse.from(savedTask);
+    }
+
+    @Transactional
+    public TaskResponse createOptionalTask(CreateOptionalTaskRequest request) {
+        Task newTask = Task
+                .builder()
+                .taskType(request.taskType())
+                .build();
+
+        Task savedTask = taskRepository.save(newTask);
+
+        ProjectTask projectTask = new ProjectTask();
+        projectTask.setId(new ProjectTaskId(request.projectId(), savedTask.getId()));
+        projectTaskRepository.save(projectTask);
+
+        return TaskResponse.from(savedTask);
     }
 }

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @NoArgsConstructor
@@ -12,8 +13,10 @@ import lombok.NoArgsConstructor;
 @Table(name = "project_task")
 public class ProjectTask {
 
+    @Setter
     @EmbeddedId
     private ProjectTaskId id;
+
 
 
 }

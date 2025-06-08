@@ -2,6 +2,7 @@ package Idea.Idea_Hive.task.entity;
 
 import Idea.Idea_Hive.member.entity.Member;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,4 +47,15 @@ public class Task {
     @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @Builder
+    public Task(Boolean isRequired, Boolean isSubmitted, String title, TaskType taskType, String filePath, Date dueDate) {
+        this.isRequired = isRequired;
+        this.isSubmitted = isSubmitted;
+        this.title = title;
+        this.taskType = taskType;
+        this.filePath = filePath;
+        this.dueDate = dueDate;
+    }
+
 }
