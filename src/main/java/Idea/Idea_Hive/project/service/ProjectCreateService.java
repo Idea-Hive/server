@@ -1,7 +1,7 @@
 package Idea.Idea_Hive.project.service;
 
 import Idea.Idea_Hive.member.entity.Member;
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ProjectCreateRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectTempSavedInfoResponse;
 import Idea.Idea_Hive.project.entity.*;
@@ -23,7 +23,7 @@ import java.util.Optional;
 @Slf4j
 public class ProjectCreateService {
 
-    private final MemberJpaRepo memberJpaRepo;
+    private final MemberRepository memberRepository;
     private final ProjectRepository projectRepository;
     private final SkillStackRepository skillStackRepository;
     private final ProjectMemberRepository projectMemberRepository;
@@ -35,7 +35,7 @@ public class ProjectCreateService {
             validationProjectRequest(request);
         }
 
-        Member member = memberJpaRepo.findById(request.userId())
+        Member member = memberRepository.findById(request.userId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
         //임시 저장 되어있던 프로젝트를 수정하여 저장하는 경우

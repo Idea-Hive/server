@@ -1,13 +1,17 @@
 package Idea.Idea_Hive.project.service;
 
+import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
+import Idea.Idea_Hive.project.entity.repository.manage.ProjectManageRepository;
 import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +25,7 @@ public class ProjectManageService {
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
     private final TaskRepository taskRepository;
+    private final ProjectManageRepository projectManageRepository;
 
     @Transactional
     public void submit(Long projectId) {
@@ -44,5 +49,10 @@ public class ProjectManageService {
         }
         // todo: 상태 업데이트하기
         project.updateStatus(ProjectStatus.COMPLETED);
+    }
+
+    public ProjectSearchResponse getProjectListByStatus(Long memberId, ProjectStatus status, Pageable pageable) {
+        Page<Project> projects = projectManageRepository.findProjectByMemberIdAndStatusWithPage(memberId, status, pageable);
+        return ProjectSearchResponse.of(projects);
     }
 }

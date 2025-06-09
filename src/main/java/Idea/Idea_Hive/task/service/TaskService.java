@@ -1,7 +1,7 @@
 package Idea.Idea_Hive.task.service;
 
 import Idea.Idea_Hive.member.entity.Member;
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.task.dto.request.CreateOptionalTaskRequest;
 import Idea.Idea_Hive.task.dto.request.ProjectTaskListRequest;
 import Idea.Idea_Hive.task.dto.request.UpdateTaskDueDateRequest;
@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 public class TaskService {
 
     private final TaskRepository taskRepository;
-    private final MemberJpaRepo memberRepository;
+    private final MemberRepository memberRepository;
     private final ProjectTaskRepository projectTaskRepository;
 
     public ProjectTaskListResponse getTaskList(ProjectTaskListRequest request) {
@@ -69,7 +69,7 @@ public class TaskService {
 
 
         List<Member> membersInProject = memberRepository
-                .findMembersByProjectId(request.projectId());
+                .findMemberByProject_with_querydsl(request.projectId());
 
         Member targetMember = membersInProject.stream()
                 .filter(m -> m.getId().equals(request.memberId()))

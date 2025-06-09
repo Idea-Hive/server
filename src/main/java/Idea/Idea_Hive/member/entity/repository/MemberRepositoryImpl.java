@@ -10,15 +10,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Repository
 @Slf4j
 @RequiredArgsConstructor
+@Repository
 public class MemberRepositoryImpl implements MemberRepositoryCustom{
 
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public List<Member> findMembersByProjectId(Long projectId) {
+    public List<Member> findMemberByProject_with_querydsl(Long projectId) {
         QMember member = QMember.member;
         QProjectMember projectMember = QProjectMember.projectMember;
 

@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface MemberRepositoryCustom {
 
-    public List<Member> findMembersByProjectId(Long projectId);
+    List<Member> findMemberByProject_with_querydsl(Long projectId);
 }

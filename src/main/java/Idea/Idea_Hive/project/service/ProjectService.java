@@ -2,7 +2,7 @@ package Idea.Idea_Hive.project.service;
 
 
 import Idea.Idea_Hive.member.entity.Member;
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.*;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +33,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMemberRepository projectMemberRepository;
-    private final MemberJpaRepo memberJpaRepo;
+    private final MemberRepository memberRepository;
     private final ProjectApplicationsRepository projectApplicationsRepository;
     private final SkillStackRepository skillStackRepository;
 
@@ -48,7 +47,7 @@ public class ProjectService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
 
-        Member member = memberJpaRepo.findById(memberId)
+        Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
         ProjectMemberId projectMemberId = ProjectMemberId.builder()

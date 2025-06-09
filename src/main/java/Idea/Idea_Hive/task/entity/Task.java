@@ -44,7 +44,6 @@ public class Task {
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private Member member;
 
