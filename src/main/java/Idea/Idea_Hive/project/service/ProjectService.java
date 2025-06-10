@@ -12,6 +12,7 @@ import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
 import Idea.Idea_Hive.project.entity.repository.SkillStackRepository;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
+import Idea.Idea_Hive.notification.service.NotificationService;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -37,6 +37,7 @@ public class ProjectService {
     private final MemberJpaRepo memberJpaRepo;
     private final ProjectApplicationsRepository projectApplicationsRepository;
     private final SkillStackRepository skillStackRepository;
+    private final NotificationService notificationService;
 
     /**
      * 프로젝트와 멤버 정보를 조회하는 유틸리티 메서드
@@ -180,6 +181,12 @@ public class ProjectService {
         } else{ // 기존에 ProjectMember에 값이 있을 경우
             optionalProjectMember.get().updateProfileShared(true);
         }
+
+        //알람 발행
+        notificationService.sendProjectApplicationNotification(
+                projectApplyRequest.projectId(),
+                info.getMember().getName()+"님이 프로젝트에 지원했습니다."
+        );
 
     }
 
