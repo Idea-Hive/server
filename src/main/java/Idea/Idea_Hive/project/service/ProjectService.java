@@ -105,9 +105,14 @@ public class ProjectService {
         if (optionalProjectApplications.isEmpty()) {
             throw new IllegalArgumentException("지원한 내용이 없습니다.");
         } else {
-            optionalProjectApplications.get().updateIsAccepted(
+            ProjectApplications projectApplications = optionalProjectApplications.get();
+            projectApplications.updateIsAccepted(
                     projectApplyDecisionRequest.decision()
             );
+
+            if (projectApplyDecisionRequest.decision() == IsAccepted.REJECTED) {
+                projectApplications.updateRejectionMessage(projectApplyDecisionRequest.rejectionMessage());
+            }
 
             Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
 
