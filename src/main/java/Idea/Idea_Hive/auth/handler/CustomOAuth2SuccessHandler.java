@@ -30,7 +30,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     private final MemberService memberService;
     private final TokenService tokenService;
 
-    @Value("${frontend.url:http://localhost:3000}")
+    @Value("${frontend.url}")
     private String FRONTEND_URL;
 
     @Override
