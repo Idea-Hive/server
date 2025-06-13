@@ -93,6 +93,7 @@ public class SecurityConfig {
                             .requestMatchers("/api/project/applicants").permitAll()
                             .requestMatchers("/api/member/password-reset").permitAll()
                             .requestMatchers("/api/project/viewCnt").permitAll()
+                            .requestMatchers("/health").permitAll()
                             .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */
