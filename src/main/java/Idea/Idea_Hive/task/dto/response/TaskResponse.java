@@ -12,9 +12,10 @@ public record TaskResponse(
         String title,
         TaskType taskType,
         String filePath,
-        String pic,
+        String pic, // 담당자 이름
         Date dueDate,
-        Date uploadDate
+        Date uploadDate,
+        Long picId
 ) {
 
     public static TaskResponse from(Task task) {
@@ -25,9 +26,10 @@ public record TaskResponse(
                 task.getTitle(),
                 task.getTaskType(),
                 task.getFilePath(),
-                task.getPic(),
+                task.getMember().getName(),
                 task.getDueDate(),
-                task.getUploadDate()
+                task.getUploadDate(),
+                task.getMember().getId()
         );
     }
 }

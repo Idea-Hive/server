@@ -1,5 +1,7 @@
 package Idea.Idea_Hive.task.entity.repository;
 
+import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.member.entity.QMember;
 import Idea.Idea_Hive.task.entity.QProjectTask;
 import Idea.Idea_Hive.task.entity.QTask;
 import Idea.Idea_Hive.task.entity.Task;

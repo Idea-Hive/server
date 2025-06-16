@@ -2,10 +2,9 @@ package Idea.Idea_Hive.auth.service;
 
 import Idea.Idea_Hive.auth.dto.response.TokenResponse;
 import Idea.Idea_Hive.member.entity.Member;
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.redis.RedisDao;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -16,10 +15,10 @@ public class TokenService {
 
     private final JwtProvider jwtProvider;
     private final RedisDao redisDao;
-    private final MemberJpaRepo memberJpaRepo;
+    private final MemberRepository memberRepository;
 
     public TokenResponse createTokens(String email) {
-        Member member = memberJpaRepo.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(
                         () -> new IllegalArgumentException("존재하지 않는 이메일 입니다.")
                 );
@@ -39,7 +38,7 @@ public class TokenService {
     }
 
     public String createRefreshToken(String email) {
-        Member member = memberJpaRepo.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(
                         () -> new IllegalArgumentException("존재하지 않는 이메일 입니다.")
                 );

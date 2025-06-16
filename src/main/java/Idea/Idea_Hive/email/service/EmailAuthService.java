@@ -1,9 +1,8 @@
 package Idea.Idea_Hive.email.service;
 
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.redis.RedisDao;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
@@ -17,14 +16,14 @@ public class EmailAuthService {
 
     private final JavaMailSender mailSender;
     private final RedisDao redisDao;
-    private final MemberJpaRepo memberJpaRepo;
+    private final MemberRepository memberRepository;
     private static final long EXPIRE_MINUTES = 5;
 
 
     public void sendSignUpAuthCode(String email) {
 
         /* 예외처리 추가 : 이미 존재하는 회원일 경우 예외 발생 */
-        if (memberJpaRepo.findByEmail(email).isPresent()) {
+        if (memberRepository.findByEmail(email).isPresent()) {
             throw new IllegalArgumentException("이미 가입된 회원입니다.");
         }
 
