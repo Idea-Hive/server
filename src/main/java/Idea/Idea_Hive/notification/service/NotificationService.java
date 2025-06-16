@@ -1,6 +1,6 @@
 package Idea.Idea_Hive.notification.service;
 
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
+import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.entity.Role;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.notification.entity.Notification;
@@ -17,7 +17,7 @@ public class NotificationService {
 
     private final SimpMessagingTemplate messagingTemplate;
     private final ProjectMemberRepository projectMemberRepository;
-    private final MemberJpaRepo memberJpaRepo;
+    private final MemberRepository memberRepository;
     private final NotificationRepository notificationRepository;
 
     public void sendProjectApplicationNotification(Long projectId, String message) {
@@ -29,7 +29,7 @@ public class NotificationService {
 
         //데이터베이스에 저장
         Notification notification = Notification.builder()
-                .receiver(memberJpaRepo.findById(creatorId).get())
+                .receiver(memberRepository.findById(creatorId).get())
                 .message(message)
                 .build();
 
