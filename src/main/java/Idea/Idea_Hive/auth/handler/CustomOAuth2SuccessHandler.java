@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -32,6 +33,19 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
     @Value("${frontend.url}")
     private String FRONTEND_URL;
+
+    // application.yml 또는 application-{profile}.yml 에 정의된 값 주입
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.samesite}")
+    private String cookieSameSite; // "Lax", "Strict", "None"
+
+    @Value("${app.cookie.http-only}")
+    private boolean cookieHttpOnly;
+
+    @Value("${app.cookie.path}")
+    private String cookiePath;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -56,13 +70,24 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         // todo: 임시 RefreshToken 발급
         String refreshToken = tokenService.createTempRefreshToken(signUpResponse.email());
 
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
-        refreshTokenCookie.setSecure(false);   // HTTPS에서만 전송
-        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
-        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+//        refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
+//        refreshTokenCookie.setSecure(false);   // HTTPS에서만 전송
+//        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
+//        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
+//
+//        response.addCookie(refreshTokenCookie);
+        // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
+        ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(cookieHttpOnly)
+                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
+                .path(cookiePath)
+                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
+                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
+                // .domain(cookieDomain)
+                .build();
 
-        response.addCookie(refreshTokenCookie);
+        response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());
 
         // todo: 운영 시 url 수정 필요 ..
         String url = FRONTEND_URL + "/auth/social";
