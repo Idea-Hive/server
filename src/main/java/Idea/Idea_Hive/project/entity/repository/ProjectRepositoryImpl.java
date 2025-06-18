@@ -207,6 +207,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 .limit(pageable.getPageSize())
                 .fetch();
 
+
+
         Long total = queryFactory
                 .select(project.countDistinct())
                 .from(project)
@@ -252,8 +254,9 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
             };
         } else {
             return new OrderSpecifier<?>[]{
-                    new OrderSpecifier<>(Order.DESC, project.searchDate),
-                    new OrderSpecifier<>(Order.DESC, project.expirationDate)
+                    new OrderSpecifier<>(Order.ASC, project.expirationDate),
+                    new OrderSpecifier<>(Order.DESC, project.searchDate)
+
             };
         }
     }
