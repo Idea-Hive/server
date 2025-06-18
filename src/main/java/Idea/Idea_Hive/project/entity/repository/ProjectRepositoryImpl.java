@@ -264,7 +264,7 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
         QProject project = QProject.project;
 
         return queryFactory
-                .select(project.count())
+                .select(project.countDistinct())
                 .from(project)
                 .join(project.projectMembers)
                 .where(project.projectMembers.any().member.id.eq(memberId)

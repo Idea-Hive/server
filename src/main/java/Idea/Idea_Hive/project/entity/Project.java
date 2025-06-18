@@ -52,8 +52,10 @@ public class Project {
 
     private LocalDateTime expirationDate;
 
+    /*
     @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
     private ProjectDetail projectDetail;
+     */
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectSkillStack> projectSkillStacks = new ArrayList<>();
@@ -121,11 +123,14 @@ public class Project {
         this.expirationDate = this.createdDate.plusMonths(1);
         this.searchDate = LocalDateTime.now();
     }
+
+    /*
     // Project 엔티티
     public void setProjectDetail(ProjectDetail projectDetail) {
         this.projectDetail = projectDetail;
         projectDetail.setProject(this);  // 양방향 연관관계 설정
     }
+     */
 
     // ProjectMember 추가 메서드
     public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isLike) {
