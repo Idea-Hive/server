@@ -2,6 +2,7 @@ package Idea.Idea_Hive.project.dto.response;
 
 import Idea.Idea_Hive.project.entity.ProjectApplications;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -15,6 +16,7 @@ public record ProjectApplicantResponse (
         int pageSize
 ){
     public static ProjectApplicantResponse of(Page<ProjectApplications> projectApplicationsPage, ProjectRepository projectRepository) {
+
         List<ProjectApplicantResponseDto> applicantDto = projectApplicationsPage.getContent().stream()
                 .map(applications -> {
                     Long completedProjectCnt = projectRepository.countCompletedProjectByMemberId(applications.getMember().getId());

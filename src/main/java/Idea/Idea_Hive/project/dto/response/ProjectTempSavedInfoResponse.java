@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 public record ProjectTempSavedInfoResponse(
         String title,
         String description,
-        String idea,
         String contact,
         Integer maxMembers,
         LocalDateTime dueDateFrom,
@@ -22,7 +21,6 @@ public record ProjectTempSavedInfoResponse(
         return new ProjectTempSavedInfoResponse(
                 project.getTitle(),
                 project.getDescription(),
-                project.getProjectDetail().getIdea(),
                 project.getContact(),
                 project.getMaxMembers(),
                 project.getDueDateFrom(),

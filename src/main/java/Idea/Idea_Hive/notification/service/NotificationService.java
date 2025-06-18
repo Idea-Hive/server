@@ -1,6 +1,8 @@
 package Idea.Idea_Hive.notification.service;
 
+import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
+import Idea.Idea_Hive.notification.dto.NotificationDto;
 import Idea.Idea_Hive.project.entity.Role;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.notification.entity.Notification;
@@ -28,17 +30,27 @@ public class NotificationService {
                 .getMember().getId();
 
         //데이터베이스에 저장
+        Member receiver = memberRepository.findById(creatorId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
         Notification notification = Notification.builder()
-                .receiver(memberRepository.findById(creatorId).get())
+                .receiver(receiver)
                 .message(message)
                 .build();
 
-        notificationRepository.save(notification);
+        Notification savedNotification = notificationRepository.save(notification);
+
+        // DTO 생성
+        NotificationDto notificationDto = new NotificationDto(
+                savedNotification.getId(),
+                savedNotification.getMessage(),
+                savedNotification.getCreatedDate()
+        );
 
         //실시간 알림 전송(현재 접속 중인 경우)
         messagingTemplate.convertAndSend(
                 "/topic/user/" + creatorId,
-                notification
+                notificationDto
         );
 
     }

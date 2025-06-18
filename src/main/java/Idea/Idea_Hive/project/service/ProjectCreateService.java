@@ -57,8 +57,8 @@ public class ProjectCreateService {
                     request.isSave()
             );
 
-            projectDetail = project.getProjectDetail();
-            projectDetail.updateIdea(request.idea());
+//            projectDetail = project.getProjectDetail();
+//            projectDetail.updateIdea(request.idea());
         } else { //새로 생성하는 경우
             projectDetail = ProjectDetail.builder()
                     .idea(request.idea())
@@ -76,7 +76,7 @@ public class ProjectCreateService {
         }
 
         // 연관관계 설정
-        project.setProjectDetail(projectDetail);
+//        project.setProjectDetail(projectDetail);
 
         // 기술스택 추가
         if (request.projectId() != null) { //기존에 저장되어있는 프로젝트가 있을 경우

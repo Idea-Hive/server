@@ -3,10 +3,12 @@ package Idea.Idea_Hive.project.dto.response;
 import Idea.Idea_Hive.project.entity.IsAccepted;
 import Idea.Idea_Hive.project.entity.ProjectApplications;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 public record ProjectApplicantResponseDto (
         Long applyId,
         Long memberId,
