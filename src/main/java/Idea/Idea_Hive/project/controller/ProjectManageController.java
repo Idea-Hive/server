@@ -1,6 +1,7 @@
 package Idea.Idea_Hive.project.controller;
 
 import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ProjectSubmitRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
@@ -18,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Security;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -53,5 +55,13 @@ public class ProjectManageController {
 
         ProjectSearchResponse response = projectManageService.getProjectListByStatus(memberId, status, pageable);
         return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary="프로젝트 멤버 조회 API")
+    @GetMapping("/members")
+    public ResponseEntity<List<MemberInfoResponse>> getProjectMemebers(@RequestParam("id") Long id) {
+        return ResponseEntity.ok(
+                projectManageService.getMembersByProjectId(id)
+        );
     }
 }

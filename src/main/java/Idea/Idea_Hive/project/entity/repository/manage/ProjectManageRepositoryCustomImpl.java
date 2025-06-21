@@ -1,9 +1,8 @@
 package Idea.Idea_Hive.project.entity.repository.manage;
 
-import Idea.Idea_Hive.project.entity.Project;
-import Idea.Idea_Hive.project.entity.ProjectStatus;
-import Idea.Idea_Hive.project.entity.QProject;
-import Idea.Idea_Hive.project.entity.QProjectMember;
+import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.member.entity.QMember;
+import Idea.Idea_Hive.project.entity.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
@@ -11,8 +10,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositoryCustom{
@@ -51,6 +53,20 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
         ).orElse(0L);
 
         return new PageImpl<>(projects, pageable, total);
+    }
 
+    @Override
+    public List<Member> findMemberByProjectId(Long projectId) {
+        QProject project = QProject.project;
+        QMember member = QMember.member;
+        QProjectMember projectMember = QProjectMember.projectMember;
+
+        return jpaQueryFactory
+                .select(member)
+                .from(member)
+                .join(projectMember).on(member.id.eq(projectMember.member.id))
+                .join(project).on(projectMember.project.id.eq(project.id))
+                .where(project.id.eq(projectId))
+                .fetch();
     }
 }
