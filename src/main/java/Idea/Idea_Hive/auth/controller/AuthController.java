@@ -11,7 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -30,6 +32,19 @@ public class AuthController {
     private final AuthService authService;
     private final TokenService tokenService;
 
+    // application.yml 또는 application-{profile}.yml 에 정의된 값 주입
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.samesite}")
+    private String cookieSameSite; // "Lax", "Strict", "None"
+
+    @Value("${app.cookie.http-only}")
+    private boolean cookieHttpOnly;
+
+    @Value("${app.cookie.path}")
+    private String cookiePath;
+
     @GetMapping("/secure")
     public String secure(@AuthenticationPrincipal OAuth2User principal) {
         return "로그인한 사용자: " + SecurityContextHolder.getContext().getAuthentication().getName();
@@ -44,14 +59,25 @@ public class AuthController {
         AuthInfoResponse authInfoResponse = authService.getAuthInfo(request);
         TokenResponse tokens = tokenService.createTokens(request.email());
 
-        // 리프레시 토큰을 HttpOnly 쿠키로 설정
-        Cookie refreshTokenCookie = new Cookie("refreshToken", tokens.refreshToken());
-        refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
-        refreshTokenCookie.setSecure(false);   // HTTPS에서만 전송
-        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
-        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
+//        // 리프레시 토큰을 HttpOnly 쿠키로 설정
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", tokens.refreshToken());
+//        refreshTokenCookie.setHttpOnly(cookieHttpOnly); // JavaScript에서 접근 불가
+//        refreshTokenCookie.setSecure(cookieSecure);   // HTTPS에서만 전송
+//        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
+//        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
 
-        response.addCookie(refreshTokenCookie);
+        // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
+        ResponseCookie refreshTokenCookie = ResponseCookie.from("refreshToken", tokens.refreshToken())
+                .httpOnly(cookieHttpOnly)
+                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
+                .path(cookiePath)
+                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
+                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
+                // .domain(cookieDomain) // 필요시 도메인 설정
+                .build();
+
+//        response.addCookie(refreshTokenCookie);
+        response.addHeader("Set-Cookie", refreshTokenCookie.toString());
 
         LoginResponse loginResponse = new LoginResponse(
                 authInfoResponse.email(),
@@ -84,13 +110,26 @@ public class AuthController {
         // 토큰 재발급
         TokenResponse tokenResponse = tokenService.createTokens(email);
         // 리프레시 토큰을 HttpOnly 쿠키로 설정
-        Cookie refreshTokenCookie = new Cookie("refreshToken", tokenResponse.refreshToken());
-        refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
-        refreshTokenCookie.setSecure(false);   // HTTPS에서만 전송
-        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
-        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", tokenResponse.refreshToken());
+//        refreshTokenCookie.setHttpOnly(cookieHttpOnly); // JavaScript에서 접근 불가
+//        refreshTokenCookie.setSecure(cookieSecure);   // HTTPS에서만 전송
+//        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
+//        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
+//
+//        response.addCookie(refreshTokenCookie);// 갱신된 쿠키 설정
 
-        response.addCookie(refreshTokenCookie);// 갱신된 쿠키 설정
+        // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
+        ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refreshToken", tokenResponse.refreshToken())
+                .httpOnly(cookieHttpOnly)
+                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
+                .path(cookiePath)
+                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
+                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
+                // .domain(cookieDomain)
+                .build();
+
+        response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());
+
         return ResponseEntity.ok(Map.of("accessToken", tokenResponse.accessToken()));
 
     }
