@@ -43,6 +43,7 @@ public class MemberService {
         // todo: DB 저장, Member Entity 변수 생성 시 추가
         Member member = Member.builder()
                 .email(request.email())
+                .name(request.name())
                 .password(hashedPassword)
                 .type("email")
                 .build();
