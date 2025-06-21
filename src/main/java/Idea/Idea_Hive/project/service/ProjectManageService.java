@@ -1,9 +1,9 @@
 package Idea.Idea_Hive.project.service;
 
+import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
-import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
 import Idea.Idea_Hive.project.entity.repository.manage.ProjectManageRepository;
 import Idea.Idea_Hive.task.entity.Task;
@@ -23,7 +23,6 @@ import java.util.List;
 public class ProjectManageService {
 
     private final ProjectRepository projectRepository;
-    private final ProjectMemberRepository projectMemberRepository;
     private final TaskRepository taskRepository;
     private final ProjectManageRepository projectManageRepository;
 
@@ -54,5 +53,11 @@ public class ProjectManageService {
     public ProjectSearchResponse getProjectListByStatus(Long memberId, ProjectStatus status, Pageable pageable) {
         Page<Project> projects = projectManageRepository.findProjectByMemberIdAndStatusWithPage(memberId, status, pageable);
         return ProjectSearchResponse.of(projects);
+    }
+
+    public List<MemberInfoResponse> getMembersByProjectId(Long projectId) {
+        return projectManageRepository.findMemberByProjectId(projectId)
+                .stream().map(MemberInfoResponse::from)
+                .toList();
     }
 }
