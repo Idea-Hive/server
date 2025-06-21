@@ -1,10 +1,7 @@
 package Idea.Idea_Hive.task.controller;
 
 import Idea.Idea_Hive.file.service.FileStorageService;
-import Idea.Idea_Hive.task.dto.request.CreateOptionalTaskRequest;
-import Idea.Idea_Hive.task.dto.request.ProjectTaskListRequest;
-import Idea.Idea_Hive.task.dto.request.UpdateTaskDueDateRequest;
-import Idea.Idea_Hive.task.dto.request.UpdateTaskPicRequest;
+import Idea.Idea_Hive.task.dto.request.*;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
 import Idea.Idea_Hive.task.service.TaskService;
@@ -57,13 +54,18 @@ public class TaskController {
     }
 
     @Operation(summary = "로컬용 과제 파일 업로드 API - 개발 중")
-    @PostMapping(value = "/file-upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<String> uploadTaskFile(
             @Parameter(description = "업로드할 파일", required = true,
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestParam("file") MultipartFile file) {
+            @RequestPart("file") MultipartFile file,
 
-        fileStorageService.storeFile(file);
+            @Parameter(description = "Task id", required = true,
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("taskInfo") FileUploadRequest request
+            ) {
+
+        fileStorageService.storeFile(file, request.taskId());
         return ResponseEntity.ok("개발중입니다.");
     }
 }

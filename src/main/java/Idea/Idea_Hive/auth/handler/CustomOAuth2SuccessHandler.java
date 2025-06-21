@@ -63,6 +63,9 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
             String jsonError = String.format("{\"error\": \"%s\"}", e.getMessage());
             response.getWriter().write(jsonError);
+            // todo: 운영 시 url 수정 필요 ..
+            String url = FRONTEND_URL + "/auth/social";
+            response.sendRedirect(url);
             return;
         }
 

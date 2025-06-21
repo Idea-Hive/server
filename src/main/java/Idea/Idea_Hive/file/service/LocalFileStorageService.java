@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-//@Profile("local")
+@Profile("local")
 public class LocalFileStorageService implements FileStorageService {
 
     private final Path fileStorageLocation;
@@ -52,7 +52,7 @@ public class LocalFileStorageService implements FileStorageService {
 
 
     @Override
-    public String storeFile(MultipartFile file) {
+    public String storeFile(MultipartFile file, Long taskId) {
 
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String extension = ""; // 확장자(.pdf, .txt, .ppt ...)
