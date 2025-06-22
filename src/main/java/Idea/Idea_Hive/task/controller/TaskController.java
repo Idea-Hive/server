@@ -54,7 +54,7 @@ public class TaskController {
     }
 
     @Operation(summary = "로컬용 과제 파일 업로드 API - 개발 중")
-    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
     public ResponseEntity<String> uploadTaskFile(
             @Parameter(description = "업로드할 파일", required = true,
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))

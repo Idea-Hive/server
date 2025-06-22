@@ -19,6 +19,14 @@ public record TaskResponse(
 ) {
 
     public static TaskResponse from(Task task) {
+
+        String memberName = "";
+        Long memberId = null;
+        if(task.getMember() != null) {
+            memberName = task.getMember().getName();
+            memberId = task.getMember().getId();
+        }
+        assert task.getMember() != null;
         return new TaskResponse(
                 task.getId(),
                 task.getIsRequired(),
@@ -26,10 +34,10 @@ public record TaskResponse(
                 task.getTitle(),
                 task.getTaskType(),
                 task.getFilePath(),
-                task.getMember().getName(),
+                memberName,
                 task.getDueDate(),
                 task.getUploadDate(),
-                task.getMember().getId()
+                memberId
         );
     }
 }

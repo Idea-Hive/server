@@ -1,8 +1,11 @@
 package Idea.Idea_Hive.file.service;
 
 import Idea.Idea_Hive.exception.handler.custom.FileStorageException;
+import Idea.Idea_Hive.task.entity.Task;
+import Idea.Idea_Hive.task.entity.repository.TaskRepository;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,8 +25,10 @@ public class LocalFileStorageService implements FileStorageService {
 
     private final Path fileStorageLocation;
     private final String UPLOAD_DIR_NAME = "test_uploads";
+    private final TaskRepository taskRepository;
 
-    public LocalFileStorageService() {
+    public LocalFileStorageService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
         try {
             // 1. ClassLoader를 통해 resources 디렉터리의 URL을 얻습니다.
             URL resourceDirUrl = getClass().getClassLoader().getResource("");
@@ -51,7 +56,9 @@ public class LocalFileStorageService implements FileStorageService {
     }
 
 
+
     @Override
+    @Transactional
     public String storeFile(MultipartFile file, Long taskId) {
 
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
@@ -60,7 +67,10 @@ public class LocalFileStorageService implements FileStorageService {
         if (i>0) {
             extension = originalFileName.substring(i); // 확장자 추출
         }
-        String storedFileName = UUID.randomUUID().toString() + extension; // 파일명 겹칠 경우 처리
+        String storedFileName = originalFileName.substring(0, i) + UUID.randomUUID().toString() + extension; // 파일명 겹칠 경우 처리
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new FileStorageException("존재하지 않는 과제입니다."));
 
         try {
             if (originalFileName.contains("..")) {
@@ -69,9 +79,13 @@ public class LocalFileStorageService implements FileStorageService {
 
             Path targetLocation =
                     this.fileStorageLocation.resolve(storedFileName);
+
             try (InputStream inputStream = file.getInputStream()) {
                 Files.copy(inputStream, targetLocation, StandardCopyOption.REPLACE_EXISTING);
             }
+
+            task.uploadFile(targetLocation.toString());
+            taskRepository.save(task);
 
             return targetLocation.toString();
         } catch (IOException ex) {
