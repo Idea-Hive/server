@@ -1,11 +1,9 @@
 package Idea.Idea_Hive.task.service;
 
+import Idea.Idea_Hive.exception.handler.custom.FileStorageException;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
-import Idea.Idea_Hive.task.dto.request.CreateOptionalTaskRequest;
-import Idea.Idea_Hive.task.dto.request.ProjectTaskListRequest;
-import Idea.Idea_Hive.task.dto.request.UpdateTaskDueDateRequest;
-import Idea.Idea_Hive.task.dto.request.UpdateTaskPicRequest;
+import Idea.Idea_Hive.task.dto.request.*;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
 import Idea.Idea_Hive.task.entity.ProjectTask;
@@ -96,4 +94,16 @@ public class TaskService {
 
         return TaskResponse.from(savedTask);
     }
+
+    @Transactional
+    public TaskResponse attachLink(AttachLinkRequest request) {
+        Task task = taskRepository.findById(request.taskId())
+                .orElseThrow(() -> new NullPointerException("존재하지 않는 과제입니다."));
+
+        task.attachLink(request.attachedLink());
+        Task savedTask = taskRepository.save(task);
+
+        return TaskResponse.from(savedTask);
+    }
+
 }

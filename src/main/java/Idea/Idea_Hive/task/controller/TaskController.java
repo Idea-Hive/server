@@ -4,6 +4,7 @@ import Idea.Idea_Hive.file.service.FileStorageService;
 import Idea.Idea_Hive.task.dto.request.*;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
+import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -53,9 +54,9 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "로컬용 과제 파일 업로드 API - 개발 중")
+    @Operation(summary = "로컬용 과제 파일 업로드 API")
     @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> uploadTaskFile(
+    public ResponseEntity<TaskResponse> uploadTaskFile(
             @Parameter(description = "업로드할 파일", required = true,
                     content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
             @RequestPart("file") MultipartFile file,
@@ -65,7 +66,15 @@ public class TaskController {
             @RequestPart("taskInfo") FileUploadRequest request
             ) {
 
-        fileStorageService.storeFile(file, request.taskId());
-        return ResponseEntity.ok("개발중입니다.");
+        TaskResponse response = fileStorageService.storeFile(file, request.taskId());
+        return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "과제 링크 첨부 API")
+    @PostMapping("/attach-link")
+    public ResponseEntity<TaskResponse> attachLink(@RequestBody AttachLinkRequest request) {
+        TaskResponse response = taskService.attachLink(request);
+        return ResponseEntity.ok(response);
+    }
+
 }

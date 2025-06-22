@@ -1,6 +1,7 @@
 package Idea.Idea_Hive.file.service;
 
 import Idea.Idea_Hive.exception.handler.custom.FileStorageException;
+import Idea.Idea_Hive.task.dto.response.TaskResponse;
 import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.repository.TaskRepository;
 import org.springframework.context.annotation.Profile;
@@ -59,7 +60,7 @@ public class LocalFileStorageService implements FileStorageService {
 
     @Override
     @Transactional
-    public String storeFile(MultipartFile file, Long taskId) {
+    public TaskResponse storeFile(MultipartFile file, Long taskId) {
 
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String extension = ""; // 확장자(.pdf, .txt, .ppt ...)
@@ -85,9 +86,9 @@ public class LocalFileStorageService implements FileStorageService {
             }
 
             task.uploadFile(targetLocation.toString());
-            taskRepository.save(task);
+            Task savedTask = taskRepository.save(task);
 
-            return targetLocation.toString();
+            return TaskResponse.from(savedTask);
         } catch (IOException ex) {
             throw new FileStorageException("파일 저장 실패:" + originalFileName + ". 재시도 해주세요 : " + ex.getMessage());
         }
