@@ -24,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TaskController {
 
     private final TaskService taskService;
-    private final FileStorageService fileStorageService;
+//    private final FileStorageService fileStorageService;
 
 
     @GetMapping("")
@@ -54,21 +54,21 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "로컬용 과제 파일 업로드 API")
-    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<TaskResponse> uploadTaskFile(
-            @Parameter(description = "업로드할 파일", required = true,
-                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-            @RequestPart("file") MultipartFile file,
-
-            @Parameter(description = "Task id", required = true,
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-            @RequestPart("taskInfo") FileUploadRequest request
-            ) {
-
-        TaskResponse response = fileStorageService.storeFile(file, request.taskId());
-        return ResponseEntity.ok(response);
-    }
+//    @Operation(summary = "로컬용 과제 파일 업로드 API")
+//    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+//    public ResponseEntity<TaskResponse> uploadTaskFile(
+//            @Parameter(description = "업로드할 파일", required = true,
+//                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+//            @RequestPart("file") MultipartFile file,
+//
+//            @Parameter(description = "Task id", required = true,
+//                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+//            @RequestPart("taskInfo") FileUploadRequest request
+//            ) {
+//
+//        TaskResponse response = fileStorageService.storeFile(file, request.taskId());
+//        return ResponseEntity.ok(response);
+//    }
 
     @Operation(summary = "과제 링크 첨부 API")
     @PostMapping("/attach-link")
