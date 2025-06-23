@@ -1,18 +1,21 @@
 package Idea.Idea_Hive.task.controller;
 
-import Idea.Idea_Hive.task.dto.request.CreateOptionalTaskRequest;
-import Idea.Idea_Hive.task.dto.request.ProjectTaskListRequest;
-import Idea.Idea_Hive.task.dto.request.UpdateTaskDueDateRequest;
-import Idea.Idea_Hive.task.dto.request.UpdateTaskPicRequest;
+import Idea.Idea_Hive.file.service.FileStorageService;
+import Idea.Idea_Hive.task.dto.request.*;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
+import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class TaskController {
 
     private final TaskService taskService;
+    private final FileStorageService fileStorageService;
 
 
     @GetMapping("")
@@ -50,9 +54,27 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "과제 파일 업로드 API")
-    @PostMapping("/file-upload")
-    public ResponseEntity<String> uploadTaskFile(String request) {
-        return ResponseEntity.ok("개발중입니다.");
+    @Operation(summary = "로컬용 과제 파일 업로드 API")
+    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<TaskResponse> uploadTaskFile(
+            @Parameter(description = "업로드할 파일", required = true,
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart("file") MultipartFile file,
+
+            @Parameter(description = "Task id", required = true,
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("taskInfo") FileUploadRequest request
+            ) {
+
+        TaskResponse response = fileStorageService.storeFile(file, request.taskId());
+        return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "과제 링크 첨부 API")
+    @PostMapping("/attach-link")
+    public ResponseEntity<TaskResponse> attachLink(@RequestBody AttachLinkRequest request) {
+        TaskResponse response = taskService.attachLink(request);
+        return ResponseEntity.ok(response);
+    }
+
 }
