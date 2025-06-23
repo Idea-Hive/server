@@ -210,6 +210,14 @@ spring:
           timeout: 5000 # 6
           starttls:
             enable: true # 7
+
+# AWS S3 설정
+aws:
+  region: ap-northeast-2
+  s3:
+    bucket-name: taskmate-bucket2
+    bucket-url: https://taskmate-bucket2.s3.ap-northeast-2.amazonaws.com
+
 frontend:
   url: ${frontend-url}
 
