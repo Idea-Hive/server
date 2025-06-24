@@ -89,13 +89,11 @@ public class MemberService {
             default -> "UnknownUser";
         };
 
-        Member member = Member.builder()
+        return Member.builder()
                 .email(email)
                 .name(name)
                 .type(provider)
                 .build();
-
-        return member;
     }
 
     @Transactional

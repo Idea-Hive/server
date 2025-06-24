@@ -3,10 +3,7 @@ package Idea.Idea_Hive.member.entity;
 import Idea.Idea_Hive.project.entity.ProjectMember;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -32,6 +29,7 @@ public class Member {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @Setter
     private String name;
 
     @Column(unique = true)
@@ -46,11 +44,14 @@ public class Member {
 
     private Boolean isDeleted;
 
+    @Setter
     private String job;
 
+    @Setter
     private Integer career;
 
     // 관심사
+    @Setter
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
     private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();
 
@@ -66,7 +67,8 @@ public class Member {
     private String profileUrl;
 
 
-    // 해시태그 추가 메서드
+
+    // 스킬스택 추가 메서드
     public void addSkillStack(SkillStack skillstack) {
         MemberSkillStack memberSkillStack = MemberSkillStack.builder()
                 .member(this)
@@ -75,10 +77,35 @@ public class Member {
         this.memberSkillStacks.add(memberSkillStack);
     }
 
+
+
     // 비밀번호 수정 메서드
     // 반드시 해싱된 패스워드여야 함 !!
     public void updatePassword(String hashedPassword) {
         this.password = hashedPassword;
+    }
+
+    /**
+     * 회원의 기존 모든 기술 스택을 제거합니다.
+     * MemberSkillStack 엔티티의 생명주기가 Member에 의해 관리되므로 (CascadeType.ALL),
+     * 컬렉션에서 제거하면 DB에서도 삭제됩니다.
+     */
+    public void clearSkillStacks() {
+        // MemberSkillStack과의 양방향 연관 관계를 끊어주고, 컬렉션을 비웁니다.
+        // CascadeType.ALL과 orphanRemoval=true가 함께 설정되어 있다면 더 확실하게 동작합니다.
+        // 현재는 CascadeType.ALL만 있으므로, MemberSkillStack의 member 필드를 null로 설정해주면
+        // 고아 객체로 인식되어 삭제될 수 있지만, 명시적으로 컬렉션을 비우는 것이 안전합니다.
+        // 주의: DB에서 MemberSkillStack 레코드를 삭제합니다.
+
+        if (this.memberSkillStacks != null) {
+            // 양방향 연관관계 제거
+             for (MemberSkillStack mss : this.memberSkillStacks) {
+                mss.setMember(null); // MemberSkillStack에 Setter 추가
+             }
+            this.memberSkillStacks.clear();
+        } else {
+            this.memberSkillStacks = new ArrayList<>(); // null일 경우 초기화
+        }
     }
 
     @Builder
