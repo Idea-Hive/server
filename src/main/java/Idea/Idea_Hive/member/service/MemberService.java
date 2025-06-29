@@ -1,8 +1,10 @@
 package Idea.Idea_Hive.member.service;
 
 import Idea.Idea_Hive.member.entity.dto.request.PasswordResetRequest;
+import Idea.Idea_Hive.member.entity.dto.request.ProfileUpdateRequest;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.redis.RedisDao;
+import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.skillstack.entity.repository.SkillStackJpaRepo;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.request.SignUpRequest;
@@ -17,6 +19,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -140,6 +144,47 @@ public class MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
 
+        return MemberInfoResponse.from(member);
+    }
+
+    private Member getMemberFromContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        // 로그인 정보가 없는 경우
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new BadCredentialsException("잘못된 접근입니다.");
+        }
+
+        String userEmail = authentication.getName();
+
+        return memberRepository.findByEmail(userEmail)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+    }
+
+    @Transactional
+    public MemberInfoResponse updateProfile(ProfileUpdateRequest request) {
+        /* 프로필 업데이트 서비스 메서드 */
+        // 1. 멤버 조회
+        Member member = getMemberFromContext();
+
+        // 2. 기본 프로필 정보 업데이트 (이름, 직업, 경력) 및 수정일자(updatedDate) 최신화
+        member.setName(request.name() != null ? request.name() : member.getName());
+        member.setJob(request.job() != null ? request.job() : member.getJob());
+        member.setCareer(request.career() != null ? request.career() : member.getCareer());
+
+        // 3. 기술 스택 업데이트
+        member.clearSkillStacks();
+
+        List<Long> skillStackIds = request.skillStackIds();
+        if (skillStackIds != null && !skillStackIds.isEmpty()) {
+            List<SkillStack> newSkillStacks = skillStackJpaRepo.findAllByIdIn(skillStackIds);
+            if (newSkillStacks.size() != skillStackIds.size()) {
+                throw new IllegalArgumentException("존재하지 않는 SkillStack ID가 포함되어 있습니다.");
+            }
+            newSkillStacks.forEach(member::addSkillStack);
+        }
+
+//        Member updatedMember = memberRepository.save(member);
         return MemberInfoResponse.from(member);
     }
 

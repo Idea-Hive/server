@@ -3,6 +3,7 @@ package Idea.Idea_Hive.member.entity;
 import Idea.Idea_Hive.project.entity.ProjectMember;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
@@ -52,7 +53,7 @@ public class Member {
 
     // 관심사
     @Setter
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -91,20 +92,16 @@ public class Member {
      * 컬렉션에서 제거하면 DB에서도 삭제됩니다.
      */
     public void clearSkillStacks() {
-        // MemberSkillStack과의 양방향 연관 관계를 끊어주고, 컬렉션을 비웁니다.
-        // CascadeType.ALL과 orphanRemoval=true가 함께 설정되어 있다면 더 확실하게 동작합니다.
-        // 현재는 CascadeType.ALL만 있으므로, MemberSkillStack의 member 필드를 null로 설정해주면
-        // 고아 객체로 인식되어 삭제될 수 있지만, 명시적으로 컬렉션을 비우는 것이 안전합니다.
-        // 주의: DB에서 MemberSkillStack 레코드를 삭제합니다.
-
         if (this.memberSkillStacks != null) {
-            // 양방향 연관관계 제거
-             for (MemberSkillStack mss : this.memberSkillStacks) {
-                mss.setMember(null); // MemberSkillStack에 Setter 추가
-             }
+            // SkillStack과의 양방향 연관관계도 함께 정리해주는 것이 안전합니다.
+            for (MemberSkillStack mss : new ArrayList<>(this.memberSkillStacks)) {
+                // MemberSkillStack이 참조하는 SkillStack의 컬렉션에서도 자신을 제거
+                if (mss.getSkillstack() != null) {
+                    mss.getSkillstack().setMemberSkillStacks(null);
+                }
+            }
+            // 이제 Member의 컬렉션을 비웁니다. orphanRemoval=true에 의해 DB에서 삭제됩니다.
             this.memberSkillStacks.clear();
-        } else {
-            this.memberSkillStacks = new ArrayList<>(); // null일 경우 초기화
         }
     }
 
