@@ -65,16 +65,16 @@ public class TaskService {
         Task task = taskRepository.findById(request.taskId())
                 .orElseThrow(() -> new IllegalArgumentException("잘못된 taskId 입니다."));
 
-
         List<Member> membersInProject = memberRepository
                 .findMemberByProject_with_querydsl(request.projectId());
 
-        Member targetMember = membersInProject.stream()
-                .filter(m -> m.getId().equals(request.memberId()))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("해당 memberId는 프로젝트에 속해있지 않습니다."));
-
-        task.setMember(targetMember);
+        if (request.memberId() != null) {
+            Member targetMember = membersInProject.stream()
+                    .filter(m -> m.getId().equals(request.memberId()))
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalArgumentException("해당 memberId는 프로젝트에 속해있지 않습니다."));
+            task.setMember(targetMember);
+        }
         Task savedTask = taskRepository.save(task);
         return TaskResponse.from(savedTask);
     }
