@@ -12,5 +12,5 @@ public interface ProjectManageRepositoryCustom {
 
     Page<Project> findProjectByMemberIdAndStatusWithPage(Long memberId, ProjectStatus status, Pageable pageable);
     List<Member> findMemberByProjectId(Long projectId);
-
+    Page<Project> findProjectByMemberIdWithPage(Long memberId, Pageable pageable);
 }

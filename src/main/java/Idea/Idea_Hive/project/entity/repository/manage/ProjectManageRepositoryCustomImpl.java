@@ -69,4 +69,31 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
                 .where(project.id.eq(projectId))
                 .fetch();
     }
+
+    @Override
+    public Page<Project> findProjectByMemberIdWithPage(Long memberId, Pageable pageable) {
+        QProjectMember projectMember = QProjectMember.projectMember;
+        QProject project = QProject.project;
+
+        List<Project> projects =  jpaQueryFactory
+                .select(project)
+                .from(project)
+                .join(project.projectMembers, projectMember)
+                .where(projectMember.member.id.eq(memberId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(project.createdDate.desc())
+                .fetch();
+
+        // 전체 개수 쿼리
+        long total = Optional.ofNullable(jpaQueryFactory
+                .select(project.count())
+                .from(project)
+                .join(project.projectMembers, projectMember)
+                .where(projectMember.member.id.eq(memberId))
+                .fetchOne()
+        ).orElse(0L);
+
+        return new PageImpl<>(projects, pageable, total);
+    }
 }
