@@ -3,10 +3,8 @@ package Idea.Idea_Hive.member.entity;
 import Idea.Idea_Hive.project.entity.ProjectMember;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.transaction.Transactional;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
@@ -32,6 +30,7 @@ public class Member {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @Setter
     private String name;
 
     @Column(unique = true)
@@ -46,12 +45,15 @@ public class Member {
 
     private Boolean isDeleted;
 
+    @Setter
     private String job;
 
+    @Setter
     private Integer career;
 
     // 관심사
-    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
+    @Setter
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL)
@@ -66,7 +68,8 @@ public class Member {
     private String profileUrl;
 
 
-    // 해시태그 추가 메서드
+
+    // 스킬스택 추가 메서드
     public void addSkillStack(SkillStack skillstack) {
         MemberSkillStack memberSkillStack = MemberSkillStack.builder()
                 .member(this)
@@ -75,10 +78,31 @@ public class Member {
         this.memberSkillStacks.add(memberSkillStack);
     }
 
+
+
     // 비밀번호 수정 메서드
     // 반드시 해싱된 패스워드여야 함 !!
     public void updatePassword(String hashedPassword) {
         this.password = hashedPassword;
+    }
+
+    /**
+     * 회원의 기존 모든 기술 스택을 제거합니다.
+     * MemberSkillStack 엔티티의 생명주기가 Member에 의해 관리되므로 (CascadeType.ALL),
+     * 컬렉션에서 제거하면 DB에서도 삭제됩니다.
+     */
+    public void clearSkillStacks() {
+        if (this.memberSkillStacks != null) {
+            // SkillStack과의 양방향 연관관계도 함께 정리해주는 것이 안전합니다.
+            for (MemberSkillStack mss : new ArrayList<>(this.memberSkillStacks)) {
+                // MemberSkillStack이 참조하는 SkillStack의 컬렉션에서도 자신을 제거
+                if (mss.getSkillstack() != null) {
+                    mss.getSkillstack().setMemberSkillStacks(null);
+                }
+            }
+            // 이제 Member의 컬렉션을 비웁니다. orphanRemoval=true에 의해 DB에서 삭제됩니다.
+            this.memberSkillStacks.clear();
+        }
     }
 
     @Builder

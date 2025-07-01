@@ -17,4 +17,7 @@ public interface SkillStackJpaRepo extends JpaRepository<SkillStack, Long> {
     boolean existsByName(String name);
 
     List<SkillStack> findAllById(Iterable<Long> ids);
+
+    /* todo: 위 메서드(findAllById)랑 비교 후 하나로 통합하기 */
+    List<SkillStack> findAllByIdIn(List<Long> ids);
 }

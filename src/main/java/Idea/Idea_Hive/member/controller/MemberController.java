@@ -1,10 +1,12 @@
 package Idea.Idea_Hive.member.controller;
 
 import Idea.Idea_Hive.member.entity.dto.request.PasswordResetRequest;
+import Idea.Idea_Hive.member.entity.dto.request.ProfileUpdateRequest;
 import Idea.Idea_Hive.member.entity.dto.request.SignUpRequest;
 import Idea.Idea_Hive.member.entity.dto.response.SignUpResponse;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.service.MemberService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +36,13 @@ public class MemberController {
     @GetMapping("/info")
     public ResponseEntity<MemberInfoResponse> getUserInfo() {
         MemberInfoResponse memberInfoResponse = memberService.getUserInfo();
+        return ResponseEntity.ok(memberInfoResponse);
+    }
+
+    @Operation(summary = "회원 프로필 수정", description = "로그인한 회원의 프로필 정보를 수정합니다.")
+    @PutMapping("/update")
+    public ResponseEntity<MemberInfoResponse> updateMyProfile(@RequestBody ProfileUpdateRequest request) {
+        MemberInfoResponse memberInfoResponse = memberService.updateProfile(request);
         return ResponseEntity.ok(memberInfoResponse);
     }
 }

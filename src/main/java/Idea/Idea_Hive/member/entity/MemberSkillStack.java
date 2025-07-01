@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -15,6 +16,7 @@ public class MemberSkillStack {
     @EmbeddedId
     private MemberSkillStackId id;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("memberId")
     @JoinColumn(name = "member_id")
