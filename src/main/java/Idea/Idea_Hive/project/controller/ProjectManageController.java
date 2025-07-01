@@ -47,13 +47,31 @@ public class ProjectManageController {
             @RequestParam("page") int page) {
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        // 기본 size: 10, 정렬 기준: createdDate 내림차순
+
         Long memberId = memberRepository.findByEmail(email)
                 .map(Member::getId)
                 .orElseThrow(IllegalAccessError::new);
+
+        // 기본 size: 10, 정렬 기준: createdDate 내림차순
         Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
         ProjectSearchResponse response = projectManageService.getProjectListByStatus(memberId, status, pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary= "마이페이지 > 내 모든 프로젝트 목록 조회")
+    @GetMapping("/all")
+    public ResponseEntity<ProjectSearchResponse> getAllProject(
+            @RequestParam("page") int page) {
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Long memberId = memberRepository.findByEmail(email)
+                .map(Member::getId)
+                .orElseThrow(IllegalAccessError::new);
+
+        // 기본 size: 10, 정렬 기준: createdDate 내림차순(최신순)
+        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        ProjectSearchResponse response = projectManageService.getAllProjectList(memberId, pageable);
         return ResponseEntity.ok(response);
     }
 

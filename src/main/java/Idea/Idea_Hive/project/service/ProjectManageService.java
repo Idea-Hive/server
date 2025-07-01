@@ -55,6 +55,11 @@ public class ProjectManageService {
         return ProjectSearchResponse.of(projects);
     }
 
+    public ProjectSearchResponse getAllProjectList(Long memberId, Pageable pageable) {
+        Page<Project> projects = projectManageRepository.findProjectByMemberIdWithPage(memberId, pageable);
+        return ProjectSearchResponse.of(projects);
+    }
+
     public List<MemberInfoResponse> getMembersByProjectId(Long projectId) {
         return projectManageRepository.findMemberByProjectId(projectId)
                 .stream().map(MemberInfoResponse::from)
