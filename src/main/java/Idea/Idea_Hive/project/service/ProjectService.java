@@ -3,6 +3,7 @@ package Idea.Idea_Hive.project.service;
 
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
+import Idea.Idea_Hive.notification.entity.NotificationType;
 import Idea.Idea_Hive.project.dto.request.*;
 import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
@@ -112,8 +113,15 @@ public class ProjectService {
                     projectApplyDecisionRequest.decision()
             );
 
+            Long applicantId = optionalProjectApplications.get().getMember().getId();
+
             if (projectApplyDecisionRequest.decision() == IsAccepted.REJECTED) {
                 projectApplications.updateRejectionMessage(projectApplyDecisionRequest.rejectionMessage());
+                notificationService.addNotification(
+                        projectApplyDecisionRequest.projectId(),
+                        applicantId,
+                        NotificationType.PROJECT_APPLICATION_REJECTED
+                );
             }
 
             Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
@@ -124,9 +132,19 @@ public class ProjectService {
 
             if (projectApplyDecisionRequest.decision() == IsAccepted.CONFIRMED) {
                 optionalProjectMember.get().updateRole(Role.TEAM_MEMBER);
+                notificationService.addNotification(
+                        projectApplyDecisionRequest.projectId(),
+                        applicantId,
+                        NotificationType.PROJECT_APPLICATION_ACCEPTED
+                );
             } else if (projectApplyDecisionRequest.decision() == IsAccepted.CANCEL_CONFIRM) { // 확정 취소의 경우 ProjectApplications의 isAccepted를 미정으로 변경
                 optionalProjectMember.get().updateRole(Role.GUEST);
                 optionalProjectApplications.get().updateIsAccepted(IsAccepted.UNDECIDED);
+                notificationService.addNotification(
+                        projectApplyDecisionRequest.projectId(),
+                        applicantId,
+                        NotificationType.PROJECT_CONFIRMATION_CANCELLED
+                );
             }
         }
     }
@@ -188,9 +206,10 @@ public class ProjectService {
         }
 
         //알람 발행
-        notificationService.sendProjectApplicationNotification(
+        notificationService.addNotification(
                 projectApplyRequest.projectId(),
-                info.getMember().getName()+"님이 프로젝트에 지원했습니다."
+                projectApplyRequest.memberId(),
+                NotificationType.PROJECT_APPLICATION
         );
 
     }
@@ -310,6 +329,7 @@ public class ProjectService {
 
         //프로젝트 정보 수정
         project.updateProjectInfo(
+                request.name(),
                 request.title(),
                 request.description(),
                 request.contact(),
@@ -363,6 +383,9 @@ public class ProjectService {
     }
 
     private void validationProjectRequest(ProjectUpdateRequest request) {
+        if (!StringUtils.hasText(request.name())) {
+            throw new IllegalArgumentException("프로젝트 명은 필수 입력값입니다.");
+        }
         if (!StringUtils.hasText(request.title())) {
             throw new IllegalArgumentException("제목은 필수 입력값입니다.");
         }

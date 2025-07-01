@@ -2,6 +2,7 @@ package Idea.Idea_Hive.project.entity;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.notification.entity.Notification;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import jakarta.persistence.*;
 import lombok.*;
@@ -20,6 +21,8 @@ public class Project {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false)
     private Long id;
+
+    private String name;
 
     private String title;
 
@@ -72,7 +75,8 @@ public class Project {
     private List<ProjectApplications> projectApplications = new ArrayList<>();
 
     @Builder
-    public Project(String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
+    public Project(String name, String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
+        this.name = name;
         this.title = title;
         this.description = description;
         this.contact = contact;
@@ -108,8 +112,9 @@ public class Project {
     }
 
     // 임시저장된 프로젝트 업데이트
-    public void updateTemporaryProject(String title, String description,String contact, Integer maxMembers,
+    public void updateTemporaryProject(String name, String title, String description,String contact, Integer maxMembers,
                                        LocalDateTime dueDateFrom, LocalDateTime dueDateTo, Boolean isSave) {
+        this.name = name;
         this.title = title;
         this.description = description;
         this.contact = contact;
@@ -198,8 +203,9 @@ public class Project {
     }
 
     // 프로젝트 정보 수정
-    public void updateProjectInfo(String title, String description,String contact, Integer maxMembers,
+    public void updateProjectInfo(String name, String title, String description,String contact, Integer maxMembers,
                                        LocalDateTime dueDateFrom, LocalDateTime dueDateTo) {
+        this.name = name;
         this.title = title;
         this.description = description;
         this.contact = contact;
@@ -208,5 +214,4 @@ public class Project {
         this.dueDateTo = dueDateTo;
         this.modifiedDate = LocalDateTime.now();
     }
-
 }

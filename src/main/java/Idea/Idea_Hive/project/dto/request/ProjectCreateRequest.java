@@ -8,6 +8,7 @@ import java.util.List;
 public record ProjectCreateRequest (
         Long projectId,
         Long userId,
+        String name,
         String title,
         String description,
         String idea,

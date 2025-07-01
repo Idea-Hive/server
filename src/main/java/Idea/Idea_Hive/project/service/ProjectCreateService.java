@@ -58,6 +58,7 @@ public class ProjectCreateService {
 
             // 프로젝트 정보 업데이트
             project.updateTemporaryProject(
+                    request.name(),
                     request.title(),
                     request.description(),
                     request.contact(),
@@ -75,6 +76,7 @@ public class ProjectCreateService {
                     .build();
 
             project = Project.builder()
+                    .name(request.name())
                     .title(request.title())
                     .description(request.description())
                     .contact(request.contact())
@@ -168,10 +170,10 @@ public class ProjectCreateService {
 
             // Project를 다시 저장하여 ProjectMember도 함께 저장
             projectRepository.save(savedProject);
+        }
 
-            if (request.isSave()) {
-                createDefaultTasksForProject(savedProject);
-            }
+        if (request.isSave()) {
+            createDefaultTasksForProject(savedProject);
         }
 
         return savedProject.getId();
