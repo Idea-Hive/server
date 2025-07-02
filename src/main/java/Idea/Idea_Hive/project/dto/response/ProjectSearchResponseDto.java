@@ -4,6 +4,7 @@ import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.Role;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,8 @@ public record ProjectSearchResponseDto(
         List<String> hashtagNames,
         String creator,
         int viewCnt,
-        int likedCnt
+        int likedCnt,
+        LocalDateTime expirationDate
 ) {
     public static ProjectSearchResponseDto from(Project project) {
         return new ProjectSearchResponseDto(
@@ -30,7 +32,8 @@ public record ProjectSearchResponseDto(
                         .map(pm -> pm.getMember().getName())
                         .orElse("Unknown"),
                 project.getViewCnt(),
-                project.getLikedCnt()
+                project.getLikedCnt(),
+                project.getExpirationDate()
         );
     }
 }

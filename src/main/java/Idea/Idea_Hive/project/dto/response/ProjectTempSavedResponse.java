@@ -8,14 +8,12 @@ import java.util.stream.Collectors;
 
 public record ProjectTempSavedResponse(
         Long projectId,
-        String title,
-        LocalDateTime tempSavedDate
+        String name
 ) {
     public ProjectTempSavedResponse(Project project) {
         this(
                 project.getId(),
-                project.getTitle(),
-                project.getCreatedDate()
+                project.getName()
         );
     }
 

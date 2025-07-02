@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 public record ProjectInfoResponse (
         Long projectId,
+        String name,
         String title,
         List<String> hashtagNames,
         Long creatorId,
@@ -42,6 +43,7 @@ public record ProjectInfoResponse (
 
         return new ProjectInfoResponse(
                 project.getId(),
+                project.getName(),
                 project.getTitle(),
                 project.getHashtags().stream()
                         .map(Hashtag::getName)

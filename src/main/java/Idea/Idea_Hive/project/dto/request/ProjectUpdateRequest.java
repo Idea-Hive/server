@@ -7,6 +7,7 @@ import java.util.List;
 
 public record ProjectUpdateRequest(
         Long projectId,
+        String name,
         String title,
         String description,
         String idea,
