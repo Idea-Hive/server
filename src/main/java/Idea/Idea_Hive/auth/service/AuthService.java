@@ -6,6 +6,7 @@ import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +26,16 @@ public class AuthService {
         }
 
         return new AuthInfoResponse(member.getEmail(), member.getName());
+    }
+
+    public boolean verifyMemberIdIsLogined(Long memberId) {
+        // memberId가 현재 로그인한 멤버의 memberId인지 확인하는 메서드
+        // todo: Token에 id값 추가 시 변경해야함..
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(IllegalAccessError::new);
+
+        return member.getEmail().equals(email);
     }
 }

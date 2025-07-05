@@ -1,5 +1,6 @@
 package Idea.Idea_Hive.project.controller;
 
+import Idea.Idea_Hive.auth.service.AuthService;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
@@ -7,6 +8,11 @@ import Idea.Idea_Hive.project.dto.request.ProjectSubmitRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.service.ProjectManageService;
+import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
+import Idea.Idea_Hive.task.dto.response.TaskResponse;
+import Idea.Idea_Hive.task.entity.ProjectTask;
+import Idea.Idea_Hive.task.entity.TaskType;
+import Idea.Idea_Hive.task.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,12 +20,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Security;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,9 +36,9 @@ import java.util.List;
 public class ProjectManageController {
 
     private final ProjectManageService projectManageService;
-
-    // todo: 수정 예정
     private final MemberRepository memberRepository;
+    private final AuthService authService;
+    private final TaskService taskService;
 
     @Operation(summary = "프로젝트 제출 API")
     @PostMapping("/submit")
@@ -81,5 +89,20 @@ public class ProjectManageController {
         return ResponseEntity.ok(
                 projectManageService.getMembersByProjectId(id)
         );
+    }
+
+    @Operation(summary="(캘린더) 프로젝트 모든 과제 조회 API")
+    @GetMapping("/calender")
+    public ResponseEntity<Map<TaskType, ProjectTaskListResponse>> getAllProjectTasks(
+            @RequestParam("memberId") Long memberId,
+            @RequestParam("projectId") Long projectId) {
+
+        boolean verify = authService.verifyMemberIdIsLogined(memberId);
+        if (!verify) {
+            throw new BadCredentialsException("로그인한 사용자와 memberId가 다릅니다.");
+        }
+        Map<TaskType, ProjectTaskListResponse> projectTaskListResponseMap = taskService.getAllTask(projectId);
+
+        return ResponseEntity.ok(projectTaskListResponseMap);
     }
 }
