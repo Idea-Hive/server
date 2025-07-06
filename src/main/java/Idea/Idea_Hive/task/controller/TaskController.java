@@ -2,6 +2,7 @@ package Idea.Idea_Hive.task.controller;
 
 import Idea.Idea_Hive.file.service.FileStorageService;
 import Idea.Idea_Hive.task.dto.request.*;
+import Idea.Idea_Hive.task.dto.response.DownloadFileResponse;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
 import Idea.Idea_Hive.task.entity.Task;
@@ -11,11 +12,16 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class TaskController {
 
     private final TaskService taskService;
-//    private final FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
 
 
     @GetMapping("")
@@ -54,22 +60,44 @@ public class TaskController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-//    @Operation(summary = "로컬용 과제 파일 업로드 API")
-//    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
-//    public ResponseEntity<TaskResponse> uploadTaskFile(
-//            @Parameter(description = "업로드할 파일", required = true,
-//                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
-//            @RequestPart("file") MultipartFile file,
-//
-//            @Parameter(description = "Task id", required = true,
-//                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
-//            @RequestPart("taskInfo") FileUploadRequest request
-//            ) {
-//
-//        TaskResponse response = fileStorageService.storeFile(file, request.taskId());
-//        return ResponseEntity.ok(response);
-//    }
+    @Operation(summary = "과제 파일 업로드 API")
+    @PostMapping(value = "/file-upload", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public ResponseEntity<TaskResponse> uploadTaskFile(
+            @Parameter(description = "업로드할 파일", required = true,
+                    content = @Content(mediaType = MediaType.MULTIPART_FORM_DATA_VALUE))
+            @RequestPart("file") MultipartFile file,
 
+            @Parameter(description = "Task id", required = true,
+                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
+            @RequestPart("taskInfo") FileUploadRequest request
+            ) {
+
+        TaskResponse response = fileStorageService.storeFile(file, request.taskId());
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "과제 파일 다운로드 API")
+    @GetMapping("/download/{taskId}")
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long taskId) {
+
+        DownloadFileResponse downloadFile = fileStorageService.downloadFile(taskId);
+
+        Resource resource = downloadFile.resource();
+        String originalFileName = downloadFile.originalFileName();
+
+        String encodedFileName;
+        try {
+            encodedFileName = URLEncoder.encode(originalFileName, "UTF-8").replaceAll("\\+", "%20");
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("파일 이름 인코딩 실패 : " + e);
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        return ResponseEntity.ok().headers(headers).body(resource);
+    }
     @Operation(summary = "과제 링크 첨부 API")
     @PostMapping("/attach-link")
     public ResponseEntity<TaskResponse> attachLink(@RequestBody AttachLinkRequest request) {

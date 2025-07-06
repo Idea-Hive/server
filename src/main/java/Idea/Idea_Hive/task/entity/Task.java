@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -32,13 +31,13 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private TaskType taskType;
 
-    // 업로드된 파일 경로
+    // 업로드된 파일 경로 또는 S3 Key
     @Setter
     private String filePath;
 
-    // 담당자 (person in charge)
-//    @Setter
-//    private String pic;
+    // 사용자가 업로드한 원본 파일 이름
+    @Setter
+    private String originalFileName;
 
     // 마감 기한
     @Setter
@@ -67,18 +66,17 @@ public class Task {
         this.attachedLink = attachedLink;
     }
 
-    public Task uploadFile(String filePath) {
+    public void uploadFile(String filePath, String originalFileName) {
         this.isSubmitted = true;
         this.filePath = filePath;
+        this.originalFileName = originalFileName;
         this.uploadDate = new Date();
-        return this;
     }
 
-    public Task attachLink(String attachedLink) {
+    public void attachLink(String attachedLink) {
         this.isSubmitted = true;
         this.attachedLink = attachedLink;
         this.uploadDate = new Date();
-        return this;
     }
 
 }
