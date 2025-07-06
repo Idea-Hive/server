@@ -27,6 +27,7 @@ public class TaskController {
 //    private final FileStorageService fileStorageService;
 
 
+    @Operation(summary = "프로젝트 과제 조회 API")
     @GetMapping("")
     public ResponseEntity<ProjectTaskListResponse> getTaskList(ProjectTaskListRequest request) {
         ProjectTaskListResponse response = taskService.getTaskList(request);

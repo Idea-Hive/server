@@ -9,6 +9,7 @@ import Idea.Idea_Hive.task.dto.response.TaskResponse;
 import Idea.Idea_Hive.task.entity.ProjectTask;
 import Idea.Idea_Hive.task.entity.ProjectTaskId;
 import Idea.Idea_Hive.task.entity.Task;
+import Idea.Idea_Hive.task.entity.TaskType;
 import Idea.Idea_Hive.task.entity.repository.ProjectTaskRepository;
 import Idea.Idea_Hive.task.entity.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +18,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,20 @@ public class TaskService {
 
         Map<Boolean, List<TaskResponse>> partitioned = taskRepository
                 .findTasksByProjectIdAndTaskType(request.projectId(), request.taskType())
+                .stream()
+                .map(TaskResponse::from)
+                .collect(Collectors.partitioningBy(TaskResponse::isRequired));
+
+        List<TaskResponse> requiredTasks = partitioned.getOrDefault(true, Collections.emptyList());
+        List<TaskResponse> optionalTasks = partitioned.getOrDefault(false, Collections.emptyList());
+
+
+        return new ProjectTaskListResponse(requiredTasks, optionalTasks);
+    }
+
+    public ProjectTaskListResponse getTaskList(Long projectId, TaskType taskType) {
+        Map<Boolean, List<TaskResponse>> partitioned = taskRepository
+                .findTasksByProjectIdAndTaskType(projectId, taskType)
                 .stream()
                 .map(TaskResponse::from)
                 .collect(Collectors.partitioningBy(TaskResponse::isRequired));
@@ -104,6 +121,17 @@ public class TaskService {
         Task savedTask = taskRepository.save(task);
 
         return TaskResponse.from(savedTask);
+    }
+
+    public Map<TaskType, ProjectTaskListResponse> getAllTask(Long projectId) {
+        List<TaskType> taskTypes = Stream.of(TaskType.values()).toList();
+        Map<TaskType, ProjectTaskListResponse> tasks = new HashMap<>();
+
+        for(TaskType taskType: taskTypes) {
+            tasks.put(taskType, getTaskList(projectId, taskType));
+        }
+
+        return tasks;
     }
 
 }
