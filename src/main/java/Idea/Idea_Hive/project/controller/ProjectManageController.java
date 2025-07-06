@@ -4,6 +4,7 @@ import Idea.Idea_Hive.auth.service.AuthService;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
+import Idea.Idea_Hive.project.dto.request.ProjectLeaveRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectSubmitRequest;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
@@ -61,7 +62,7 @@ public class ProjectManageController {
                 .orElseThrow(IllegalAccessError::new);
 
         // 기본 size: 10, 정렬 기준: createdDate 내림차순
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
         ProjectSearchResponse response = projectManageService.getProjectListByStatus(memberId, status, pageable);
         return ResponseEntity.ok(response);
@@ -78,7 +79,7 @@ public class ProjectManageController {
                 .orElseThrow(IllegalAccessError::new);
 
         // 기본 size: 10, 정렬 기준: createdDate 내림차순(최신순)
-        Pageable pageable = PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
+        Pageable pageable = PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
         ProjectSearchResponse response = projectManageService.getAllProjectList(memberId, pageable);
         return ResponseEntity.ok(response);
     }
@@ -104,5 +105,12 @@ public class ProjectManageController {
         Map<TaskType, ProjectTaskListResponse> projectTaskListResponseMap = taskService.getAllTask(projectId);
 
         return ResponseEntity.ok(projectTaskListResponseMap);
+      
+     
+    @Operation(summary = "프로젝트 탈퇴 API")
+    @DeleteMapping("/leave")
+    public ResponseEntity<String> projectLeave(@RequestBody ProjectLeaveRequest request) {
+        projectManageService.leaveProject(request.memberId(), request.projectId());
+        return ResponseEntity.ok("프로젝트 탈퇴 완료");
     }
 }
