@@ -105,6 +105,7 @@ public class ProjectManageController {
         Map<TaskType, ProjectTaskListResponse> projectTaskListResponseMap = taskService.getAllTask(projectId);
 
         return ResponseEntity.ok(projectTaskListResponseMap);
+    }
       
      
     @Operation(summary = "프로젝트 탈퇴 API")
