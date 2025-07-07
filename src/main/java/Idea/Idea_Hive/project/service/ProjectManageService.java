@@ -5,6 +5,7 @@ import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ProjectLeaveRequest;
+import Idea.Idea_Hive.project.dto.response.MyPageProjectListResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
@@ -65,9 +66,9 @@ public class ProjectManageService {
         return ProjectSearchResponse.of(projects);
     }
 
-    public ProjectSearchResponse getAllProjectList(Long memberId, Pageable pageable) {
+    public MyPageProjectListResponse getAllProjectList(Long memberId, Pageable pageable) {
         Page<Project> projects = projectManageRepository.findProjectByMemberIdWithPage(memberId, pageable);
-        return ProjectSearchResponse.of(projects);
+        return MyPageProjectListResponse.of(projects);
     }
 
     public List<MemberInfoResponse> getMembersByProjectId(Long projectId) {
