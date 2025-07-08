@@ -6,6 +6,7 @@ import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ProjectLeaveRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectSubmitRequest;
+import Idea.Idea_Hive.project.dto.response.MyPageProjectListResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.service.ProjectManageService;
@@ -70,7 +71,7 @@ public class ProjectManageController {
 
     @Operation(summary= "마이페이지 > 내 모든 프로젝트 목록 조회")
     @GetMapping("/all")
-    public ResponseEntity<ProjectSearchResponse> getAllProject(
+    public ResponseEntity<MyPageProjectListResponse> getAllProject(
             @RequestParam("page") int page) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -80,7 +81,7 @@ public class ProjectManageController {
 
         // 기본 size: 10, 정렬 기준: createdDate 내림차순(최신순)
         Pageable pageable = PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
-        ProjectSearchResponse response = projectManageService.getAllProjectList(memberId, pageable);
+        MyPageProjectListResponse response = projectManageService.getAllProjectList(memberId, pageable);
         return ResponseEntity.ok(response);
     }
 
