@@ -17,10 +17,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,8 +38,9 @@ public class TaskService {
                 .collect(Collectors.partitioningBy(TaskResponse::isRequired));
 
         List<TaskResponse> requiredTasks = partitioned.getOrDefault(true, Collections.emptyList());
+        requiredTasks.sort(Comparator.comparing(TaskResponse::id));
         List<TaskResponse> optionalTasks = partitioned.getOrDefault(false, Collections.emptyList());
-
+        requiredTasks.sort(Comparator.comparing(TaskResponse::id));
 
         return new ProjectTaskListResponse(requiredTasks, optionalTasks);
     }
