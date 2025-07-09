@@ -14,6 +14,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -27,6 +28,7 @@ import java.util.UUID;
 
 @Service
 @Profile("prod")
+@ConditionalOnProperty(name = "aws.s3.bucket-name")
 @Slf4j
 @RequiredArgsConstructor
 public class ProdFileStorageService implements FileStorageService {
