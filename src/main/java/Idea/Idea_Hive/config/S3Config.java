@@ -1,6 +1,6 @@
 package Idea.Idea_Hive.config;
 
-import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,8 +15,8 @@ public class S3Config {
     private String region;
 
     @Bean
-    public AmazonS3 amazonS3(){
-        return AmazonS3ClientBuilder.standard()
+    public AmazonS3Client amazonS3Client(){
+        return (AmazonS3Client) AmazonS3ClientBuilder.standard()
                 .withRegion(region)
                 .build();
     }
