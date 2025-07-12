@@ -80,7 +80,7 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
                 .from(project)
                 .join(project.projectMembers, projectMember)
                 .where(
-                        projectMember.member.id.eq(memberId),ㅔ
+                        projectMember.member.id.eq(memberId),
                         project.status.ne(ProjectStatus.RECRUITING) // RECRUITING이 아닌 프로젝트만
                 )
                 .offset(pageable.getOffset())
