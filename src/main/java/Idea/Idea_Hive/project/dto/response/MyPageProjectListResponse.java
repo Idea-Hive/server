@@ -17,6 +17,7 @@ public record MyPageProjectListResponse(
         int pageSize
 ) {
     public static MyPageProjectListResponse of(Page<Project> projectPage) {
+
         Map<ProjectStatus, List<ProjectManageResponse>> projectMap = projectPage.getContent().stream()
                 .map(ProjectManageResponse::from)
                 .collect(Collectors.groupingBy(
