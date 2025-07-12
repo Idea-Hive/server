@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -41,7 +42,7 @@ public class Task {
 
     // 마감 기한
     @Setter
-    private Date dueDate;
+    private LocalDateTime dueDate;
 
     // 제출 시간
     private Date uploadDate;
@@ -55,7 +56,7 @@ public class Task {
     private Member member;
 
     @Builder
-    public Task(Boolean isRequired, Boolean isSubmitted, String title, TaskType taskType, String filePath, Date dueDate,
+    public Task(Boolean isRequired, Boolean isSubmitted, String title, TaskType taskType, String filePath, LocalDateTime dueDate,
                 String attachedLink) {
         this.isRequired = isRequired;
         this.isSubmitted = isSubmitted;

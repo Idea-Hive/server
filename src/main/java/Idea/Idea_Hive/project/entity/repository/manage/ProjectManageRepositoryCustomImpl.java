@@ -79,7 +79,10 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
                 .select(project)
                 .from(project)
                 .join(project.projectMembers, projectMember)
-                .where(projectMember.member.id.eq(memberId))
+                .where(
+                        projectMember.member.id.eq(memberId),ㅔ
+                        project.status.ne(ProjectStatus.RECRUITING) // RECRUITING이 아닌 프로젝트만
+                )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .orderBy(project.createdDate.desc())
@@ -90,7 +93,10 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
                 .select(project.count())
                 .from(project)
                 .join(project.projectMembers, projectMember)
-                .where(projectMember.member.id.eq(memberId))
+                .where(
+                        projectMember.member.id.eq(memberId),
+                        project.status.ne(ProjectStatus.RECRUITING) // RECRUITING이 아닌 프로젝트만
+                )
                 .fetchOne()
         ).orElse(0L);
 

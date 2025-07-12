@@ -3,6 +3,7 @@ package Idea.Idea_Hive.project.controller;
 import Idea.Idea_Hive.auth.service.AuthService;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
+import Idea.Idea_Hive.member.entity.dto.response.ProjectMemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ChangeProjectLeaderRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectLeaveRequest;
@@ -81,7 +82,7 @@ public class ProjectManageController {
 
     @Operation(summary="프로젝트 멤버 조회 API")
     @GetMapping("/members")
-    public ResponseEntity<List<MemberInfoResponse>> getProjectMemebers(@RequestParam("id") Long id) {
+    public ResponseEntity<List<ProjectMemberInfoResponse>> getProjectMemebers(@RequestParam("id") Long id) {
         return ResponseEntity.ok(
                 projectManageService.getMembersByProjectId(id)
         );

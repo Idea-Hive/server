@@ -3,6 +3,7 @@ package Idea.Idea_Hive.project.service;
 import Idea.Idea_Hive.exception.handler.custom.InvalidProjectManageException;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
+import Idea.Idea_Hive.member.entity.dto.response.ProjectMemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ChangeProjectLeaderRequest;
 import Idea.Idea_Hive.project.dto.response.MyPageProjectResponse;
@@ -72,9 +73,9 @@ public class ProjectManageService {
         return MyPageProjectResponse.of(projects, likeProjects);
     }
 
-    public List<MemberInfoResponse> getMembersByProjectId(Long projectId) {
+    public List<ProjectMemberInfoResponse> getMembersByProjectId(Long projectId) {
         return projectManageRepository.findMemberByProjectId(projectId)
-                .stream().map(MemberInfoResponse::from)
+                .stream().map(member -> ProjectMemberInfoResponse.from(member, projectId))
                 .toList();
     }
 
