@@ -63,9 +63,13 @@ public class Member {
 
     private String type; // sns 연동 유형
 
-    private boolean isVerified;
-
     private String profileUrl;
+
+    private boolean isServiceAgreed;
+
+    private boolean isPrivacyAgreed;
+
+    private boolean isMarketingAgreed;
 
 
 
@@ -108,7 +112,9 @@ public class Member {
     @Builder
     public Member(final String name, final String email,
                   final String password, final String job,
-                  final String type, final Integer career) {
+                  final String type, final Integer career,
+                  final boolean isServiceAgreed, final boolean isPrivacyAgreed,
+                  final boolean isMarketingAgreed) {
         this.name = name;
         this.email = email;
         this.password = password;
@@ -117,5 +123,8 @@ public class Member {
         this.career = career;
         this.createdDate = LocalDateTime.now();
         this.isDeleted = false;
+        this.isServiceAgreed = isServiceAgreed;
+        this.isPrivacyAgreed = isPrivacyAgreed;
+        this.isMarketingAgreed = isMarketingAgreed;
     }
 }

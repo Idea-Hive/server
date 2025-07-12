@@ -7,6 +7,9 @@ import java.util.List;
 public record SignUpRequest(
         String email,
         String name,
-        String password
+        String password,
+        boolean isServiceAgreed,
+        boolean isPrivacyAgreed,
+        boolean isMarketingAgreed
 ) {
 }
