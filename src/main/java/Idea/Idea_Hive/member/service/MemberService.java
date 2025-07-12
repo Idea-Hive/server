@@ -50,6 +50,9 @@ public class MemberService {
                 .name(request.name())
                 .password(hashedPassword)
                 .type("email")
+                .isServiceAgreed(request.isServiceAgreed())
+                .isPrivacyAgreed(request.isPrivacyAgreed())
+                .isMarketingAgreed(request.isMarketingAgreed())
                 .build();
 
         Member saved = memberRepository.save(member);

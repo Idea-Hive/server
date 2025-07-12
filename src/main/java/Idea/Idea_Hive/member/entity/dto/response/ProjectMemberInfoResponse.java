@@ -1,17 +1,13 @@
 package Idea.Idea_Hive.member.entity.dto.response;
 
 import Idea.Idea_Hive.member.entity.Member;
-import Idea.Idea_Hive.member.entity.MemberSkillStack;
 import Idea.Idea_Hive.project.entity.Role;
-import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.skillstack.entity.dto.SkillStackVO;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public record MemberInfoResponse(
+public record ProjectMemberInfoResponse(
         Long id,
         String name,
         String email,
@@ -25,16 +21,22 @@ public record MemberInfoResponse(
         Boolean isDeleted,
         Boolean isServiceAgreed,
         Boolean isPrivacyAgreed,
-        Boolean isMarketingAgreed
+        Boolean isMarketingAgreed,
+        Role projectRole
 ) {
-
-    public static MemberInfoResponse from(Member member) {
+    public static ProjectMemberInfoResponse from(Member member, Long projectId) {
 
         List<SkillStackVO> skillStacks = member.getMemberSkillStacks().stream()
                 .map(ms -> SkillStackVO.from(ms.getSkillstack()))
                 .toList();
 
-        return new MemberInfoResponse(
+        Role projectRole = member.getProjectMembers().stream()
+                .filter(pm -> pm.getProject().getId().equals(projectId))
+                .findFirst()
+                .map(pm -> pm.getRole())
+                .orElse(null);
+
+        return new ProjectMemberInfoResponse(
                 member.getId(),
                 member.getName(),
                 member.getEmail(),
@@ -48,7 +50,8 @@ public record MemberInfoResponse(
                 member.getIsDeleted(),
                 member.isServiceAgreed(),
                 member.isPrivacyAgreed(),
-                member.isMarketingAgreed()
+                member.isMarketingAgreed(),
+                projectRole
         );
     }
 }

@@ -3,6 +3,7 @@ package Idea.Idea_Hive.task.dto.response;
 import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.TaskType;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public record TaskResponse(
@@ -14,7 +15,7 @@ public record TaskResponse(
         String attachedLink,
         String filePath,
         String pic, // 담당자 이름
-        Date dueDate,
+        LocalDateTime dueDate,
         Date uploadDate,
         Long picId
 ) {
