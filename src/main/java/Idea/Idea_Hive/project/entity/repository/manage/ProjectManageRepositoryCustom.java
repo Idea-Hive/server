@@ -13,4 +13,6 @@ public interface ProjectManageRepositoryCustom {
     Page<Project> findProjectByMemberIdAndStatusWithPage(Long memberId, ProjectStatus status, Pageable pageable);
     List<Member> findMemberByProjectId(Long projectId);
     Page<Project> findProjectByMemberIdWithPage(Long memberId, Pageable pageable);
+    List<Project> findProjectByMemberId(Long memberId);
+    List<Project> findLikeProjectByMemberId(Long memberId); // 찜한 프로젝트 목록 조회
 }

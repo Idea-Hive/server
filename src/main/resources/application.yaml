@@ -115,6 +115,10 @@ app:
     samesite: Lax
 
 --- # prod(cloud)
+
+server:
+  forward-headers-strategy: native
+
 spring:
   config:
     activate:

@@ -92,7 +92,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 
         response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());
 
-        // todo: 운영 시 url 수정 필요 ..
         String url = FRONTEND_URL + "/auth/social";
         response.sendRedirect(url);
     }
