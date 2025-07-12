@@ -1,9 +1,9 @@
 package Idea.Idea_Hive.task.dto.request;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 public record UpdateTaskDueDateRequest(
         Long taskId,
-        Date dueDate
+        LocalDateTime dueDate
 ) {
 }
