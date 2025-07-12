@@ -132,7 +132,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         show_sql: true
@@ -143,7 +143,7 @@ spring:
 
   sql:
     init:
-      mode: never # ddl-auto가 update 일때는 never, create일 때는 always로 설정해야 skillstack 테이블에 데이터가 중복으로 들어가지 않음
+      mode: always # ddl-auto가 update 일때는 never, create일 때는 always로 설정해야 skillstack 테이블에 데이터가 중복으로 들어가지 않음
 
   security:
     oauth2:
