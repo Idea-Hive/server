@@ -4,31 +4,30 @@ import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import org.springframework.data.domain.Page;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public record MyPageProjectListResponse(
+public record MyPageProjectResponse(
         Map<ProjectStatus, List<ProjectManageResponse>> projects,
-        long totalCnt,
-        int totalPages,
-        int currentPage,
-        int pageSize
+        List<ProjectManageResponse> likeProject
 ) {
-    public static MyPageProjectListResponse of(Page<Project> projectPage) {
-        Map<ProjectStatus, List<ProjectManageResponse>> projectMap = projectPage.getContent().stream()
+    // 찜한 프로젝트 목록 별도로 추가..
+    public static MyPageProjectResponse of(List<Project> projects, List<Project> likeProjects) {
+
+        Map<ProjectStatus, List<ProjectManageResponse>> projectMap = projects.stream()
                 .map(ProjectManageResponse::from)
                 .collect(Collectors.groupingBy(
                         ProjectManageResponse::status,
                         Collectors.toList()
                 ));
 
-        return new MyPageProjectListResponse(
+        List<ProjectManageResponse> likes = likeProjects.stream()
+                .map(ProjectManageResponse::from)
+                .toList();
+
+        return new MyPageProjectResponse(
                 projectMap,
-                projectPage.getTotalElements(),
-                projectPage.getTotalPages(),
-                projectPage.getNumber()+1,
-                projectPage.getSize());
+                likes);
     }
 }

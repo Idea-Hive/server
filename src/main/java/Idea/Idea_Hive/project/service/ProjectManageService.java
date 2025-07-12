@@ -4,8 +4,8 @@ import Idea.Idea_Hive.exception.handler.custom.InvalidProjectManageException;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.dto.response.MemberInfoResponse;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
-import Idea.Idea_Hive.project.dto.request.ProjectLeaveRequest;
-import Idea.Idea_Hive.project.dto.response.MyPageProjectListResponse;
+import Idea.Idea_Hive.project.dto.request.ChangeProjectLeaderRequest;
+import Idea.Idea_Hive.project.dto.response.MyPageProjectResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
 import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
@@ -15,9 +15,9 @@ import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -66,9 +66,10 @@ public class ProjectManageService {
         return ProjectSearchResponse.of(projects);
     }
 
-    public MyPageProjectListResponse getAllProjectList(Long memberId, Pageable pageable) {
-        Page<Project> projects = projectManageRepository.findProjectByMemberIdWithPage(memberId, pageable);
-        return MyPageProjectListResponse.of(projects);
+    public MyPageProjectResponse getMyPageProject(Long memberId) {
+        List<Project> projects = projectManageRepository.findProjectByMemberId(memberId);
+        List<Project> likeProjects = projectManageRepository.findLikeProjectByMemberId(memberId);
+        return MyPageProjectResponse.of(projects, likeProjects);
     }
 
     public List<MemberInfoResponse> getMembersByProjectId(Long projectId) {
@@ -112,5 +113,81 @@ public class ProjectManageService {
             projectRepository.delete(project); // 팀장이 나가면 프로젝트가 아예 사라짐
         }
         projectMemberRepository.delete(projectMember);
+    }
+
+    @Transactional
+    public void deleteProject(Long memberId, Long projectId) {
+        // 현재 로그인한 사람이 맞는지 검증
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String memberEmail = authentication.getName();
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("로그인한 사용자가 아닙니다."));
+
+        if (!member.getEmail().equals(memberEmail)) {
+            throw new InvalidProjectManageException("로그인한 사용자와 탈퇴하려는 사용자 id가 다릅니다.");
+        }
+        // Project 찾기
+
+        Project project = projectRepository.findById(projectId).orElseThrow( () -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
+        // ProjectMember 생성
+        ProjectMemberId projectMemberId = ProjectMemberId.builder()
+                .projectId(projectId)
+                .memberId(memberId)
+                .build();
+
+        Optional<ProjectMember> _projectMember = projectMemberRepository.findById(projectMemberId);
+
+        if (_projectMember.isEmpty()) {
+            throw new IllegalArgumentException("존재하지 않는 프로젝트이거나, 해당 프로젝트의 멤버가 아닙니다.");
+        }
+
+        ProjectMember projectMember = _projectMember.get();
+        // 팀장이고 팀원 없을때만 삭제 가능함
+        if (projectMember.getRole().equals(Role.LEADER)) {
+            if (getMembersByProjectId(projectId).size() != 1) {
+                throw new IllegalArgumentException("현재 다른 팀원(들)이 존재하여 프로젝트 탈퇴가 불가능합니다.");
+            }
+            projectRepository.delete(project); // 팀장이 나가면 프로젝트가 아예 사라짐
+            projectMemberRepository.delete(projectMember);
+        } else {
+            // 팀장 아니면 삭제가 안됨
+            throw new IllegalArgumentException("팀장만 삭제 가능합니다.");
+        }
+    }
+
+    @Transactional
+    public void changeProjectLeader(ChangeProjectLeaderRequest request) {
+        Long beforeLeaderId = request.beforeLeaderId();
+        Long afterLeaderId = request.beforeLeaderId();
+        Member beforeMember = memberRepository.findById(beforeLeaderId)
+                .orElseThrow(IllegalArgumentException::new);
+        String loginMemberEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        if (!beforeMember.getEmail().equals(loginMemberEmail)) {
+            throw new IllegalArgumentException("팀장 변경은 팀장만 가능합니다.");
+        }
+
+        ProjectMemberId beforeLeaderProjectId = ProjectMemberId.builder()
+                .memberId(beforeLeaderId)
+                .projectId(request.projectId())
+                .build();
+
+        ProjectMemberId afterLeaderProjectId = ProjectMemberId.builder()
+                .memberId(afterLeaderId)
+                .projectId(request.projectId())
+                .build();
+
+        ProjectMember beforeProjectMember = projectMemberRepository.findById(beforeLeaderProjectId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        ProjectMember afterProjectMember = projectMemberRepository.findById(afterLeaderProjectId)
+                .orElseThrow(IllegalArgumentException::new);
+
+        if (!beforeProjectMember.getRole().equals(Role.LEADER)) {
+            throw new IllegalStateException("팀장만 팀장을 양도할 수 있습니다.");
+        }
+
+        beforeProjectMember.setRole(Role.TEAM_MEMBER);
+        afterProjectMember.setRole(Role.LEADER);
     }
 }

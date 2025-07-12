@@ -2,10 +2,7 @@ package Idea.Idea_Hive.project.entity;
 
 import Idea.Idea_Hive.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -31,6 +28,7 @@ public class ProjectMember {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
+    @Setter
     private Role role;
 
     private boolean isProfileShared;

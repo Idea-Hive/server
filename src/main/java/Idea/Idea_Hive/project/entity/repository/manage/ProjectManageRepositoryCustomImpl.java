@@ -96,4 +96,32 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
 
         return new PageImpl<>(projects, pageable, total);
     }
+
+    @Override
+    public List<Project> findProjectByMemberId(Long memberId) {
+        QProjectMember projectMember = QProjectMember.projectMember;
+        QProject project = QProject.project;
+
+        return jpaQueryFactory
+                .select(project)
+                .from(project)
+                .join(project.projectMembers, projectMember)
+                .where(projectMember.member.id.eq(memberId))
+                .fetch();
+    }
+
+    @Override
+    public List<Project> findLikeProjectByMemberId(Long memberId){
+        QProjectMember projectMember = QProjectMember.projectMember;
+        QProject project = QProject.project;
+
+        return jpaQueryFactory
+                .select(project)
+                .from(project)
+                .join(project.projectMembers, projectMember)
+                .where(
+                        projectMember.member.id.eq(memberId),
+                        projectMember.isLike.isTrue())
+                .fetch();
+    }
 }
