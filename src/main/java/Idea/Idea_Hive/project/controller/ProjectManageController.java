@@ -121,6 +121,7 @@ public class ProjectManageController {
     @Operation(summary = "팀장 변경 API")
     @PutMapping("/leader/change")
     public ResponseEntity<Void> changeProjectLeader(@RequestBody ChangeProjectLeaderRequest request) {
+        projectManageService.changeProjectLeader(request);
         return ResponseEntity.ok().build();
     }
 }
