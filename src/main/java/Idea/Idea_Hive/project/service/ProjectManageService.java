@@ -159,7 +159,7 @@ public class ProjectManageService {
     @Transactional
     public void changeProjectLeader(ChangeProjectLeaderRequest request) {
         Long beforeLeaderId = request.beforeLeaderId();
-        Long afterLeaderId = request.beforeLeaderId();
+        Long afterLeaderId = request.afterLeaderId();
         Member beforeMember = memberRepository.findById(beforeLeaderId)
                 .orElseThrow(IllegalArgumentException::new);
         String loginMemberEmail = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
