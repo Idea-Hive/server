@@ -24,9 +24,8 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom{
         return jpaQueryFactory
                 .select(task)
                 .from(projectTask)
-                .join(task)
-                .on(projectTask.id.taskId.eq(task.id))
-                .where(projectTask.id.projectId.eq(projectId))
+                .join(projectTask.task, task)
+                .where(projectTask.project.id.eq(projectId))
                 .fetch();
     }
 
@@ -38,9 +37,8 @@ public class TaskRepositoryImpl implements TaskRepositoryCustom{
         return jpaQueryFactory
                 .select(task)
                 .from(projectTask)
-                .join(task)
-                .on(projectTask.id.taskId.eq(task.id))
-                .where(projectTask.id.projectId.eq(projectId), task.taskType.eq(taskType))
+                .join(projectTask.task, task)
+                .where(projectTask.project.id.eq(projectId), task.taskType.eq(taskType))
                 .fetch();
     }
 }

@@ -11,7 +11,6 @@ import Idea.Idea_Hive.project.entity.repository.SkillStackRepository;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.task.dto.request.CreateTaskRequest;
 import Idea.Idea_Hive.task.entity.ProjectTask;
-import Idea.Idea_Hive.task.entity.ProjectTaskId;
 import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.TaskType;
 import Idea.Idea_Hive.task.entity.repository.ProjectTaskRepository;
@@ -152,13 +151,7 @@ public class ProjectCreateService {
 
         Project savedProject = projectRepository.save(project);
 
-        // ProjectMember 생성
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(savedProject.getId())
-                .memberId(member.getId())
-                .build();
-
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findByProjectIdAndMemberId(savedProject.getId(),member.getId());
         if (optionalProjectMember.isEmpty()) {
             savedProject.addProjectMember(
                     member,
@@ -270,9 +263,10 @@ public class ProjectCreateService {
             Task savedTask = taskRepository.save(task);
 
             // ProjectTask 연결 테이블에 추가
-            ProjectTaskId projectTaskId = new ProjectTaskId(project.getId(), savedTask.getId());
-            ProjectTask projectTask = new ProjectTask();
-            projectTask.setId(projectTaskId);
+            ProjectTask projectTask = ProjectTask.builder()
+                    .project(project)
+                    .task(savedTask)
+                    .build();
 
             projectTaskRepository.save(projectTask);
         }

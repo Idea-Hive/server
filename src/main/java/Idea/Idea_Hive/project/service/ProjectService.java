@@ -53,12 +53,8 @@ public class ProjectService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
 
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(projectId)
-                .memberId(memberId)
-                .build();
 
-        return new ProjectAndMemberInfo(project, member, projectMemberId);
+        return new ProjectAndMemberInfo(project, member, projectId, memberId);
 
     }
 
@@ -66,12 +62,14 @@ public class ProjectService {
     private static class ProjectAndMemberInfo{
         private final Project project;
         private final Member member;
-        private final ProjectMemberId projectMemberId;
+        private final Long projectId;
+        private final Long memberId;
 
-        public ProjectAndMemberInfo(Project project, Member member, ProjectMemberId projectMemberId) {
+        public ProjectAndMemberInfo(Project project, Member member, Long projectId, Long memberId) {
             this.project = project;
             this.member = member;
-            this.projectMemberId = projectMemberId;
+            this.projectId = projectId;
+            this.memberId = memberId;
         }
     }
 
@@ -101,7 +99,10 @@ public class ProjectService {
 
     @Transactional
     public void projectApplyDecision(ProjectApplyDecisionRequest projectApplyDecisionRequest) {
-        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectApplyDecisionRequest.projectId(), projectApplyDecisionRequest.userId());
+        Long projectId = projectApplyDecisionRequest.projectId();
+        Long memberId = projectApplyDecisionRequest.userId();
+
+        ProjectAndMemberInfo info = getProjectAndMemberInfo(projectId, memberId);
 
         Optional<ProjectApplications> optionalProjectApplications = projectApplicationsRepository.findById(projectApplyDecisionRequest.applyId());
 
@@ -124,7 +125,7 @@ public class ProjectService {
                 );
             }
 
-            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
+            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId);
 
             if (optionalProjectMember.isEmpty()) {
                 throw new IllegalArgumentException("ProjectMember 테이블에 데이터가 존재하지 않습니다.");
@@ -184,13 +185,12 @@ public class ProjectService {
         info.getProject().getProjectApplications().add(newApplicant);
         projectApplicationsRepository.save(newApplicant);
 
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(info.getProjectMemberId());
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findByProjectIdAndMemberId(projectApplyRequest.projectId(),projectApplyRequest.memberId());
 
         // 기존에 ProjectMember에 값이 없을 경우 새로운 값 추가
         if (optionalProjectMember.isEmpty()) {
 
             ProjectMember projectMember = ProjectMember.builder()
-                    .id(info.getProjectMemberId())
                     .project(info.getProject())
                     .member(info.getMember())
                     .role(Role.GUEST)
@@ -216,14 +216,16 @@ public class ProjectService {
 
     @Transactional
     public void viewIdea(ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
-        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectIdAndMemberIdDto.projectId(), projectIdAndMemberIdDto.memberId());
+        Long projectId = projectIdAndMemberIdDto.projectId();
+        Long memberId = projectIdAndMemberIdDto.memberId();
 
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberInfo.getProjectMemberId());
+        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectId, memberId);
+
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId);
 
         if (optionalProjectMember.isEmpty()) {
 
             ProjectMember projectMember = ProjectMember.builder()
-                    .id(projectMemberInfo.getProjectMemberId())
                     .project(projectMemberInfo.getProject())
                     .member(projectMemberInfo.getMember())
                     .role(Role.GUEST)
@@ -278,15 +280,17 @@ public class ProjectService {
 
     @Transactional
     public void likeProject(ProjectLikeRequest projectLikeRequest) {
-        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectLikeRequest.projectId(), projectLikeRequest.memberId());
+        Long projectId = projectLikeRequest.projectId();
+        Long memberId = projectLikeRequest.memberId();
 
-        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberInfo.getProjectMemberId());
+        ProjectAndMemberInfo projectMemberInfo = getProjectAndMemberInfo(projectId, memberId);
+
+        Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findByProjectIdAndMemberId(projectId, memberId);
 
         // 기존에 ProjectMember에 값이 없을 경우 새로운 값 추가
         if (optionalProjectMember.isEmpty()) {
 
             ProjectMember projectMember = ProjectMember.builder()
-                    .id(projectMemberInfo.getProjectMemberId())
                     .project(projectMemberInfo.getProject())
                     .member(projectMemberInfo.getMember())
                     .role(Role.GUEST)

@@ -13,17 +13,16 @@ import lombok.Setter;
 @Table(name = "member_skillstack")
 public class MemberSkillStack {
 
-    @EmbeddedId
-    private MemberSkillStackId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("skillstackId")
     @JoinColumn(name = "skillstack_id")
     private SkillStack skillstack;
 
@@ -31,6 +30,5 @@ public class MemberSkillStack {
     public MemberSkillStack(Member member, SkillStack skillstack) {
         this.member = member;
         this.skillstack = skillstack;
-        this.id = new MemberSkillStackId(member.getId(), skillstack.getId());
     }
 }

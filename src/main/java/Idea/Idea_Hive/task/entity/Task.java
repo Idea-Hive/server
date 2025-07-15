@@ -8,7 +8,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Getter
@@ -54,6 +56,11 @@ public class Task {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTask> projectTasks = new ArrayList<>();
+
+
 
     @Builder
     public Task(Boolean isRequired, Boolean isSubmitted, String title, TaskType taskType, String filePath, LocalDateTime dueDate,
