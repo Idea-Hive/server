@@ -6,3 +6,4 @@ public record ChangeProjectLeaderRequest(
         Long projectId
 ) {
 }
+
