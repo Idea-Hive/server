@@ -38,7 +38,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     @Value("${app.cookie.secure}")
     private boolean cookieSecure;
 
-    @Value("${app.cookie.samesite}")
+    @Value("${app.cookie.sameSite}")
     private String cookieSameSite; // "Lax", "Strict", "None"
 
     @Value("${app.cookie.http-only}")
@@ -80,6 +80,14 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
 //        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
 //
 //        response.addCookie(refreshTokenCookie);
+
+        // 쿠키 설정값 로그 출력
+        log.info("=== 쿠키 설정값 확인 ===");
+        log.info("cookieSecure: {}", cookieSecure);
+        log.info("cookieSameSite: {}", cookieSameSite);
+        log.info("cookieHttpOnly: {}", cookieHttpOnly);
+        log.info("cookiePath: {}", cookiePath);
+        
         // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
         ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
                 .httpOnly(cookieHttpOnly)
