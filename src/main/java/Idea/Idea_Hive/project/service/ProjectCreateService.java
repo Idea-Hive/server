@@ -45,6 +45,10 @@ public class ProjectCreateService {
             validationProjectRequest(request);
         }
 
+        if (!StringUtils.hasText(request.name())) {
+            throw new IllegalArgumentException("프로젝트명은 필수 입력값입니다.");
+        }
+
         Member member = memberRepository.findById(request.userId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
