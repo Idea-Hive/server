@@ -228,4 +228,4 @@ frontend:
 app:
   cookie:
     secure: true
-    samesite: None
+    sameSite: None

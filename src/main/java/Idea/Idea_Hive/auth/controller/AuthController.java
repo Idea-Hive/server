@@ -36,7 +36,7 @@ public class AuthController {
     @Value("${app.cookie.secure}")
     private boolean cookieSecure;
 
-    @Value("${app.cookie.samesite}")
+    @Value("${app.cookie.sameSite}")
     private String cookieSameSite; // "Lax", "Strict", "None"
 
     @Value("${app.cookie.http-only}")
