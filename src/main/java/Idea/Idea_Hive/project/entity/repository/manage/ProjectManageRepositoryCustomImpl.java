@@ -82,6 +82,8 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
                 .where(
                         projectMember.member.id.eq(memberId),
                         project.status.ne(ProjectStatus.RECRUITING) // RECRUITING이 아닌 프로젝트만
+                                .or(project.status.eq(ProjectStatus.RECRUITING)
+                                        .and(project.isNew.eq(false)))
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -96,6 +98,8 @@ public class ProjectManageRepositoryCustomImpl implements ProjectManageRepositor
                 .where(
                         projectMember.member.id.eq(memberId),
                         project.status.ne(ProjectStatus.RECRUITING) // RECRUITING이 아닌 프로젝트만
+                                .or(project.status.eq(ProjectStatus.RECRUITING)
+                                        .and(project.isNew.eq(false)))
                 )
                 .fetchOne()
         ).orElse(0L);
