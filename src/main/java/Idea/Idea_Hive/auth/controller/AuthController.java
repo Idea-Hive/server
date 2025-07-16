@@ -118,6 +118,8 @@ public class AuthController {
 //
 //        response.addCookie(refreshTokenCookie);// 갱신된 쿠키 설정
 
+        log.info("cookieSameSite{}", cookieSameSite);
+        log.info("cookieSecure{}", cookieSecure);
         // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
         ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refreshToken", tokenResponse.refreshToken())
                 .httpOnly(cookieHttpOnly)

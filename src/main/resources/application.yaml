@@ -112,7 +112,7 @@ frontend:
 app:
   cookie:
     secure: false # 로컬 http 환경
-    samesite: Lax
+    sameSite: Lax
 
 --- # prod(cloud)
 
