@@ -62,8 +62,8 @@ public class ProjectManageService {
         project.updateStatus(ProjectStatus.COMPLETED);
     }
 
-    public ProjectSearchResponse getProjectListByStatus(Long memberId, ProjectStatus status, Pageable pageable) {
-        Page<Project> projects = projectManageRepository.findProjectByMemberIdAndStatusWithPage(memberId, status, pageable);
+    public ProjectSearchResponse getProjectListByStatus(Long memberId, Pageable pageable) {
+        Page<Project> projects = projectManageRepository.findProjectByMemberIdWithPage(memberId, pageable);
         return ProjectSearchResponse.of(projects);
     }
 

@@ -51,7 +51,6 @@ public class ProjectManageController {
     @Operation(summary = "프로젝트 관리 > 프로젝트 목록 조회(본인) API")
     @GetMapping("/manage")
     public ResponseEntity<ProjectSearchResponse> getProject(
-            @RequestParam("status") ProjectStatus status,
             @RequestParam("page") int page) {
 
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -63,7 +62,7 @@ public class ProjectManageController {
         // 기본 size: 10, 정렬 기준: createdDate 내림차순
         Pageable pageable = PageRequest.of(page-1, 10, Sort.by(Sort.Direction.DESC, "createdDate"));
 
-        ProjectSearchResponse response = projectManageService.getProjectListByStatus(memberId, status, pageable);
+        ProjectSearchResponse response = projectManageService.getProjectListByStatus(memberId, pageable);
         return ResponseEntity.ok(response);
     }
 
