@@ -47,9 +47,6 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
     @Value("${app.cookie.path}")
     private String cookiePath;
 
-    @Value("${app.cookie.domain}")
-    private String cookieDomain;
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
@@ -90,7 +87,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         log.info("cookieSameSite: {}", cookieSameSite);
         log.info("cookieHttpOnly: {}", cookieHttpOnly);
         log.info("cookiePath: {}", cookiePath);
-        log.info("cookieDomain: {}", cookieDomain);
+//        log.info("cookieDomain: {}", cookieDomain);
 
         // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
         ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
@@ -99,7 +96,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                 .path(cookiePath)
                 .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
                 .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
-                 .domain(cookieDomain)
+//                 .domain(cookieDomain)
                 .build();
 
         response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());
