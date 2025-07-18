@@ -4,6 +4,7 @@ import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.notification.entity.Notification;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
+import Idea.Idea_Hive.task.entity.ProjectTask;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -74,6 +75,9 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL , orphanRemoval = true)
     private List<ProjectApplications> projectApplications = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTask> ProjectTasks = new ArrayList<>();
+
     @Builder
     public Project(String name, String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
         this.name = name;
@@ -139,13 +143,7 @@ public class Project {
 
     // ProjectMember 추가 메서드
     public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isLike) {
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(this.id)
-                .memberId(member.getId())
-                .build();
-
         ProjectMember projectMember = ProjectMember.builder()
-                .id(projectMemberId)
                 .project(this)
                 .member(member)
                 .role(role)

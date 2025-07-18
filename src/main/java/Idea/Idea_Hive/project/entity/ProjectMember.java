@@ -13,16 +13,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProjectMember {
 
-    @EmbeddedId
-    private ProjectMemberId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("projectId")
     @JoinColumn(name = "project_id")
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private Member member;
 

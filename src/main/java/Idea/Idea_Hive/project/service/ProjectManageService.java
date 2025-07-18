@@ -94,13 +94,8 @@ public class ProjectManageService {
         // Project 찾기
 
         Project project = projectRepository.findById(projectId).orElseThrow( () -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
-        // ProjectMember 생성
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(project.getId())
-                .memberId(member.getId())
-                .build();
 
-        Optional<ProjectMember> _projectMember = projectMemberRepository.findById(projectMemberId);
+        Optional<ProjectMember> _projectMember = projectMemberRepository.findByProjectIdAndMemberId(project.getId(),member.getId());
 
         if (_projectMember.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 프로젝트이거나, 해당 프로젝트의 멤버가 아닙니다.");
@@ -130,13 +125,8 @@ public class ProjectManageService {
         // Project 찾기
 
         Project project = projectRepository.findById(projectId).orElseThrow( () -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
-        // ProjectMember 생성
-        ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                .projectId(projectId)
-                .memberId(memberId)
-                .build();
 
-        Optional<ProjectMember> _projectMember = projectMemberRepository.findById(projectMemberId);
+        Optional<ProjectMember> _projectMember = projectMemberRepository.findByProjectIdAndMemberId(projectId,memberId);
 
         if (_projectMember.isEmpty()) {
             throw new IllegalArgumentException("존재하지 않는 프로젝트이거나, 해당 프로젝트의 멤버가 아닙니다.");
@@ -168,20 +158,10 @@ public class ProjectManageService {
             throw new IllegalArgumentException("팀장 변경은 팀장만 가능합니다.");
         }
 
-        ProjectMemberId beforeLeaderProjectId = ProjectMemberId.builder()
-                .memberId(beforeLeaderId)
-                .projectId(request.projectId())
-                .build();
-
-        ProjectMemberId afterLeaderProjectId = ProjectMemberId.builder()
-                .memberId(afterLeaderId)
-                .projectId(request.projectId())
-                .build();
-
-        ProjectMember beforeProjectMember = projectMemberRepository.findById(beforeLeaderProjectId)
+        ProjectMember beforeProjectMember = projectMemberRepository.findByProjectIdAndMemberId(request.projectId(),beforeLeaderId)
                 .orElseThrow(IllegalArgumentException::new);
 
-        ProjectMember afterProjectMember = projectMemberRepository.findById(afterLeaderProjectId)
+        ProjectMember afterProjectMember = projectMemberRepository.findByProjectIdAndMemberId(request.projectId(),afterLeaderId)
                 .orElseThrow(IllegalArgumentException::new);
 
         if (!beforeProjectMember.getRole().equals(Role.LEADER)) {

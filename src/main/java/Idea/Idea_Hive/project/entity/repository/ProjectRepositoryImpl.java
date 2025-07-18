@@ -123,13 +123,8 @@ public class ProjectRepositoryImpl implements ProjectRepositoryCustom{
                 throw new IllegalArgumentException("존재하지 않는 회원입니다.");
             }
 
-            ProjectMemberId projectMemberId = ProjectMemberId.builder()
-                    .projectId(projectId)
-                    .memberId(userId)
-                    .build();
-
             // 들어온 프로젝트에 대해 유저의 찜 여부
-            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findById(projectMemberId);
+            Optional<ProjectMember> optionalProjectMember = projectMemberRepository.findByProjectIdAndMemberId(projectId,userId);
 
             if (optionalProjectMember.isPresent() && optionalProjectMember.get().isLike()) {
                 isLike = true;

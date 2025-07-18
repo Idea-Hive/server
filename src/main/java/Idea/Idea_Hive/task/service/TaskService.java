@@ -1,13 +1,12 @@
 package Idea.Idea_Hive.task.service;
 
-import Idea.Idea_Hive.exception.handler.custom.FileStorageException;
 import Idea.Idea_Hive.member.entity.Member;
 import Idea.Idea_Hive.member.entity.repository.MemberRepository;
+import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
 import Idea.Idea_Hive.task.dto.request.*;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
 import Idea.Idea_Hive.task.dto.response.TaskResponse;
 import Idea.Idea_Hive.task.entity.ProjectTask;
-import Idea.Idea_Hive.task.entity.ProjectTaskId;
 import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.TaskType;
 import Idea.Idea_Hive.task.entity.repository.ProjectTaskRepository;
@@ -28,6 +27,7 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final MemberRepository memberRepository;
     private final ProjectTaskRepository projectTaskRepository;
+    private final ProjectRepository projectRepository;
 
     public ProjectTaskListResponse getTaskList(ProjectTaskListRequest request) {
 
@@ -103,8 +103,11 @@ public class TaskService {
 
         Task savedTask = taskRepository.save(newTask);
 
-        ProjectTask projectTask = new ProjectTask();
-        projectTask.setId(new ProjectTaskId(request.projectId(), savedTask.getId()));
+        ProjectTask projectTask = ProjectTask.builder()
+                .project(projectRepository.findById(request.projectId())
+                        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다.")))
+                .task(savedTask)
+                .build();
         projectTaskRepository.save(projectTask);
 
         return TaskResponse.from(savedTask);
