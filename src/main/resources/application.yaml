@@ -112,7 +112,7 @@ frontend:
 app:
   cookie:
     secure: false # 로컬 http 환경
-    sameSite: Lax
+    sameSite: None
     domain: ""
 
 --- # prod(cloud)
@@ -230,4 +230,4 @@ app:
   cookie:
     secure: true
     sameSite: None
-    domain: .task-mate.co.kr
+    domain: api.task-mate.co.kr
