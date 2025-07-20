@@ -113,6 +113,7 @@ app:
   cookie:
     secure: false # 로컬 http 환경
     sameSite: Lax
+    domain: ""
 
 --- # prod(cloud)
 
