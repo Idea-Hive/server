@@ -33,7 +33,6 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@Slf4j
 public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
@@ -110,8 +109,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        log.info("frontendUrl:{}", frontendUrl);
-        
+
         configuration.setAllowedOrigins(Arrays.asList(
                 frontendUrl
         ));
