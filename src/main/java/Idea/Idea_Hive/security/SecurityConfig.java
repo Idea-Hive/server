@@ -6,6 +6,7 @@ import Idea.Idea_Hive.auth.infra.JwtAuthenticationFilter;
 import Idea.Idea_Hive.auth.infra.JwtAuthenticationProvider;
 import Idea.Idea_Hive.auth.service.CustomOauth2UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +33,7 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
@@ -108,7 +110,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
+        log.info("frontendUrl:{}", frontendUrl);
+        
         configuration.setAllowedOrigins(Arrays.asList(
                 frontendUrl
         ));
