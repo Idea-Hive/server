@@ -230,4 +230,4 @@ app:
   cookie:
     secure: true
     sameSite: None
-    domain: www.task-mate.co.kr
+    domain: .task-mate.co.kr
