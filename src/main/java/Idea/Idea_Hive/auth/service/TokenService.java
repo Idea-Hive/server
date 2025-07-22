@@ -61,4 +61,8 @@ public class TokenService {
         return jwtProvider.getEmail(token);
     }
 
+    public void deleteRefreshToken(String email) {
+        // todo: 수정 완료 시 RefreshToken Redis에서 제거, 프론트에서도 AccessToken 제거해줘야함.
+        redisDao.deleteValues(email); // Refresh Token 제거
+    }
 }

@@ -4,6 +4,7 @@ import Idea.Idea_Hive.project.entity.Project;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import org.springframework.data.domain.Page;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ public record MyPageProjectResponse(
     public static MyPageProjectResponse of(List<Project> projects, List<Project> likeProjects) {
 
         Map<ProjectStatus, List<ProjectManageResponse>> projectMap = projects.stream()
+                .filter(Project::getIsSave)
                 .map(ProjectManageResponse::from)
                 .collect(Collectors.groupingBy(
                         ProjectManageResponse::status,

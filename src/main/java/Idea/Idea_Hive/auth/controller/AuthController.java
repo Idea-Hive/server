@@ -6,12 +6,14 @@ import Idea.Idea_Hive.auth.dto.response.LoginResponse;
 import Idea.Idea_Hive.auth.dto.response.TokenResponse;
 import Idea.Idea_Hive.auth.service.AuthService;
 import Idea.Idea_Hive.auth.service.TokenService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -88,6 +90,22 @@ public class AuthController {
         return ResponseEntity.ok(loginResponse);
     }
 
+    @Operation(summary = "로그아웃 API")
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request) {
+        Optional<String> refreshTokenOpt = extractTokenFromCookie(request, "refreshToken");
+
+        if (refreshTokenOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token not found.");
+        }
+
+        String refreshToken = refreshTokenOpt.get();
+        String email = tokenService.getEmail(refreshToken);
+        tokenService.deleteRefreshToken(email);
+
+        return ResponseEntity.ok("로그아웃 완료");
+    }
+
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshTokens(HttpServletRequest request, HttpServletResponse response) {
         Optional<String> refreshTokenOpt = extractTokenFromCookie(request, "refreshToken");
@@ -149,6 +167,8 @@ public class AuthController {
         }
         return Optional.empty();
     }
+
+
 
 
 }
