@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -91,8 +92,9 @@ public class AuthController {
     }
 
     @Operation(summary = "로그아웃 API")
-    @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request,
+                                         HttpServletResponse response) {
         Optional<String> refreshTokenOpt = extractTokenFromCookie(request, "refreshToken");
 
         if (refreshTokenOpt.isEmpty()) {
@@ -102,6 +104,18 @@ public class AuthController {
         String refreshToken = refreshTokenOpt.get();
         String email = tokenService.getEmail(refreshToken);
         tokenService.deleteRefreshToken(email);
+
+        // 쿠키 만료시키기
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(cookieHttpOnly)
+                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
+                .path(cookiePath)
+                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
+                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
+                // .domain(cookieDomain) // 필요시 도메인 설정
+                .build();
+
+        response.addHeader("Set-Cookie", deleteCookie.toString());
 
         return ResponseEntity.ok("로그아웃 완료");
     }
