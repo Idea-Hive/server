@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public record ProjectSearchResponseDto(
         Long id,
-        String title,
+        String name,
         String description,
         List<String> hashtagNames,
         String creator,
@@ -21,7 +21,7 @@ public record ProjectSearchResponseDto(
     public static ProjectSearchResponseDto from(Project project) {
         return new ProjectSearchResponseDto(
                 project.getId(),
-                project.getTitle(),
+                project.getName(),
                 project.getDescription(),
                 project.getHashtags().stream()
                         .map(Hashtag::getName)
