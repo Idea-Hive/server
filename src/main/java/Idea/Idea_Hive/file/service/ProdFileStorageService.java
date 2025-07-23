@@ -62,8 +62,7 @@ public class ProdFileStorageService implements FileStorageService {
             metadata.setContentLength(file.getSize());
 
             try (InputStream inputStream = file.getInputStream()) {
-                amazonS3Client.putObject(new PutObjectRequest(bucket, s3Key, inputStream, metadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
+                amazonS3Client.putObject(new PutObjectRequest(bucket, s3Key, inputStream, metadata));
             }
 
             // S3 키와 원본 파일 이름을 각각의 필드에 저장 ★★★
