@@ -25,4 +25,17 @@ public class Hashtag {
         this.project = project;
         this.name = name;
     }
+
+    public void setProject(Project project) {
+        // 기존에 참고하고 있던 project가 있다 ? -> 삭제
+        if (this.project != null) {
+            this.project.getHashtags().remove(this);
+        }
+
+        this.project = project;
+
+        if (project != null && !project.getHashtags().contains(this)) {
+            project.getHashtags().add(this);
+        }
+    }
 }

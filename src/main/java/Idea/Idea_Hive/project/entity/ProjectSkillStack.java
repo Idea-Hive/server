@@ -31,4 +31,18 @@ public class ProjectSkillStack {
         this.project = project;
         this.skillstack = skillstack;
     }
+
+    public void setProject(Project project) {
+        // 기존에 참고하고 있던 project가 있다 ? -> 삭제
+        if (this.project != null) {
+            this.project.getProjectSkillStacks().remove(this);
+        }
+
+        this.project = project;
+
+        if (project != null && !project.getProjectSkillStacks().contains(this)) {
+            project.getProjectSkillStacks().add(this);
+        }
+    }
+
 }

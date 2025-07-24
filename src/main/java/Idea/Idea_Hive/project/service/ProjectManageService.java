@@ -136,7 +136,7 @@ public class ProjectManageService {
         // 팀장이고 팀원 없을때만 삭제 가능함
         if (projectMember.getRole().equals(Role.LEADER)) {
             if (getMembersByProjectId(projectId).size() != 1) {
-                throw new IllegalArgumentException("현재 다른 팀원(들)이 존재하여 프로젝트 탈퇴가 불가능합니다.");
+                throw new IllegalArgumentException("현재 다른 팀원(들)이 존재하여 프로젝트 삭제가 불가능합니다.");
             }
             projectRepository.delete(project); // 팀장이 나가면 프로젝트가 아예 사라짐
             projectMemberRepository.delete(projectMember);

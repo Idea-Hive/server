@@ -31,4 +31,16 @@ public class ProjectTask {
         this.task = task;
     }
 
+    public void setProject(Project project) {
+        // 기존에 참고하고 있던 project가 있다 ? -> 삭제
+        if (this.project != null) {
+            this.project.getProjectTasks().remove(this);
+        }
+
+        this.project = project;
+
+        if (project != null && !project.getProjectTasks().contains(this)) {
+            project.getProjectTasks().add(this);
+        }
+    }
 }

@@ -2,7 +2,6 @@ package Idea.Idea_Hive.project.entity;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
 import Idea.Idea_Hive.member.entity.Member;
-import Idea.Idea_Hive.notification.entity.Notification;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
 import Idea.Idea_Hive.task.entity.ProjectTask;
 import jakarta.persistence.*;
@@ -56,10 +55,10 @@ public class Project {
 
     private LocalDateTime expirationDate;
 
-    /*
-    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
+
+    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private ProjectDetail projectDetail;
-     */
+
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectSkillStack> projectSkillStacks = new ArrayList<>();
@@ -97,22 +96,30 @@ public class Project {
         this.likedCnt = 0;
     }
 
+    // ★★★ 1:1 관계를 위한 편의 메소드 ★★★
+    public void setProjectDetail(ProjectDetail projectDetail) {
+        this.projectDetail = projectDetail;
+        // 관계 설정의 책임을 '주인'에게 위임
+        if (projectDetail != null && projectDetail.getProject() != this) {
+            projectDetail.setProject(this);
+        }
+    }
+
     // 스킬스택 추가 메서드
     public void addSkillStack(SkillStack skillstack) {
         ProjectSkillStack projectSkillStack = ProjectSkillStack.builder()
-                .project(this)
                 .skillstack(skillstack)
                 .build();
-        this.projectSkillStacks.add(projectSkillStack);
+
+        projectSkillStack.setProject(this);
     }
 
     //해시태그 연관관계 편의 메서드
     public void addHashtag(String name) {
         Hashtag hashtag = Hashtag.builder()
-                .project(this)
                 .name(name)
                 .build();
-        this.hashtags.add(hashtag);
+        hashtag.setProject(this);
     }
 
     // 임시저장된 프로젝트 업데이트
@@ -142,9 +149,8 @@ public class Project {
      */
 
     // ProjectMember 추가 메서드
-    public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isLike) {
+    public void addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isLike) {
         ProjectMember projectMember = ProjectMember.builder()
-                .project(this)
                 .member(member)
                 .role(role)
                 .isProfileShared(isProfileShared)
@@ -152,8 +158,7 @@ public class Project {
                 .isLike(isLike)
                 .build();
 
-        this.projectMembers.add(projectMember);
-        return projectMember;
+        projectMember.setProject(this);
     }
 
     // ProjectApplications 추가 메서드
@@ -161,13 +166,12 @@ public class Project {
         ProjectApplications projectApplications = ProjectApplications.builder()
                 .id(id)
                 .member(member)
-                .project(this)
                 .applicationMessage(message)
                 .isAccepted(isAccepted)
                 .applicationDate(LocalDateTime.now())
                 .build();
 
-        this.projectApplications.add(projectApplications);
+        projectApplications.setProject(this);
         return projectApplications;
     }
 

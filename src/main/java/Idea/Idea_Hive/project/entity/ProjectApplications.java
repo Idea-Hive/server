@@ -54,4 +54,16 @@ public class ProjectApplications {
         this.applicationMessage = applicationMessage;
     }
 
+    public void setProject(Project project) {
+        // 기존에 참고하고 있던 project가 있다 ? -> 삭제
+        if (this.project != null) {
+            this.project.getProjectApplications().remove(this);
+        }
+
+        this.project = project;
+
+        if (project != null && !project.getProjectApplications().contains(this)) {
+            project.getProjectApplications().add(this);
+        }
+    }
 }

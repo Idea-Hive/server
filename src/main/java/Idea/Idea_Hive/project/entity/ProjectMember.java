@@ -19,10 +19,12 @@ public class ProjectMember {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
+    @Setter
     private Project project;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
+    @Setter
     private Member member;
 
     @Enumerated(EnumType.STRING)
@@ -47,6 +49,21 @@ public class ProjectMember {
 
     public void updateRole(Role role) {
         this.role = role;
+    }
+
+    public void setProject(Project project) {
+
+        // 기존에 참고하고 있던 project가 있다 ? -> 삭제
+        if (this.project != null) {
+            this.project.getProjectMembers().remove(this);
+        }
+
+        this.project = project;
+
+        if (project != null && !project.getProjectMembers().contains(this)) {
+            project.getProjectMembers().add(this);
+        }
+
     }
 
 }
