@@ -12,8 +12,8 @@ public record TaskResponse(
         Boolean isSubmitted,
         String title,
         TaskType taskType,
+        String attachedLink,
         String originalFileName,
-        String filePath,
         String pic, // 담당자 이름
         LocalDateTime dueDate,
         Date uploadDate,
