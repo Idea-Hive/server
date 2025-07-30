@@ -12,7 +12,7 @@ public record TaskResponse(
         Boolean isSubmitted,
         String title,
         TaskType taskType,
-        String attachedLink,
+        String originalFileName,
         String filePath,
         String pic, // 담당자 이름
         LocalDateTime dueDate,
@@ -36,7 +36,7 @@ public record TaskResponse(
                 task.getTitle(),
                 task.getTaskType(),
                 task.getAttachedLink(),
-                task.getFilePath(),
+                task.getOriginalFileName(),
                 memberName,
                 task.getDueDate(),
                 task.getUploadDate(),

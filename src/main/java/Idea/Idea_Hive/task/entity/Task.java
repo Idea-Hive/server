@@ -79,6 +79,7 @@ public class Task {
         this.filePath = filePath;
         this.originalFileName = originalFileName;
         this.uploadDate = new Date();
+        this.attachedLink = "https://taskmate-bucket2.s3.ap-northeast-2.amazonaws.com/"+filePath;
     }
 
     public void attachLink(String attachedLink) {
