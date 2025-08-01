@@ -36,7 +36,7 @@ public record TaskResponse(
                 task.getIsSubmitted(),
                 task.getTitle(),
                 task.getTaskType(),
-                task.getAttachedLink(),
+                task.getFileUploadLink(),
                 task.getOriginalFileName(),
                 task.getAttachedLink(),
                 memberName,
