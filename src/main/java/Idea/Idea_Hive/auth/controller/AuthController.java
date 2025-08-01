@@ -48,6 +48,9 @@ public class AuthController {
     @Value("${app.cookie.path}")
     private String cookiePath;
 
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
+
     @GetMapping("/secure")
     public String secure(@AuthenticationPrincipal OAuth2User principal) {
         return "로그인한 사용자: " + SecurityContextHolder.getContext().getAuthentication().getName();
@@ -76,7 +79,7 @@ public class AuthController {
                 .path(cookiePath)
                 .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
                 .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
-                // .domain(cookieDomain) // 필요시 도메인 설정
+                .domain(cookieDomain.isEmpty() ? null : cookieDomain) // 필요시 도메인 설정
                 .build();
 
 //        response.addCookie(refreshTokenCookie);
@@ -112,7 +115,7 @@ public class AuthController {
                 .path(cookiePath)
                 .maxAge(0)
                 .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
-                // .domain(cookieDomain) // 필요시 도메인 설정
+                .domain(cookieDomain.isEmpty() ? null : cookieDomain) // 필요시 도메인 설정
                 .build();
 
         response.addHeader("Set-Cookie", deleteCookie.toString());
@@ -157,7 +160,7 @@ public class AuthController {
                 .path(cookiePath)
                 .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
                 .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
-                // .domain(cookieDomain)
+                .domain(cookieDomain.isEmpty() ? null : cookieDomain)
                 .build();
 
         response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());

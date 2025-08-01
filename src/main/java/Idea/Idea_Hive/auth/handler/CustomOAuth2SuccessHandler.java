@@ -95,7 +95,7 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
                 .path(cookiePath)
                 .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
                 .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
-                .domain(cookieDomain)
+                .domain(cookieDomain.isEmpty() ? null : cookieDomain)
                 .build();
 
         response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());
