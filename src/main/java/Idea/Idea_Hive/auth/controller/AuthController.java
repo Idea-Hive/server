@@ -106,16 +106,16 @@ public class AuthController {
         tokenService.deleteRefreshToken(email);
 
         // 쿠키 만료시키기
-        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
-                .httpOnly(cookieHttpOnly)
-                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
-                .path(cookiePath)
-                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
-                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
-                // .domain(cookieDomain) // 필요시 도메인 설정
-                .build();
-
-        response.addHeader("Set-Cookie", deleteCookie.toString());
+//        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+//                .httpOnly(cookieHttpOnly)
+//                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
+//                .path(cookiePath)
+//                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
+//                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
+//                // .domain(cookieDomain) // 필요시 도메인 설정
+//                .build();
+//
+//        response.addHeader("Set-Cookie", deleteCookie.toString());
 
         return ResponseEntity.ok("로그아웃 완료");
     }
