@@ -27,7 +27,6 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google or github
-        log.info("OAuth2 사용자 정보 로드 완료 - registrationId: {}", registrationId);
 
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
 //        String email = (String) attributes.get("email"); // Email 추출
@@ -65,8 +64,6 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
     private String fetchGithubEmail(OAuth2UserRequest userRequest) {
         String uri = "https://api.github.com/user/emails";
         String token = userRequest.getAccessToken().getTokenValue();
-
-        log.info("GitHub 이메일 API 호출 시작 - URI: {}", uri);
 
         /* Http Message */
         HttpHeaders headers = new HttpHeaders();
