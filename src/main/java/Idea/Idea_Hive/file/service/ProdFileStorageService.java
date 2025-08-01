@@ -85,6 +85,8 @@ public class ProdFileStorageService implements FileStorageService {
             throw new FileStorageException("과제에 업로드된 파일이 없습니다. taskId: " + taskId);
         }
 
+        log.info("S3 파일 다운로드 시도 - bucket: {}, key: {}", bucket, s3Key);
+
         try {
             S3Object s3Object = amazonS3Client.getObject(bucket, s3Key);
             Resource resource = new InputStreamResource(s3Object.getObjectContent());
@@ -92,9 +94,11 @@ public class ProdFileStorageService implements FileStorageService {
             // ★★★ 핵심: DB에 저장된 원본 파일 이름을 바로 사용 ★★★
             String originalFileName = task.getOriginalFileName();
 
+            log.info("S3 파일 다운로드 성공 - originalFileName: {}", originalFileName);
             return DownloadFileResponse.of(resource, originalFileName);
 
         } catch (Exception e) {
+            log.error("S3 파일 다운로드 실패 - bucket: {}, key: {}, error: {}", bucket, s3Key, e.getMessage(), e);
             throw new FileStorageException("S3 파일 다운로드 중 오류가 발생했습니다: " + e);
         }
     }

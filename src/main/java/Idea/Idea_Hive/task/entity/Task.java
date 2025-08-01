@@ -46,11 +46,17 @@ public class Task {
     @Setter
     private LocalDateTime dueDate;
 
-    // 제출 시간
-    private Date uploadDate;
+    // 과제 파일 제출 시간
+    private Date fileUploadDate;
 
-    // 첨부 링크
+    // 과제 링크 제출 시간
+    private Date linkAttachedDate;
+
+    // 과제 링크(링크 업로드)
     private String attachedLink;
+
+    // 과제 파일 링크(파일 업로드)
+    private String fileUploadLink;
 
     @Setter
     @ManyToOne(fetch = FetchType.LAZY)
@@ -64,28 +70,28 @@ public class Task {
 
     @Builder
     public Task(Boolean isRequired, Boolean isSubmitted, String title, TaskType taskType, String filePath, LocalDateTime dueDate,
-                String attachedLink) {
+                String fileUploadLink) {
         this.isRequired = isRequired;
         this.isSubmitted = isSubmitted;
         this.title = title;
         this.taskType = taskType;
         this.filePath = filePath;
         this.dueDate = dueDate;
-        this.attachedLink = attachedLink;
+        this.fileUploadLink = fileUploadLink;
     }
 
     public void uploadFile(String filePath, String originalFileName) {
         this.isSubmitted = true;
         this.filePath = filePath;
         this.originalFileName = originalFileName;
-        this.uploadDate = new Date();
-        this.attachedLink = "https://taskmate-bucket2.s3.ap-northeast-2.amazonaws.com/"+filePath;
+        this.fileUploadDate = new Date();
+        this.fileUploadLink = "https://taskmate-bucket2.s3.ap-northeast-2.amazonaws.com/"+filePath;
     }
 
     public void attachLink(String attachedLink) {
         this.isSubmitted = true;
         this.attachedLink = attachedLink;
-        this.uploadDate = new Date();
+        this.linkAttachedDate = new Date();
     }
 
 }
