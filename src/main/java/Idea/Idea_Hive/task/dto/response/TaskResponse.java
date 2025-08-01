@@ -13,9 +13,11 @@ public record TaskResponse(
         TaskType taskType,
         String fileUploadLink,
         String originalFileName,
+        String attachedLink,
         String pic, // 담당자 이름
         LocalDateTime dueDate,
         LocalDateTime fileUploadDate,
+        LocalDateTime linkUploadDate,
         Long picId
 ) {
 
@@ -36,9 +38,11 @@ public record TaskResponse(
                 task.getTaskType(),
                 task.getAttachedLink(),
                 task.getOriginalFileName(),
+                task.getAttachedLink(),
                 memberName,
                 task.getDueDate(),
                 task.getFileUploadDate(),
+                task.getLinkAttachedDate(),
                 memberId
         );
     }
