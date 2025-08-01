@@ -4,7 +4,6 @@ import Idea.Idea_Hive.task.entity.Task;
 import Idea.Idea_Hive.task.entity.TaskType;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public record TaskResponse(
         Long id,
@@ -16,7 +15,7 @@ public record TaskResponse(
         String originalFileName,
         String pic, // 담당자 이름
         LocalDateTime dueDate,
-        Date fileUploadDate,
+        LocalDateTime fileUploadDate,
         Long picId
 ) {
 

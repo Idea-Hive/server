@@ -47,10 +47,10 @@ public class Task {
     private LocalDateTime dueDate;
 
     // 과제 파일 제출 시간
-    private Date fileUploadDate;
+    private LocalDateTime fileUploadDate;
 
     // 과제 링크 제출 시간
-    private Date linkAttachedDate;
+    private LocalDateTime linkAttachedDate;
 
     // 과제 링크(링크 업로드)
     private String attachedLink;
@@ -84,14 +84,14 @@ public class Task {
         this.isSubmitted = true;
         this.filePath = filePath;
         this.originalFileName = originalFileName;
-        this.fileUploadDate = new Date();
+        this.fileUploadDate = LocalDateTime.now();
         this.fileUploadLink = "https://taskmate-bucket2.s3.ap-northeast-2.amazonaws.com/"+filePath;
     }
 
     public void attachLink(String attachedLink) {
         this.isSubmitted = true;
         this.attachedLink = attachedLink;
-        this.linkAttachedDate = new Date();
+        this.linkAttachedDate = LocalDateTime.now();
     }
 
 }
