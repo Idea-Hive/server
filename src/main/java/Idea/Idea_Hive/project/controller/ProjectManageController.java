@@ -10,6 +10,7 @@ import Idea.Idea_Hive.project.dto.request.ProjectLeaveRequest;
 import Idea.Idea_Hive.project.dto.request.ProjectSubmitRequest;
 import Idea.Idea_Hive.project.dto.response.MyPageProjectResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectSubmitResponse;
 import Idea.Idea_Hive.project.entity.ProjectStatus;
 import Idea.Idea_Hive.project.service.ProjectManageService;
 import Idea.Idea_Hive.task.dto.response.ProjectTaskListResponse;
@@ -42,9 +43,9 @@ public class ProjectManageController {
 
     @Operation(summary = "프로젝트 제출 API")
     @PostMapping("/submit")
-    public ResponseEntity<Void> projectSubmit(@RequestBody ProjectSubmitRequest request) {
-        projectManageService.submit(request.projectId());
-        return ResponseEntity.ok().build();
+    public ResponseEntity<ProjectSubmitResponse> projectSubmit(@RequestBody ProjectSubmitRequest request) {
+        ProjectSubmitResponse projectSubmitResponse = projectManageService.submit(request.projectId());
+        return ResponseEntity.ok(projectSubmitResponse);
     }
 
     // todo: 전체적인 로직 수정할 예정
