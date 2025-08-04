@@ -8,6 +8,7 @@ import Idea.Idea_Hive.member.entity.repository.MemberRepository;
 import Idea.Idea_Hive.project.dto.request.ChangeProjectLeaderRequest;
 import Idea.Idea_Hive.project.dto.response.MyPageProjectResponse;
 import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectSubmitResponse;
 import Idea.Idea_Hive.project.entity.*;
 import Idea.Idea_Hive.project.entity.repository.ProjectMemberRepository;
 import Idea.Idea_Hive.project.entity.repository.ProjectRepository;
@@ -39,7 +40,7 @@ public class ProjectManageService {
     private final ProjectMemberRepository projectMemberRepository;
 
     @Transactional
-    public void submit(Long projectId) {
+    public ProjectSubmitResponse submit(Long projectId) {
         // todo: Project 불러오기
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프로젝트입니다."));
@@ -53,13 +54,21 @@ public class ProjectManageService {
 
         List<Task> tasks = taskRepository.findTasksByProjectId(projectId)
                 .stream().filter(Task::getIsRequired).toList(); // 필수 제출만
-        for (Task task : tasks) {
-            if (!task.getIsSubmitted()) { // 제출 안한 경우 예외 던짐
-                throw new IllegalArgumentException("제출하지 않은 항목이 있습니다 : " + task.getTitle());
-            }
+
+        //제출되지 않은 taskId들을 리스트에 넣기
+        List<Long> unsubmittedTaskIds = tasks.stream()
+                .filter(task -> !task.getIsSubmitted())
+                .map(Task::getId)
+                .toList();
+
+        // 모든 과제가 제출되지 않았을 경우
+        if (!unsubmittedTaskIds.isEmpty()) {
+            return ProjectSubmitResponse.failure(unsubmittedTaskIds);
         }
+
         // todo: 상태 업데이트하기
         project.updateStatus(ProjectStatus.COMPLETED);
+        return ProjectSubmitResponse.success();
     }
 
     public ProjectSearchResponse getProjectListByStatus(Long memberId, Pageable pageable) {
