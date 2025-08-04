@@ -61,6 +61,9 @@ public class ProdFileStorageService implements FileStorageService {
             metadata.setContentType(file.getContentType());
             metadata.setContentLength(file.getSize());
 
+            // 다운로드를 위해 Content-Disposition 헤더 추가
+            metadata.setContentDisposition("attachment; filename=\"" + originalFileName + "\"");
+
             try (InputStream inputStream = file.getInputStream()) {
                 amazonS3Client.putObject(new PutObjectRequest(bucket, s3Key, inputStream, metadata));
             }
@@ -94,6 +97,12 @@ public class ProdFileStorageService implements FileStorageService {
             // ★★★ 핵심: DB에 저장된 원본 파일 이름을 바로 사용 ★★★
             String originalFileName = task.getOriginalFileName();
 
+            // 파일 확장자에 따른 Content-Type 설정
+            String contentType = getContentType(originalFileName);
+            if (contentType != null) {
+                s3Object.setObjectMetadata(s3Object.getObjectMetadata());
+            }
+
             log.info("S3 파일 다운로드 성공 - originalFileName: {}", originalFileName);
             return DownloadFileResponse.of(resource, originalFileName);
 
@@ -116,4 +125,27 @@ public class ProdFileStorageService implements FileStorageService {
             log.error("S3 파일 삭제 중 오류가 발생했습니다. Key: {}", s3Key, e);
         }
     }
+
+    // 파일 확장자에 따른 Content-Type을 반환하는 헬퍼 메서드
+    private String getContentType(String fileName) {
+        if (fileName == null) return null;
+
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+        return switch (extension) {
+            case "pdf" -> "application/pdf";
+            case "doc", "docx" -> "application/msword";
+            case "xls", "xlsx" -> "application/vnd.ms-excel";
+            case "ppt", "pptx" -> "application/vnd.ms-powerpoint";
+            case "txt" -> "text/plain";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "gif" -> "image/gif";
+            case "zip" -> "application/zip";
+            case "rar" -> "application/x-rar-compressed";
+            default -> "application/octet-stream";
+        };
+    }
 }
+
+

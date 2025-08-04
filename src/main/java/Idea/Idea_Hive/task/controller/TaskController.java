@@ -95,7 +95,10 @@ public class TaskController {
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedFileName + "\"");
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM_VALUE);
+
+        // 파일 확장자에 따른 Content-Type 설정
+        String contentType = getContentType(originalFileName);
+        headers.add(HttpHeaders.CONTENT_TYPE, contentType);
 
         return ResponseEntity.ok().headers(headers).body(resource);
     }
@@ -104,6 +107,27 @@ public class TaskController {
     public ResponseEntity<TaskResponse> attachLink(@RequestBody AttachLinkRequest request) {
         TaskResponse response = taskService.attachLink(request);
         return ResponseEntity.ok(response);
+    }
+
+    // 파일 확장자에 따른 Content-Type을 반환하는 헬퍼 메서드
+    private String getContentType(String fileName) {
+        if (fileName == null) return MediaType.APPLICATION_OCTET_STREAM_VALUE;
+
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+
+        return switch (extension) {
+            case "pdf" -> "application/pdf";
+            case "doc", "docx" -> "application/msword";
+            case "xls", "xlsx" -> "application/vnd.ms-excel";
+            case "ppt", "pptx" -> "application/vnd.ms-powerpoint";
+            case "txt" -> "text/plain";
+            case "jpg", "jpeg" -> "image/jpeg";
+            case "png" -> "image/png";
+            case "gif" -> "image/gif";
+            case "zip" -> "application/zip";
+            case "rar" -> "application/x-rar-compressed";
+            default -> MediaType.APPLICATION_OCTET_STREAM_VALUE;
+        };
     }
 
 }
