@@ -29,7 +29,7 @@ public record TaskResponse(
             memberName = task.getMember().getName();
             memberId = task.getMember().getId();
         }
-        assert task.getMember() != null;
+        
         return new TaskResponse(
                 task.getId(),
                 task.getIsRequired(),
