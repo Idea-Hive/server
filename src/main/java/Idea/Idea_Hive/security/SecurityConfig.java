@@ -1,11 +1,17 @@
 package Idea.Idea_Hive.security;
 
 import Idea.Idea_Hive.auth.handler.CustomOAuth2SuccessHandler;
+import Idea.Idea_Hive.auth.infra.BearerAuthorizationExtractor;
+import Idea.Idea_Hive.auth.infra.JwtAuthenticationFilter;
+import Idea.Idea_Hive.auth.infra.JwtAuthenticationProvider;
 import Idea.Idea_Hive.auth.service.CustomOauth2UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -13,6 +19,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -30,6 +37,21 @@ public class SecurityConfig {
 
     private final CustomOAuth2SuccessHandler customOAuth2SuccessHandler;
     private final CustomOauth2UserService customOauth2UserService;
+    private final AuthenticationConfiguration authenticationConfiguration;
+
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
+    private final BearerAuthorizationExtractor extractor;
+
+    // 1번
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
+        return new JwtAuthenticationFilter("/**", extractor, authenticationManager);
+    }
 
     @Value("${frontend.url}")
     private String frontendUrl;
@@ -43,20 +65,37 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception {
+
+        AuthenticationManager authenticationManager = authenticationManager();
+        JwtAuthenticationFilter jwtAuthenticationFilter = jwtAuthenticationFilter(authenticationManager);
+
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .formLogin(AbstractHttpConfigurer::disable) // default formlogin unactive
                 .httpBasic(AbstractHttpConfigurer::disable) // httpBasic unactive
                 .csrf(AbstractHttpConfigurer::disable) /* todo: CSRF 임시 비활성, 프론트 협의 */
-                .headers(headers -> headers
-                        .frameOptions(frameOptions -> frameOptions.disable()) //h2 콘솔 연결시에만 필요
-                )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)  // IF_REQUIRED : 다른 API 요청에 대해서는 JWT 인증 사용
                 ) // 세션 Stateless 설정 (JWT 사용 예정)
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .authenticationProvider(jwtAuthenticationProvider)
                 .authorizeHttpRequests(authorize -> {
                     authorize
-                            .anyRequest().permitAll();
+                            .requestMatchers("/api/member/signup").permitAll()
+                            .requestMatchers("/api/auth/login").permitAll()
+                            .requestMatchers("/api/auth/refresh").permitAll()
+                            .requestMatchers("/api/email/signup/send").permitAll()
+                            .requestMatchers("/api/email/signup/verify").permitAll()
+                            .requestMatchers("/api/email/password-reset/send").permitAll()
+                            .requestMatchers("/api/email/password-reset/verify").permitAll()
+                            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                            .requestMatchers("/api/project/search").permitAll()
+                            .requestMatchers("/api/project/info").permitAll()
+                            .requestMatchers("/api/project/applicants").permitAll()
+                            .requestMatchers("/api/member/password-reset").permitAll()
+                            .requestMatchers("/api/project/viewCnt").permitAll()
+                            .requestMatchers("/health").permitAll()
+                            .anyRequest().authenticated();
                 })
                 /* todo: OAuth2 */
                 .oauth2Login(ouath -> ouath
@@ -74,7 +113,6 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(
                 frontendUrl
         ));
-
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "FETCH"));
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization",

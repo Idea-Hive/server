@@ -1,7 +1,10 @@
 package Idea.Idea_Hive.project.entity;
 
 import Idea.Idea_Hive.hashtag.entity.Hashtag;
+import Idea.Idea_Hive.member.entity.Member;
+import Idea.Idea_Hive.notification.entity.Notification;
 import Idea.Idea_Hive.skillstack.entity.SkillStack;
+import Idea.Idea_Hive.task.entity.ProjectTask;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,9 +23,11 @@ public class Project {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    private String name;
+
     private String title;
 
-    @Column(length = 100) // 간단 설명 글자 수 정해지면 수정 필요
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private Integer maxMembers;
@@ -41,40 +46,62 @@ public class Project {
 
     private Boolean isNew;
 
-    private Boolean tempSave;
+    private Boolean isSave; //true:저장, false:임시저장
 
-    private LocalDateTime dueDate;
+    private LocalDateTime dueDateFrom;
+
+    private LocalDateTime dueDateTo;
 
     private String contact;
 
     private LocalDateTime expirationDate;
 
-    @OneToOne
-    @JoinColumn(name = "projectDetailId")
+    /*
+    @OneToOne(mappedBy = "project", cascade = CascadeType.ALL)
     private ProjectDetail projectDetail;
+     */
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProjectSkillStack> projectSkillStacks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Hashtag> hashtags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    private List<ProjectMember> projectMembers = new ArrayList<>();
+
+    private Integer likedCnt;
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL , orphanRemoval = true)
+    private List<ProjectApplications> projectApplications = new ArrayList<>();
+
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProjectTask> ProjectTasks = new ArrayList<>();
+
     @Builder
-    public Project(String title, String description, Integer maxMembers,Boolean tempSave) {
+    public Project(String name, String title, String description,String contact, Integer maxMembers,LocalDateTime dueDateFrom,LocalDateTime dueDateTo,Boolean isSave) {
+        this.name = name;
         this.title = title;
         this.description = description;
+        this.contact = contact;
         this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
         this.createdDate = LocalDateTime.now();
         this.status = ProjectStatus.RECRUITING;
         this.isNew = true;
-        this.tempSave = tempSave;
+        this.isSave = isSave;
+        this.expirationDate = this.createdDate.plusMonths(1);
+        this.searchDate = LocalDateTime.now();
+        this.viewCnt = 0;
+        this.likedCnt = 0;
     }
 
     // 스킬스택 추가 메서드
-    public void addSkillStack(SkillStack skillStack) {
+    public void addSkillStack(SkillStack skillstack) {
         ProjectSkillStack projectSkillStack = ProjectSkillStack.builder()
                 .project(this)
-                .skillStack(skillStack)
+                .skillstack(skillstack)
                 .build();
         this.projectSkillStacks.add(projectSkillStack);
     }
@@ -86,5 +113,103 @@ public class Project {
                 .name(name)
                 .build();
         this.hashtags.add(hashtag);
+    }
+
+    // 임시저장된 프로젝트 업데이트
+    public void updateTemporaryProject(String name, String title, String description,String contact, Integer maxMembers,
+                                       LocalDateTime dueDateFrom, LocalDateTime dueDateTo, Boolean isSave) {
+        this.name = name;
+        this.title = title;
+        this.description = description;
+        this.contact = contact;
+        this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
+        this.createdDate = LocalDateTime.now();
+        this.status = ProjectStatus.RECRUITING;
+        this.isNew = true;
+        this.isSave = isSave;
+        this.expirationDate = this.createdDate.plusMonths(1);
+        this.searchDate = LocalDateTime.now();
+    }
+
+    /*
+    // Project 엔티티
+    public void setProjectDetail(ProjectDetail projectDetail) {
+        this.projectDetail = projectDetail;
+        projectDetail.setProject(this);  // 양방향 연관관계 설정
+    }
+     */
+
+    // ProjectMember 추가 메서드
+    public ProjectMember addProjectMember(Member member, Role role, boolean isProfileShared, LocalDateTime profilesharedDate, boolean isLike) {
+        ProjectMember projectMember = ProjectMember.builder()
+                .project(this)
+                .member(member)
+                .role(role)
+                .isProfileShared(isProfileShared)
+                .profileSharedDate(profilesharedDate)
+                .isLike(isLike)
+                .build();
+
+        this.projectMembers.add(projectMember);
+        return projectMember;
+    }
+
+    // ProjectApplications 추가 메서드
+    public ProjectApplications addProjectApplications(Long id, Member member, String message, IsAccepted isAccepted) {
+        ProjectApplications projectApplications = ProjectApplications.builder()
+                .id(id)
+                .member(member)
+                .project(this)
+                .applicationMessage(message)
+                .isAccepted(isAccepted)
+                .applicationDate(LocalDateTime.now())
+                .build();
+
+        this.projectApplications.add(projectApplications);
+        return projectApplications;
+    }
+
+    //좋아요 수 변경
+    public void increaseLikedCnt() {
+        this.likedCnt++;
+    }
+
+    public void decreaseLikedCnt() {
+        this.likedCnt--;
+    }
+
+    public void updateStatus(ProjectStatus status) {
+        this.status = status;
+    }
+
+    public void updateIsNew(Boolean isNew) {
+        this.isNew = isNew;
+    }
+
+    public void updateModifiedDate(LocalDateTime modifiedDate) {
+        this.modifiedDate = modifiedDate;
+    }
+
+    public void updateExpirationDate(LocalDateTime expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public void updateSearchDate(LocalDateTime searchDate) {
+        this.searchDate = searchDate;
+    }
+
+    // 프로젝트 정보 수정
+    public void updateProjectInfo(String name, String title, String description,String contact, Integer maxMembers,
+                                       LocalDateTime dueDateFrom, LocalDateTime dueDateTo) {
+        this.name = name;
+        this.title = title;
+        this.description = description;
+        this.contact = contact;
+        this.maxMembers = maxMembers;
+        this.dueDateFrom = dueDateFrom;
+        this.dueDateTo = dueDateTo;
+        this.modifiedDate = LocalDateTime.now();
     }
 }

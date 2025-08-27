@@ -27,8 +27,8 @@ public class SwaggerConfig {
 
     private Info apiInfo() {
         return new Info()
-                .title("Tasky APIs") // API의 제목
-                .description("Tasky Api documents") // API에 대한 설명
+                .title("TaskMate APIs") // API의 제목
+                .description("TaskMate Api documents") // API에 대한 설명
                 .version("1.0.0"); // API의 버전
     }
 }

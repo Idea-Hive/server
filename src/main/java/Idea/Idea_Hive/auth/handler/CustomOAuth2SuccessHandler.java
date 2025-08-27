@@ -1,12 +1,16 @@
 package Idea.Idea_Hive.auth.handler;
 
+import Idea.Idea_Hive.auth.service.TokenService;
+import Idea.Idea_Hive.common.constant.Constants;
 import Idea.Idea_Hive.member.entity.dto.response.SignUpResponse;
-import Idea.Idea_Hive.member.entity.repository.MemberJpaRepo;
 import Idea.Idea_Hive.member.service.MemberService;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -24,8 +28,28 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler {
 
-//    private final MemberJpaRepo memberJpaRepo;
     private final MemberService memberService;
+    private final TokenService tokenService;
+
+    @Value("${frontend.url}")
+    private String FRONTEND_URL;
+
+    // application.yml 또는 application-{profile}.yml 에 정의된 값 주입
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.sameSite}")
+    private String cookieSameSite; // "Lax", "Strict", "None"
+
+    @Value("${app.cookie.http-only}")
+    private boolean cookieHttpOnly;
+
+    @Value("${app.cookie.path}")
+    private String cookiePath;
+
+    @Value("${app.cookie.domain:}")
+    private String cookieDomain;
+
 
 
     @Override
@@ -35,13 +59,48 @@ public class CustomOAuth2SuccessHandler implements AuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
-        SignUpResponse signUpResponse = memberService.handleOAuth2User(attributes);
+        SignUpResponse signUpResponse;
+        try {
+            signUpResponse = memberService.handleOAuth2User(attributes);
+        } catch (IllegalArgumentException e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
+            response.setContentType("application/json;charset=UTF-8");
 
-        // todo: jwt 발급
+            String jsonError = String.format("{\"error\": \"%s\"}", e.getMessage());
+            response.getWriter().write(jsonError);
+            // todo: 운영 시 url 수정 필요 ..
+            String url = FRONTEND_URL + "/auth/social";
+            response.sendRedirect(url);
+            return;
+        }
 
 
+        // todo: 임시 RefreshToken 발급
+        String refreshToken = tokenService.createTempRefreshToken(signUpResponse.email());
 
-        // todo : 토큰 담아서 리다이렉팅
-        response.sendRedirect("http://localhost:8080/api/login/success");
+//        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
+//        refreshTokenCookie.setHttpOnly(true); // JavaScript에서 접근 불가
+//        refreshTokenCookie.setSecure(false);   // HTTPS에서만 전송
+//        refreshTokenCookie.setPath("/");      // 전체 경로에 대해 유효
+//        refreshTokenCookie.setMaxAge((int) (tokenService.getRefreshTokenValidityInMilliseconds() / 1000)); // 만료 시간 설정
+//
+//        response.addCookie(refreshTokenCookie);
+
+        // 쿠키 설정값 로그 출력
+
+        // 리프레시 토큰을 HttpOnly 쿠키로 설정 (ResponseCookie 사용)
+        ResponseCookie newRefreshTokenCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(cookieHttpOnly)
+                .secure(cookieSecure)   // 프로파일에 따라 동적으로 설정
+                .path(cookiePath)
+                .maxAge(tokenService.getRefreshTokenValidityInMilliseconds() / 1000)
+                .sameSite(cookieSameSite) // 프로파일에 따라 동적으로 설정
+                .domain(cookieDomain.isEmpty() ? null : cookieDomain)
+                .build();
+
+        response.addHeader("Set-Cookie", newRefreshTokenCookie.toString());
+
+        String url = FRONTEND_URL + "/auth/social";
+        response.sendRedirect(url);
     }
 }

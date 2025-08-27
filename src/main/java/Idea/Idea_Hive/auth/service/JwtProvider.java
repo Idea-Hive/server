@@ -2,6 +2,7 @@ package Idea.Idea_Hive.auth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
@@ -14,7 +15,9 @@ import java.util.Date;
 public class JwtProvider {
 
     private final SecretKey SECRET_KEY;
+    @Getter
     private final Long accessTokenValidityInMillisecnds;
+    @Getter
     private final Long refreshTokenValidityInMilliseconds;
 
     public JwtProvider(
@@ -26,24 +29,41 @@ public class JwtProvider {
         this.refreshTokenValidityInMilliseconds = refreshTokenValidityInMilliseconds;
     }
 
-    public String createJwtByEmail(final String email) {
+    public String createAccessToken(final String email, final Long id) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + this.accessTokenValidityInMillisecnds);
         return Jwts.builder()
                 .setSubject(email)
+                .setId(id.toString())
+                .setIssuer("Taskmate")
                 .setIssuedAt(now)
                 .setExpiration(validity)
+                .claim("type", "access")
                 .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public void validateAccessToken(final String jwt) {
+    public String createRefreshToken(final String email, final Long id) {
+        Date now = new Date();
+        Date validity = new Date(now.getTime() + this.refreshTokenValidityInMilliseconds);
+        return Jwts.builder()
+                .setSubject(email)
+                .setId(id.toString())
+                .setIssuer("Taskmate")
+                .setIssuedAt(now)
+                .setExpiration(validity)
+                .claim("type", "refresh")
+                .signWith(SECRET_KEY, SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public void validateToken(final String jwt) {
         try {
             parseToken(jwt);
         } catch (final ExpiredJwtException e) {
-            System.out.println(new BadCredentialsException("만료된 토큰입니다.").getMessage());
+            throw new BadCredentialsException("만료된 토큰입니다.", e);
         } catch (final JwtException | IllegalArgumentException e) {
-            System.out.println(new BadCredentialsException("잘못된 토큰입니다.").getMessage());
+            throw new BadCredentialsException("잘못된 토큰입니다.", e);
         }
     }
 
@@ -58,6 +78,16 @@ public class JwtProvider {
         return parseToken(jwt)
                 .getBody()
                 .getSubject();
+    }
+
+    public Long getId(String jwt) {
+        return Long.valueOf(parseToken(jwt)
+                .getBody()
+                .getId());
+    }
+
+    public Claims getClaims(String jwt) {
+        return parseToken(jwt).getBody();
     }
 
 }

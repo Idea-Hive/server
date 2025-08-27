@@ -1,9 +1,17 @@
 package Idea.Idea_Hive.project.entity.repository;
 
+import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectTempSavedInfoResponse;
 import Idea.Idea_Hive.project.entity.Project;
-
-import java.util.List;
+import Idea.Idea_Hive.project.entity.ProjectApplications;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProjectRepositoryCustom {
-    List<Project> searchByKeyword(String keyword, String recruitType);
+    Page<Project> searchByKeyword(String keyword, String recruitType, String sortType, Pageable pageable);
+    ProjectInfoResponse findProjectInfoById(Long projectId, Long userId);
+    ProjectTempSavedInfoResponse findTempSavedProjectInfoById(Long projectId);
+    void increaseViewCnt(Long projectId);
+    Page<ProjectApplications> findApplicantInfoById(Long projectId, Pageable pageable);
+    Long countCompletedProjectByMemberId(Long memberId);
 }

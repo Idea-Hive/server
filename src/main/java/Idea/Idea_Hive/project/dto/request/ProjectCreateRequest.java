@@ -1,19 +1,24 @@
 package Idea.Idea_Hive.project.dto.request;
 
-import Idea.Idea_Hive.project.entity.ProjectDetail;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-public class ProjectCreateRequest {
-    private String title;
-    private String description;
-    private String idea;
-    private Integer maxMembers;
-    private LocalDateTime dueDate;
-    private String contact;
-    private List<Long> skillStackIds;
-    private Boolean isSave;
-}
+public record ProjectCreateRequest (
+        Long projectId,
+        Long userId,
+        String name,
+        String title,
+        String description,
+        String idea,
+        String contact,
+        Integer maxMembers,
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+        LocalDateTime dueDateFrom,
+        @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+        LocalDateTime dueDateTo,
+        List<Long> skillStackIds,
+        List<String> hashtags,
+        Boolean isSave
+){}

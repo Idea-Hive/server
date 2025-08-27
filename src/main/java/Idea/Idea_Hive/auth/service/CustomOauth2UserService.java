@@ -27,6 +27,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String registrationId = userRequest.getClientRegistration().getRegistrationId(); // google or github
+
         Map<String, Object> attributes = new HashMap<>(oAuth2User.getAttributes());
 //        String email = (String) attributes.get("email"); // Email 추출
         String email = "";

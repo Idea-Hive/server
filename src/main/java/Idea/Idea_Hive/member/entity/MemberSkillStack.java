@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -12,23 +13,22 @@ import lombok.NoArgsConstructor;
 @Table(name = "member_skillstack")
 public class MemberSkillStack {
 
-    @EmbeddedId
-    private MemberSkillStackId id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("memberId")
     @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("skillStackId")
-    @JoinColumn(name = "skillStack_id")
-    private SkillStack skillStack;
+    @JoinColumn(name = "skillstack_id")
+    private SkillStack skillstack;
 
     @Builder
-    public MemberSkillStack(Member member, SkillStack skillStack) {
+    public MemberSkillStack(Member member, SkillStack skillstack) {
         this.member = member;
-        this.skillStack = skillStack;
-        this.id = new MemberSkillStackId(member.getId(), skillStack.getId());
+        this.skillstack = skillstack;
     }
 }

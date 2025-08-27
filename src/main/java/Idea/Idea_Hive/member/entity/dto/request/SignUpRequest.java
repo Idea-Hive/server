@@ -2,14 +2,14 @@ package Idea.Idea_Hive.member.entity.dto.request;
 
 import java.util.List;
 
+
+/* todo: Optional<String> name 추가 */
 public record SignUpRequest(
         String email,
-        String password,
-        String passwordCheck,
         String name,
-        String job,
-        Integer career,
-        String type, // sns 연동 종류
-        List<Long> skillstackIds
+        String password,
+        boolean isServiceAgreed,
+        boolean isPrivacyAgreed,
+        boolean isMarketingAgreed
 ) {
 }

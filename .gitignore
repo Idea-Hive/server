@@ -42,3 +42,5 @@ out/
 ### docker redis ###
 # Redis data
 docker/redis/data/
+docker/postgres/data
+docker/postgres/

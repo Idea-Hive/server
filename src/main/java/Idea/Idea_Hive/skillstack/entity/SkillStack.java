@@ -23,10 +23,12 @@ public class SkillStack {
 
     private String name; // 2depth
 
-    @OneToMany(mappedBy = "skillStack", cascade = CascadeType.ALL)
+//    @OneToMany(mappedBy = "skillstack", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy="skillstack")
+    @Setter
     private List<MemberSkillStack> memberSkillStacks = new ArrayList<>();
 
-    @OneToMany(mappedBy = "skillStack", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "skillstack", cascade = CascadeType.ALL)
     private List<ProjectSkillStack> projectSkillStacks = new ArrayList<>();
 
     @Builder

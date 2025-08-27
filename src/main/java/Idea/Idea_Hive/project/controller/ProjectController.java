@@ -1,17 +1,19 @@
 package Idea.Idea_Hive.project.controller;
 
-import Idea.Idea_Hive.project.dto.response.ProjectResponseDto;
-import Idea.Idea_Hive.project.dto.response.ProjectSearchResponse;
+import Idea.Idea_Hive.project.dto.request.*;
+import Idea.Idea_Hive.project.dto.response.ProjectApplicantResponse;
+import Idea.Idea_Hive.project.dto.response.ProjectInfoResponse;
 import Idea.Idea_Hive.project.service.ProjectService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,13 +23,111 @@ public class ProjectController {
 
     private final ProjectService projectService;
 
-    @GetMapping("/search")
-    public ResponseEntity<ProjectSearchResponse> searchProjects(@RequestParam(required = false, defaultValue = "") String keyword,
-                                                                @RequestParam(required = false, defaultValue = "ALL") String recruitType
-                                                                ) {
+    @Operation(summary = "프로젝트 상세 조회")
+    @GetMapping("/info")
+    public ResponseEntity<ProjectInfoResponse> projectInfo(@RequestParam(required = true) Long projectId,
+                                                           @RequestParam(required = false) Long userId) {
+        ProjectInfoResponse projectInfoResponse = projectService.getProjectInfo(projectId, userId);
+        return ResponseEntity.ok(projectInfoResponse);
+    }
 
-        ProjectSearchResponse reponse = projectService.searchProjects(keyword,recruitType);
-        return ResponseEntity.ok(reponse);
+    @Operation(summary = "지원자 정보 조회")
+    @GetMapping("/applicants")
+    public ResponseEntity<ProjectApplicantResponse> applicantInfo(@RequestParam(required = true) Long projectId,
+                                                                  @RequestParam(defaultValue = "1") int page,
+                                                                  @RequestParam(defaultValue = "4") int size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        ProjectApplicantResponse projectApplicant = projectService.getApplicantInfo(projectId, pageable);
+        return ResponseEntity.ok(projectApplicant);
+    }
 
+    @Operation(summary = "찜하기, 찜 해제")
+    @PostMapping("/like")
+    public ResponseEntity<Void> projectLike(@RequestBody ProjectLikeRequest projectLikeRequest) {
+        projectService.likeProject(projectLikeRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로젝트 시작")
+    @PostMapping("/start")
+    public ResponseEntity<Void> projectStart(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
+        projectService.startProject(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "팀원 추가모집")
+    @PostMapping("/recruit")
+    public ResponseEntity<Void> memberRecruit(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
+        projectService.recruitMember(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "아이디어 열람")
+    @PostMapping("/view")
+    public ResponseEntity<Void> viewIdea(@RequestBody ProjectIdAndMemberIdDto projectIdAndMemberIdDto) {
+        projectService.viewIdea(projectIdAndMemberIdDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원하기")
+    @PostMapping("/apply")
+    public ResponseEntity<Void> projectApply(@RequestBody ProjectApplyRequest projectApplyRequest) {
+        projectService.applyProject(projectApplyRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원자 거절/확정/확정취소", description = "decision 값은 CONFIRMED(확정), REJECTED(거절), CANCEL_CONFIRM(확정취소) 가능")
+    @PostMapping("/apply/decision")
+    public ResponseEntity<Void> projectApplyDecision(@RequestBody ProjectApplyDecisionRequest projectApplyDecisionRequest) {
+        projectService.projectApplyDecision(projectApplyDecisionRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원하기 수정")
+    @PostMapping("/apply/update")
+    public ResponseEntity<Void> projectApplyUpdate(@RequestBody ProjectApplyUpdateRequest projectApplyUpdateRequest) {
+        projectService.projectApplyUpdate(projectApplyUpdateRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "지원취소")
+    @DeleteMapping("/apply")
+    public ResponseEntity<Void> projectApplyDelete(@RequestBody @Schema(example = "{\"applyId\":1}") Map<String, Long> applyId) {
+        projectService.projectApplyDelete(applyId.get("applyId"));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "조회수 count")
+    @PostMapping("/viewCnt")
+    public ResponseEntity<Void> projectIncreaseViewCnt(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
+        projectService.increaseViewCnt(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "끌어올리기")
+    @PostMapping("/pushToTop")
+    public ResponseEntity<Void> projectPushToTop(@RequestBody @Schema(example = "{\"projectId\":1}") Map<String, Long> projectId) {
+        projectService.pushToTop(projectId.get("projectId"));
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "프로젝트 수정")
+    @PostMapping("/update")
+    public ResponseEntity<Long> projectUpdate(@RequestBody ProjectUpdateRequest projectUpdateRequest) {
+        Long projectId = projectService.projectUpdate(projectUpdateRequest);
+        return ResponseEntity.ok(projectId);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
